@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>aspnet-calibre-net-c959cae7-bf30-4f44-af60-9dbde724b1d1</UserSecretsId>
+    <UserSecretsId>aspnet-calibre-net-460c1009-5615-4b82-a0fa-faab7c79bf67</UserSecretsId>
     <RootNamespace>calibre-net</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
   </PropertyGroup>
@@ -12,7 +12,7 @@
   <ItemGroup>
     <None Update="Data\app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\calibre-net.Client\calibre-net.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0" />
