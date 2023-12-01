@@ -1,0 +1,52 @@
+@using System.Globalization
+@using Microsoft.Extensions.Options
+@inject NavigationManager Navigation
+@inject IOptions<SupportedCulturesOptions> SupportedCultures
+
+<p>
+    <label>
+        Select your locale:
+        <select @bind="Culture">
+            @foreach (var culture in supportedCultures)
+            {
+                <option value="@culture">@culture.DisplayName</option>
+            }
+        </select>
+    </label>
+</p>
+
+@code
+{
+    private CultureInfo[] supportedCultures {get;set;} = [];
+    
+     @* =   new[]
+    {
+        new CultureInfo("en-US"),
+        new CultureInfo("fr-FR"),
+    }; *@
+
+    protected override void OnInitialized()
+    {
+        Culture = CultureInfo.CurrentCulture;
+        supportedCultures = SupportedCultures.Value.SupportedCultures.Select(c => new CultureInfo(c)).ToArray();
+    }
+
+    private CultureInfo Culture
+    {
+        get => CultureInfo.CurrentCulture;
+        set
+        {
+            if (CultureInfo.CurrentCulture != value)
+            {
+                var uri = new Uri(Navigation.Uri)
+                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                Navigation.NavigateTo(
+                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                    forceLoad: true);
+            }
+        }
+    }
+}

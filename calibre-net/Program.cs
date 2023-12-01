@@ -6,6 +6,7 @@ using calibre_net.Components;
 using calibre_net.Components.Account;
 using calibre_net.Data;
 using MudBlazor.Services;
+using Microsoft.Extensions.Localization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddControllers();
 
 builder.Services.AddMudServices();
 
@@ -40,6 +43,22 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+// builder.Services.AddLocalization();
+
+builder.Services.AddLocalization();
+var supportedCultures = new[] { "en-US", "fr-FR", "ja-Jp" };
+builder.Services.Configure<SupportedCulturesOptions>(options =>
+options.SupportedCultures = supportedCultures);
+builder.Services.Configure<JsonStringLocalizerOptions>(options =>
+{
+    options.ResourcesPath = "Resources";
+    options.ShowKeyNameIfEmpty = true;
+    options.ShowDefaultIfEmpty = true;
+
+});
+builder.Services.AddSingleton
+     <IStringLocalizerFactory, JsonStringLocalizerFactory>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -55,10 +74,22 @@ else
     app.UseHsts();
 }
 
+
+
+
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
@@ -67,5 +98,6 @@ app.MapRazorComponents<App>()
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+
 
 app.Run();

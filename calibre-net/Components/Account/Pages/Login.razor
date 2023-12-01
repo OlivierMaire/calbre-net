@@ -1,16 +1,21 @@
-﻿@page "/Account/Login"
+@page "/Account/Login"
+@layout LoginLayout
 
+@using calibre_net.Components.Layout
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using calibre_net.Data
+@using Blazored.FluentValidation
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IStringLocalizer<Login> LoginLocalizer
+@inject IStringLocalizer<Shared> SharedLocalizer
 
-<PageTitle>Log in</PageTitle>
+<PageTitle>@LoginLocalizer["Log In"]</PageTitle>
 
 <h1>Log in</h1>
 <div class="row">
@@ -112,17 +117,5 @@
         }
     }
 
-    private sealed class InputModel
-    {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; } = "";
 
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; } = "";
-
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
-    }
 }
