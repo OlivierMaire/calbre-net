@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using calibre_net.Data;
 
@@ -10,9 +11,11 @@ using calibre_net.Data;
 namespace calibre_net.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231209132126_PasskeyId")]
+    partial class PasskeyId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -190,15 +193,31 @@ namespace calibre_net.Migrations
                     b.Property<Guid>("AaGuid")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTimeOffset>("CreatedDate")
+                    b.Property<byte[]>("AttestationClientDataJson")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<string>("AttestationFormat")
+                        .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("AttestationObject")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
 
                     b.Property<byte[]>("CredentialId")
-                        .HasColumnType("BLOB")
-                        .HasAnnotation("Relational:JsonPropertyName", "credentialId");
+                        .IsRequired()
+                        .HasColumnType("BLOB");
 
-                    b.Property<string>("JsonData")
+                    b.Property<string>("DevicePublicKeys")
+                        .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsBackedUp")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsBackupEligible")
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset?>("LastUsedDate")
                         .HasColumnType("TEXT");
@@ -220,12 +239,31 @@ namespace calibre_net.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<byte[]>("PublicKey")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.Property<DateTimeOffset>("RegDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<uint>("SignCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Transports")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<byte[]>("UserHandle")
+                        .IsRequired()
                         .HasColumnType("BLOB");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("UserIdBytes")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
 
                     b.HasKey("Id");
 
@@ -240,6 +278,24 @@ namespace calibre_net.Migrations
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("calibre_net.Models.PublicKeyCredentialDescriptorModel", "Descriptor", b1 =>
+                        {
+                            b1.Property<int>("UserCredentialId")
+                                .HasColumnType("INTEGER");
+
+                            b1.HasKey("UserCredentialId");
+
+                            b1.ToTable("UserCredentials");
+
+                            b1.ToJson("Descriptor");
+
+                            b1.WithOwner()
+                                .HasForeignKey("UserCredentialId");
+                        });
+
+                    b.Navigation("Descriptor")
                         .IsRequired();
 
                     b.Navigation("User");

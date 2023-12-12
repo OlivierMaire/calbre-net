@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using calibre_net.Data;
 
@@ -10,9 +11,11 @@ using calibre_net.Data;
 namespace calibre_net.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231210131702_UserCredentialsUpdateAaguid")]
+    partial class UserCredentialsUpdateAaguid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.0");
@@ -219,9 +222,6 @@ namespace calibre_net.Migrations
                     b.Property<string>("ProviderName")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<byte[]>("UserHandle")
-                        .HasColumnType("BLOB");
 
                     b.Property<string>("UserId")
                         .IsRequired()

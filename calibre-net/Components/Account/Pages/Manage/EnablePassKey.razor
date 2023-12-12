@@ -1,0 +1,98 @@
+@page "/Account/Manage/EnablePassKey"
+@rendermode InteractiveServer
+
+@using System.Security.Claims
+@* @using Fido2NetLib *@
+
+@inject IJSRuntime JsRuntime
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ILogger<EnablePassKey> _logger
+@inject calibre_net.Data.ApplicationDbContext DbContext
+@inject NavigationManager Navigation
+@inject Fido2NetLib.IFido2 _fido2
+@inject PasskeyService PasskeyService
+
+<HeadContent>
+</HeadContent>
+
+
+<p>@authMessage</p>
+
+@if (claims.Count() > 0)
+{
+    <ul>
+        @foreach (var claim in claims)
+        {
+            <li>@claim.Type: @claim.Value</li>
+        }
+    </ul>
+}
+
+<p>@surname</p>
+
+
+Can PassKey: @CanPassKey
+
+
+<MudInput InputType="InputType.Text" placeholder="Username" aria-labelledby="username-label" name="username"
+    autofill="username webauthn" @bind-Value="email"></MudInput>
+
+<input type="text" id="username" class="form-control" placeholder="Username" aria-labelledby="username-label"
+    name="username" autocomplete="username webauthn" required autofocus />
+
+<MudButton OnClick="GeneratePassKey"> Make a Passkey</MudButton>
+
+
+@code {
+    private bool CanPassKey = false;
+    private string email;
+    private string? authMessage;
+    private string? surname;
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    ClaimsPrincipal? User = null;
+    private Fido2NetLib.CredentialCreateOptions? credentials = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider
+        .GetAuthenticationStateAsync();
+        var user = authState.User;
+        User = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+        }
+        else
+        {
+            authMessage = "The user is NOT authenticated.";
+        }
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync(identifier: "import", "/js/passkey.js");
+            await JsRuntime.InvokeVoidAsync("blazorPasskey.test");
+            @* CanPassKey = await JsRuntime.InvokeAsync<bool>("blazorPasskey.canPassKey"); *@
+        }
+    }
+
+    public async Task GeneratePassKey()
+    {
+        credentials = PasskeyService.RequestPasskey(User);
+        var response = await JsRuntime
+        .InvokeAsync<Fido2NetLib.AuthenticatorAttestationRawResponse?>("blazorPasskey.generatePassKey",
+        credentials);
+
+        if (response != null)
+        {
+            _logger.LogInformation("Passkey response");
+            await PasskeyService.StoreCredentialsAsync(User, credentials, response);
+        }
+    }
+ 
+    
+
+}

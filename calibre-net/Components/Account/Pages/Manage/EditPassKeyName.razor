@@ -1,0 +1,34 @@
+@inject PasskeyService PasskeyService
+
+<MudDialog Class="modal-full-center">
+    <TitleContent>Passkey name</TitleContent>
+    <DialogContent>
+        <MudText Typo="Typo.body1">
+            Edit your passkey name
+        </MudText>
+        <MudTextField Label="Passkey name" @bind-Value="@Passkey.Name" MaxLength="20" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton OnClick="Save" Color="Color.Primary">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public Models.PasskeyModel Passkey { get; set; } = null!;
+
+
+private void Cancel()
+    {
+        MudDialog.Cancel();
+    }
+
+    private async Task Save()
+    {
+        // Do something with the name
+        await PasskeyService.EditNameAsync(Passkey);
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}
