@@ -1,8 +1,7 @@
 ﻿@page "/Account/Login"
-@layout LoginLayout
+@layout calibre_net.Components.Layout.LoginLayout
 @rendermode InteractiveServer
 
-@using calibre_net.Components.Layout
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
@@ -22,14 +21,6 @@
 
 
 <PageTitle>@LoginLocalizer["Log In"]</PageTitle>
-
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
-
-private bool CanPassKey = @CanPassKey; <br />
-
-private bool CanConditionalUi = @CanConditionalUi; <br />
-
 
 <MudContainer MaxWidth="MaxWidth.Small">
     <MudGrid>
@@ -132,54 +123,25 @@ private bool CanConditionalUi = @CanConditionalUi; <br />
         }
     }
 
-
-    protected override async Task OnInitializedAsync()
-    {
-        @* if (HttpMethods.IsGet(HttpContext.Request.Method))
+    @*
+protected override async Task OnInitializedAsync()
+{
+if (HttpMethods.IsGet(HttpContext.Request.Method))
 {
 // Clear the existing external cookie to ensure a clean login process
 await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-} *@
+}
 
-    }
+} *@
 
     public async Task LoginUser()
     {
-        @* // This doesn't count login failures towards account lockout
-// To enable password failures to trigger account lockout, set lockoutOnFailure: true
-var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure:
-false);
-if (result.Succeeded)
-{
-Logger.LogInformation("User logged in.");
-RedirectManager.RedirectTo(ReturnUrl);
-}
-else if (result.RequiresTwoFactor)
-{
-RedirectManager.RedirectTo(
-"Account/LoginWith2fa",
-new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-}
-else if (result.IsLockedOut)
-{
-Logger.LogWarning("User account locked out.");
-RedirectManager.RedirectTo("Account/Lockout");
-}
-else
-{
-errorMessage = "Error: Invalid login attempt.";
-} *@
-
-
         try
         {
             Input.ReturnUrl = this.ReturnUrl;
 
             var key = await authenticationService.SignInAsync(Input);
-            if (key != null)
-            {
-                NavigationManager.NavigateTo($"/Account/Login?key={key}", true);
-            }
+            NavigationManager.NavigateTo($"/Account/Login?key={key}", true);
         }
         catch (ServiceException aex)
         {
@@ -210,25 +172,20 @@ errorMessage = "Error: Invalid login attempt.";
     }
 
 
-    private FluentValidationValidator _fluentValidationValidator;
+    private FluentValidationValidator _fluentValidationValidator = null!;
     private bool Validated => _fluentValidationValidator.Validate(options => { options.IncludeAllRuleSets(); });
-
-
-    private async Task IncrementCount()
-    {
-        Logger.LogInformation("Hello");
-    }
 
     private async Task OnLoginChange()
     {
         var options = PasskeyService.GenerateAssertionOption(Input.Email);
         if (options != null)
         {
-
-
             var clientResponse = await JsRuntime
             .InvokeAsync<Fido2NetLib.AuthenticatorAssertionRawResponse?>("blazorPasskey.getCredentials",
             options);
+
+            if (clientResponse == null)
+                return;
 
             // 1. Get the assertion options we sent the client remove them from memory so they can't be used again
             var response = JsonSerializer.Deserialize<Fido2NetLib.AuthenticatorResponse>(clientResponse.Response.ClientDataJson);
@@ -259,20 +216,24 @@ errorMessage = "Error: Invalid login attempt.";
             var res = await PasskeyService.MakeAssertionAsync(
             clientResponse,
             options,
-            creds.PublicKey,
-            creds.DevicePublicKeys.Select(d => d.Key).ToList(),
+            creds.PublicKey ?? [],
+            creds.DevicePublicKeys != null ? creds.DevicePublicKeys.Where(d => d.Key != null).Select(d => d.Key ?? []).ToList() :
+            new List<byte[]>(),
             creds.SignCount);
 
             // 4. Store the updated counter
             if (res.Status is "ok")
             {
-                PasskeyService.UpdateCounters(res.CredentialId, res.SignCount, res.DevicePublicKey);
-                var key = await authenticationService.SignInAsync(Input, res.CredentialId);
-                if (key != null)
+                await PasskeyService.UpdateCountersAsync(res.CredentialId, res.SignCount, res.DevicePublicKey);
+                try
                 {
+                    var key = await authenticationService.SignInAsync(Input, res.CredentialId);
                     NavigationManager.NavigateTo($"/Account/Login?key={key}", true);
                 }
-
+                catch (Exception ex)
+                {
+                    errorMessage = $"Error: {ex.Message}";
+                }
             }
             else
             {

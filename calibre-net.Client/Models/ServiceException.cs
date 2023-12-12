@@ -11,9 +11,9 @@ public class ServiceException : Exception
     /// An optional collection of errors that can be set
     /// to provide more error detail
     /// </summary>
-    public string[] Errors { get; set; }
+    public string[] Errors { get; set; } = [];
 
-    public string ErrorCode { get; set; }
+    public string ErrorCode { get; set; } = string.Empty;
 
     /// <summary>
     /// Create a new exception with a message, status code
@@ -25,13 +25,15 @@ public class ServiceException : Exception
     /// <param name="errorCode">Optional - An error code for this error</param>
     public ServiceException(string message,
         int statusCode = 500,
-        string[] errors = null,
-        string errorCode = null) :
+        string[]? errors = null,
+        string? errorCode = null) :
         base(message)
     {
         StatusCode = statusCode;
-        Errors = errors;
-        ErrorCode = errorCode;
+        if (errors != null)
+            Errors = errors;
+        if (errorCode != null)
+            ErrorCode = errorCode;
     }
 
     /// <summary>
@@ -40,10 +42,11 @@ public class ServiceException : Exception
     /// </summary>
     /// <param name="ex"></param>
     /// <param name="statusCode"></param>
-    public ServiceException(Exception ex, int statusCode = 500, string errorCode = null) : base(ex.Message)
+    public ServiceException(Exception ex, int statusCode = 500, string? errorCode = null) : base(ex.Message)
     {
         StatusCode = statusCode;
-        ErrorCode = errorCode;
+        if (errorCode != null)
+            ErrorCode = errorCode;
     }
 
 }

@@ -38,20 +38,24 @@ public class PasskeyService
     }
 
 
-    public CredentialCreateOptions RequestPasskey(ClaimsPrincipal User)
+    public async Task<CredentialCreateOptions> RequestPasskeyAsync()
     {
+
         // 1. Get user from DB 
-        var userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var userId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         var fidoUser = new Fido2NetLib.Fido2User()
         {
-            DisplayName = User.Identity?.Name,
+            DisplayName = authState.User.Identity?.Name,
             Id = Guid.Parse(userId).ToByteArray(),
-            Name = User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value,
+            Name = authState.User.FindFirst(c => c.Type == ClaimTypes.Email)?.Value,
         };
 
         // 2. Get user existing keys by username
-        List<PublicKeyCredentialDescriptor> existingKeys = dbContext.UserCredentials.Where(uc => uc.UserId == userId)
+#pragma warning disable CS8604 // Possible null reference argument.
+        List<PublicKeyCredentialDescriptor> existingKeys = dbContext.UserCredentials.Where(uc => uc.UserId == userId && uc.CredentialId != null)
         .Select(uc => new PublicKeyCredentialDescriptor(uc.CredentialId)).ToList();
+#pragma warning restore CS8604 // Possible null reference argument.
 
         // 3. Create options
         var credentials = fidoLib.RequestNewCredential(user: fidoUser,
@@ -66,12 +70,12 @@ public class PasskeyService
         return credentials;
     }
 
-    public async Task<bool> StoreCredentialsAsync(ClaimsPrincipal User,
-    CredentialCreateOptions options,
+    public async Task<bool> StoreCredentialsAsync(CredentialCreateOptions options,
      AuthenticatorAttestationRawResponse rawResponse,
     CancellationToken cancellationToken = default(CancellationToken))
     {
-        var userId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var userId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
 
         // var userCredentials = dbContext.UserCredentials.Where(uc => uc.UserId == userId).ToList();
 
@@ -226,8 +230,10 @@ public class PasskeyService
         if (userId != null)
         {
             // 2. Get user existing keys by username
-           existingKeys = dbContext.UserCredentials.Where(uc => uc.UserId == userId.Id)
-            .Select(uc => new PublicKeyCredentialDescriptor(uc.CredentialId)).ToList();
+#pragma warning disable CS8604 // Possible null reference argument.
+            existingKeys = dbContext.UserCredentials.Where(uc => uc.UserId == userId.Id && uc.CredentialId != null)
+             .Select(uc => new PublicKeyCredentialDescriptor(uc.CredentialId)).ToList();
+#pragma warning restore CS8604 // Possible null reference argument.
         }
         // 3. Create options
         var credentials = fidoLib.GetAssertionOptions(
@@ -278,7 +284,7 @@ public class PasskeyService
         return storedCreds.Exists(c => c.CredentialId != null && c.CredentialId.SequenceEqual(args.CredentialId));
     }
 
-    public async Task UpdateCounters(byte[] credentialId, uint signCount, byte[] devicePublicKey)
+    public async Task UpdateCountersAsync(byte[] credentialId, uint signCount, byte[] devicePublicKey)
     {
         var credential = dbContext.UserCredentials.FirstOrDefault(uc => uc.CredentialId == credentialId);
 
@@ -286,10 +292,14 @@ public class PasskeyService
         {
             credential.LastUsedDate = DateTimeOffset.UtcNow;
             var credentialData = JsonSerializer.Deserialize<UserCredentialJson>(credential.JsonData ?? string.Empty);
-            credentialData.SignCount = signCount;
-            credentialData.DevicePublicKeys.Add(new DevicePublicKey { Key = devicePublicKey });
-            credential.JsonData = JsonSerializer.Serialize(credentialData);
-
+            if (credentialData != null)
+            {
+                credentialData.SignCount = signCount;
+                credentialData.DevicePublicKeys ??= [];
+                credentialData.DevicePublicKeys.Add(new DevicePublicKey { Key = devicePublicKey });
+                credential.JsonData = JsonSerializer.Serialize(credentialData);
+            }
+            await dbContext.SaveChangesAsync();
         }
     }
 

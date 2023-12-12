@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using calibre_net.Client.Pages;
-using calibre_net.Components;
 using calibre_net.Components.Account;
 using calibre_net.Data;
 using MudBlazor.Services;
@@ -10,7 +8,7 @@ using Microsoft.Extensions.Localization;
 using calibre_net.Middleware;
 using MudExtensions.Services;
 using calibre_net.Services;
-using Fido2NetLib;
+using calibre_net.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -122,7 +120,7 @@ app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(Counter).Assembly);
+    .AddAdditionalAssemblies(typeof(calibre_net.Client.Pages.Counter).Assembly);
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();

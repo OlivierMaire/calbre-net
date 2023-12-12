@@ -27,7 +27,6 @@ public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
     #endregion
 
     private readonly RequestDelegate _next;
-    private readonly PasskeyService passkeyService;
 
     public BlazorCookieAuthenticationMiddleware(RequestDelegate next)
     {
@@ -37,7 +36,6 @@ public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
     public async Task Invoke(HttpContext context,
     SignInManager<ApplicationUser> signInMgr,
     UserManager<ApplicationUser> userMgr,
-    // CalibreNetAuthenticationService authenticationService,
     PasskeyService passkeyService
     )
     {
