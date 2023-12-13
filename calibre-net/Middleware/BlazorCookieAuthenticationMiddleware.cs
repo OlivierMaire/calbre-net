@@ -138,10 +138,16 @@ public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
         //         }
         //     }
         // }
-        else if (context.Request.Path.StartsWithSegments("/Account/SignOut"))
+        else if (context.Request.Path.StartsWithSegments("/Account/Logout"))
         {
             await signInMgr.SignOutAsync();
-            context.Response.Redirect("/Account/Login");
+
+            var returnUrl = context.Request.Query["returnUrl"].ToString();
+            if (string.IsNullOrEmpty(returnUrl))
+                context.Response.Redirect("/Account/Login");
+            else
+                context.Response.Redirect("/" + returnUrl.TrimStart('/'));
+
             return;
         }
 
