@@ -1,14 +1,16 @@
 @using calibre_net.Client.Components
 @inherits LayoutComponentBase
-
-<MyMudThemeProvider />
+@layout calibre_net.Components.Layout.MyMudLayout
 
 <MudLayout>
     <MudMainContent>
         @Body
     </MudMainContent>
-            <CultureSelector @rendermode="InteractiveServer" />
 
+
+<MudAppBar Bottom="true" Fixed="true" Elevation="1" Dense=true>
+            <CultureSelector @rendermode="InteractiveServer" />
+</MudAppBar>
 </MudLayout>
 
 <div id="blazor-error-ui">

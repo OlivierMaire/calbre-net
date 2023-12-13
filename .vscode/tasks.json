@@ -36,6 +36,24 @@
                 "${workspaceFolder}/calibre-net.sln"
             ],
             "problemMatcher": "$msCompile"
-        }
+        },
+        {
+            "label": "go",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "--project",
+                "${workspaceFolder}/calibre-net/",
+                "--lp",
+                "https"
+
+            ],
+            "problemMatcher": "$msCompile"
+        },
+
+
+
     ]
 }

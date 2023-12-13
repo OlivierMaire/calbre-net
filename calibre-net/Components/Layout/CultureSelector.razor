@@ -3,32 +3,28 @@
 @inject NavigationManager Navigation
 @inject IOptions<SupportedCulturesOptions> SupportedCultures
 
-<p>
-    <label>
-        Select your locale:
-        <select @bind="Culture">
-            @foreach (var culture in supportedCultures)
-            {
-                <option value="@culture">@culture.DisplayName</option>
-            }
-        </select>
-    </label>
-</p>
+<div class="culture-selector">
+    <MudSelect @bind-Value="Culture" ToStringFunc="@convertFunc" Dense="true"
+        AdornmentIcon="@Icons.Material.Filled.Language" AdornmentColor="Color.Inherit" Adornment="Adornment.Start">
+        @foreach (var culture in supportedCultures)
+        {
+            <MudSelectItem Class="culture-selector" Value="@(culture)" />
+        }
+    </MudSelect>
+</div>
 
 @code
 {
-    private CultureInfo[] supportedCultures {get;set;} = [];
-    
-     @* =   new[]
-    {
-        new CultureInfo("en-US"),
-        new CultureInfo("fr-FR"),
-    }; *@
+    private CultureInfo[] supportedCultures { get; set; } = [];
 
+
+    private CultureInfo cultureValue { get; set; } = CultureInfo.CurrentCulture;
+    private Func<CultureInfo, string> convertFunc = ci => ci.DisplayName;
     protected override void OnInitialized()
     {
         Culture = CultureInfo.CurrentCulture;
         supportedCultures = SupportedCultures.Value.SupportedCultures.Select(c => new CultureInfo(c)).ToArray();
+        StateHasChanged();
     }
 
     private CultureInfo Culture
@@ -39,13 +35,13 @@
             if (CultureInfo.CurrentCulture != value)
             {
                 var uri = new Uri(Navigation.Uri)
-                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
                 var cultureEscaped = Uri.EscapeDataString(value.Name);
                 var uriEscaped = Uri.EscapeDataString(uri);
 
                 Navigation.NavigateTo(
-                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
-                    forceLoad: true);
+                $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                forceLoad: true);
             }
         }
     }

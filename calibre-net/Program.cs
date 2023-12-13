@@ -19,7 +19,9 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddControllers();
 
+
 builder.Services.AddMudServices();
+builder.Services.AddMudExtensions();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<IdentityUserAccessor>();
@@ -61,7 +63,6 @@ builder.Services.Configure<JsonStringLocalizerOptions>(options =>
 builder.Services.AddSingleton
      <IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
-builder.Services.AddMudExtensions();
 
 builder.Services.AddScoped<CalibreNetAuthenticationService>();
 builder.Services.AddScoped<PasskeyService>();
