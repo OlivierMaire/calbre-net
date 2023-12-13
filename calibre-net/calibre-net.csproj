@@ -15,6 +15,9 @@
   
   <ItemGroup>
     <PackageReference Include="Blazored.FluentValidation" Version="2.1.0" />
+    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.6.3" />
+    <PackageReference Include="Fido2" Version="4.0.0-beta4" />
+    <PackageReference Include="Fido2.AspNet" Version="4.0.0-beta4" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.0" />
     <ProjectReference Include="..\calibre-net.Client\calibre-net.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0" />
@@ -26,6 +29,7 @@
 
     <ItemGroup>
     <EmbeddedResource Include="Resources\*.json" />
+    <EmbeddedResource Include="Data\aaguid.json" />
   </ItemGroup>
 
 </Project>

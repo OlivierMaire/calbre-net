@@ -95,7 +95,7 @@ public class JsonStringLocalizer : IStringLocalizer
 
         using var stream = fileInfo.CreateReadStream();
 
-        return JsonSerializer.DeserializeAsync<Dictionary<string, string>>(stream).Result;
+        return JsonSerializer.DeserializeAsync<Dictionary<string, string>>(stream).Result ?? new Dictionary<string, string>();
     }
 
 
@@ -107,6 +107,6 @@ public class JsonStringLocalizer : IStringLocalizer
 
         using var stream = fileInfo.CreateReadStream();
 
-        return JsonSerializer.DeserializeAsync<Dictionary<string, string>>(stream).Result;
+        return JsonSerializer.DeserializeAsync<Dictionary<string, string>>(stream).Result ?? new Dictionary<string, string>();
     }
 }
