@@ -40,7 +40,7 @@
                 <MudText>@LoginLocalizer["Log In"]</MudText>
             </div>
         </MudItem>
-        <calibre_net.Components.Account.Shared.StatusMessage Message="@errorMessage" />
+        <StatusMessage Message="@errorMessage" />
         <EditForm Model="Input" OnValidSubmit="LoginUser" FormName="login" class="w-100" @ref="LoginEditForm">
             <FluentValidationValidator @ref="_fluentValidationValidator" />
             <MudItem xs="12">
