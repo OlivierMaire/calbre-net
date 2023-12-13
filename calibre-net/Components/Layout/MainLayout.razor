@@ -1,7 +1,6 @@
 ﻿@using calibre_net.Client.Components
 @inherits LayoutComponentBase
-
-<MyMudThemeProvider />
+@layout calibre_net.Components.Layout.MyMudLayout
 
 <div class="page mud-layout">
 
@@ -21,6 +20,7 @@
 
      <main>
         <div class="top-row px-4">
+            <CultureSelector @rendermode="InteractiveServer" />
             <MudIconButton Icon="@Icons.Custom.Brands.MudBlazor" Style="color: white;" Link="https://mudblazor.com/" Target="_blank" />
             <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Style="color: white;" Link="https://github.com/MudBlazor/MudBlazor/" Target="_blank" />
         </div>

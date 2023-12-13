@@ -3,18 +3,26 @@
 	The file remains available at all times for demonstration purposes,
 	but it is exclusively employed in the 'App.razor' component when authentication is enabled.
 */
-
 .btn-primary {
-    text-transform: uppercase;
-    --bs-btn-bg: var(--mud-palette-primary) !important;
-    --bs-btn-hover-bg: var(--mud-palette-primary-darken) !important;
+  text-transform: uppercase;
+  --bs-btn-bg: var(--mud-palette-primary) !important;
+  --bs-btn-hover-bg: var(--mud-palette-primary-darken) !important;
 }
 
 .nav-pills {
-    --bs-nav-pills-link-active-bg: var(--mud-palette-primary) !important;
+  --bs-nav-pills-link-active-bg: var(--mud-palette-primary) !important;
 }
 
 .nav {
-    --bs-nav-link-color: var(--mud-palette-primary) !important;
-    --bs-nav-link-hover-color: var(--mud-palette-primary-darken) !important;
+  --bs-nav-link-color: var(--mud-palette-primary) !important;
+  --bs-nav-link-hover-color: var(--mud-palette-primary-darken) !important;
+}
+
+.culture-selector .mud-typography-body2 {
+  font-size: 12px;
+}
+.culture-selector .mud-input {
+  font-size: 12px;
+  margin: 0 !important;
+  color: #ffffff;
 }

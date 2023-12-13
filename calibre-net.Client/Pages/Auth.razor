@@ -1,11 +1,13 @@
 ﻿@page "/auth"
+@using System.Globalization
 
 @using Microsoft.AspNetCore.Authorization
+@using calibre_net.Client.Components
 
 @attribute [Authorize]
 @rendermode InteractiveAuto
 
-<MyMudProviders />
+@* <MyMudProviders /> *@
 
 <PageTitle>Auth</PageTitle>
 
@@ -14,3 +16,20 @@
 <AuthorizeView>
 <MudText Class="mb-4">Hello @context.User.Identity?.Name!</MudText>
 </AuthorizeView>
+
+<p>
+    <b>CurrentCulture</b>: @CultureInfo.CurrentCulture
+</p>
+
+<h2>Rendered values</h2>
+
+<ul>
+    <li><b>Date</b>: @dt</li>
+    <li><b>Number</b>: @number.ToString("N2")</li>
+</ul>
+
+
+@code {
+    private DateTime dt = DateTime.Now;
+    private double number = 1999.69;
+}

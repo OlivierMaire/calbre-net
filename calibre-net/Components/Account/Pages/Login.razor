@@ -1,128 +1,230 @@
 ﻿@page "/Account/Login"
+@layout calibre_net.Components.Layout.LoginLayout
+@rendermode InteractiveServer
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using calibre_net.Data
+@using Blazored.FluentValidation
+@using System.Text.Json
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
+@inject IStringLocalizer<Login> LoginLocalizer
+@inject IStringLocalizer<Shared> SharedLocalizer
+@inject CalibreNetAuthenticationService authenticationService
+@inject IJSRuntime JsRuntime
+@inject PasskeyService PasskeyService
 
-<PageTitle>Log in</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <StatusMessage Message="@errorMessage" />
-            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
-                <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <ValidationSummary class="text-danger" role="alert" />
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                    <label for="email" class="form-label">Email</label>
-                    <ValidationMessage For="() => Input.Email" class="text-danger" />
-                </div>
-                <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="password" class="form-label">Password</label>
-                    <ValidationMessage For="() => Input.Password" class="text-danger" />
-                </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
-                    </label>
-                </div>
-                <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </EditForm>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
-    </div>
-</div>
+<PageTitle>@LoginLocalizer["Log In"]</PageTitle>
 
-@code {
+<MudContainer MaxWidth="MaxWidth.Small" Class="mb-10">
+    <MudGrid>
+        <MudItem xs="12">
+            <div class="d-flex justify-center">
+                <MudIcon Icon="" Color="Color.Primary" Size="Size.Large" ViewBox="0 0 500 500"
+                    Style="width: 100px; height: 100px;" />
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            <div class="d-flex justify-center">
+                <MudText Typo="Typo.h4">@SharedLocalizer["Site Title"]</MudText>
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            <div class="d-flex justify-center">
+                <MudText>@LoginLocalizer["Log In"]</MudText>
+            </div>
+        </MudItem>
+        <StatusMessage Message="@errorMessage" />
+        <EditForm Model="Input" OnValidSubmit="LoginUser" FormName="login" class="w-100" @ref="LoginEditForm">
+            <FluentValidationValidator @ref="_fluentValidationValidator" />
+            <MudItem xs="12">
+                <MudTextField T="string" Label="@LoginLocalizer["E-mail"]" Variant="Variant.Outlined"
+                    @bind-Value="Input.Email" For="@(() => Input.Email)" autoComplete="username webauthn" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField Label="@LoginLocalizer["Password"]" Variant="Variant.Outlined"
+                    @bind-Value="Input.Password" For="@(() => Input.Password)" InputType="@_passwordInput"
+                    Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon"
+                    OnAdornmentClick="TogglePasswordVisibility" AdornmentAriaLabel="Show Password" />
+            </MudItem>
+            <MudItem xs="12" Class="d-flex justify-space-between align-center flex-row">
+                <MudCheckBox T="bool" Label="@LoginLocalizer["Remember me?"]" Color="Color.Primary" Class="ml-n1"
+                    @bind-Value="Input.RememberMe">
+                </MudCheckBox>
+                <MudLink Href="/account/forgotpassword">@LoginLocalizer["Forgot password?"]</MudLink>
+            </MudItem>
+
+            <MudItem xs="12" Class="d-flex justify-center gap-3">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Disabled="@(!Validated)"
+                    Color="Color.Primary" Size="Size.Large" Class="w-100">@LoginLocalizer["Sign In"]</MudButton>
+                <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Disabled="@(!CanPassKey)" OnClick="UsePassKey"
+                    Color="Color.Primary" Size="Size.Large" Class="w-100">@LoginLocalizer["Use a Passkey"]</MudButton>
+            </MudItem>
+        </EditForm>
+    </MudGrid>
+</MudContainer>
+
+ @code {
     private string? errorMessage;
-
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = default!;
+    private EditForm LoginEditForm {get;set; } = null!;
 
     [SupplyParameterFromForm]
-    private InputModel Input { get; set; } = new();
+    private SignInModel Input { get; set; } = new();
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private FluentValidationValidator _fluentValidationValidator = null!;
+    private bool Validated => LoginEditForm.EditContext != null && LoginEditForm.EditContext.IsModified() ? _fluentValidationValidator.Validate(options => { 
+        options.IncludeAllRuleSets(); }) : false;
+
+    private bool CanPassKey = false;
+    private bool CanConditionalUi = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        if (firstRender)
         {
-            // Clear the existing external cookie to ensure a clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+            await JsRuntime.InvokeVoidAsync(identifier: "import", "/js/passkey.js");
+
+            CanPassKey = await JsRuntime.InvokeAsync<bool>("blazorPasskey.canPassKey");
+            CanConditionalUi = await JsRuntime.InvokeAsync<bool>("blazorPasskey.canConditionalUi");
+            StateHasChanged();
         }
     }
 
-    public async Task LoginUser()
+    @*
+[CascadingParameter]
+private HttpContext HttpContext { get; set; } = default!;
+
+protected override async Task OnInitializedAsync()
+{
+if (HttpMethods.IsGet(HttpContext.Request.Method))
+{
+// Clear the existing external cookie to ensure a clean login process
+await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+}
+
+} *@
+
+
+
+#region Password Visibility 
+    private bool _passwordVisibility;
+    private InputType _passwordInput = InputType.Password;
+    private string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    void TogglePasswordVisibility()
     {
-        // This doesn't count login failures towards account lockout
-        // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-        if (result.Succeeded)
+        if (_passwordVisibility)
         {
-            Logger.LogInformation("User logged in.");
-            RedirectManager.RedirectTo(ReturnUrl);
-        }
-        else if (result.RequiresTwoFactor)
-        {
-            RedirectManager.RedirectTo(
-                "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
-        }
-        else if (result.IsLockedOut)
-        {
-            Logger.LogWarning("User account locked out.");
-            RedirectManager.RedirectTo("Account/Lockout");
+            _passwordVisibility = false;
+            _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+            _passwordInput = InputType.Password;
         }
         else
         {
-            errorMessage = "Error: Invalid login attempt.";
+            _passwordVisibility = true;
+            _passwordInputIcon = Icons.Material.Filled.Visibility;
+            _passwordInput = InputType.Text;
+        }
+    }
+# endregion Password Visibility
+
+    public async Task LoginUser()
+    {
+        try
+        {
+            Input.ReturnUrl = this.ReturnUrl;
+
+            var key = await authenticationService.SignInAsync(Input);
+            NavigationManager.NavigateTo($"/Account/Login?key={key}", true);
+        }
+        catch (ServiceException aex)
+        {
+            errorMessage = aex.Message;
         }
     }
 
-    private sealed class InputModel
+    private async Task UsePassKey()
     {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; } = "";
+        var options = PasskeyService.GenerateAssertionOption(Input.Email);
+        if (options == null)
+        {
+            errorMessage = "Cannot use passkey at the moment.";
+            return;
+        }
 
-        [Required]
-        [DataType(DataType.Password)]
-        public string Password { get; set; } = "";
+        var clientResponse = await JsRuntime
+        .InvokeAsync<Fido2NetLib.AuthenticatorAssertionRawResponse?>("blazorPasskey.getCredentials",
+        options);
 
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        if (clientResponse == null)
+        {
+            errorMessage = "No passkey found or process aborted.";
+            return;
+        }
+
+        // 1. Get the assertion options we sent the client remove them from memory so they can't be used again
+        var response = JsonSerializer.Deserialize<Fido2NetLib.AuthenticatorResponse>(clientResponse.Response.ClientDataJson);
+        if (response is null)
+        {
+            errorMessage = "Passkey cannot be read.";
+            return;
+        }
+
+        // validate challenge key
+        var originalKey = new string(options.Challenge.Select(b => (char)b).ToArray());
+        var responseKey = new string(response.Challenge.Select(b => (char)b).ToArray());
+        if (originalKey != responseKey)
+        {
+            errorMessage = "Cannot validate the passkey.";
+            return;
+        }
+
+        // 2. Get registered credential from database
+        var creds = PasskeyService.GetCredentialById(clientResponse.Id);
+        if (creds == null)
+        {
+            errorMessage = "Cannot validate the passkey.";
+            return;
+        }
+
+        // 3. Make the assertion
+        var res = await PasskeyService.MakeAssertionAsync(
+        clientResponse,
+        options,
+        creds.PublicKey ?? [],
+        creds.DevicePublicKeys != null ? creds.DevicePublicKeys.Where(d => d.Key != null).Select(d => d.Key ?? []).ToList() :
+        new List<byte[]>(),
+        creds.SignCount);
+
+        // 4. Store the updated counter
+        if (res.Status is "ok")
+        {
+            await PasskeyService.UpdateCountersAsync(res.CredentialId, res.SignCount, res.DevicePublicKey);
+            try
+            {
+                var key = await authenticationService.SignInAsync(Input, res.CredentialId);
+                NavigationManager.NavigateTo($"/Account/Login?key={key}", true);
+            }
+            catch (ServiceException ex)
+            {
+                errorMessage = $"Error: {ex.Message}";
+            }
+        }
+        else
+        {
+            errorMessage = $"Error: {res.ErrorMessage}";
+            return;
+        }
+
     }
+
 }
