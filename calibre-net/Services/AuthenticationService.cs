@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace calibre_net.Services;
 
+[ScopedRegistration]
 public class CalibreNetAuthenticationService : IAuthenticationService
 {
     private readonly SignInManager<ApplicationUser> signInManager;

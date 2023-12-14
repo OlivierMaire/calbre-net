@@ -1,7 +1,9 @@
+using calibre_net.Services;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
+[SingletonRegistration]
 public class JsonStringLocalizerFactory : IStringLocalizerFactory{
 
 private string ResourcesPath { get; }

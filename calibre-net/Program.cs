@@ -9,6 +9,7 @@ using calibre_net.Middleware;
 using MudExtensions.Services;
 using calibre_net.Services;
 using calibre_net.Components;
+using HeimGuard;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,10 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
+builder.Services.AddHeimGuard<UserPolicyHandler>()
+    .AutomaticallyCheckPermissions()
+    .MapAuthorizationPolicies();
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
@@ -60,30 +65,23 @@ builder.Services.Configure<JsonStringLocalizerOptions>(options =>
     options.ShowDefaultIfEmpty = true;
 
 });
-builder.Services.AddSingleton
-     <IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
-
-builder.Services.AddScoped<CalibreNetAuthenticationService>();
-builder.Services.AddScoped<PasskeyService>();
-
-// builder.Services.AddScoped<Fido2NetLib.Fido2Configuration>();
-// builder.Services.AddScoped<Fido2NetLib.Fido2>();
+builder.Services.RegisterServices(builder.Configuration);
 
 builder.Services.AddFido2(options =>
       {
-        options.ServerDomain = "localhost";
-        options.ServerName = "Calibre.Net";
-        options.ServerIcon = "https://static-00.iconduck.com/assets.00/apps-calibre-icon-512x512-qox1oz2k.png";
-        options.Origins = new HashSet<string> { "https://localhost:7046/" };
+          options.ServerDomain = "localhost";
+          options.ServerName = "Calibre.Net";
+          options.ServerIcon = "https://static-00.iconduck.com/assets.00/apps-calibre-icon-512x512-qox1oz2k.png";
+          options.Origins = new HashSet<string> { "https://localhost:7046/" };
 
-        //   options.ServerDomain = Configuration["fido2:serverDomain"];
-        //   options.ServerName = "FIDO2 Test";
-        //   options.Origins = Configuration.GetSection("fido2:origins").Get<HashSet<string>>();
-        //   options.TimestampDriftTolerance = Configuration.GetValue<int>("fido2:timestampDriftTolerance");
-        //   options.MDSCacheDirPath = Configuration["fido2:MDSCacheDirPath"];
-        //   options.BackupEligibleCredentialPolicy = Configuration.GetValue<Fido2Configuration.CredentialBackupPolicy>("fido2:backupEligibleCredentialPolicy");
-        //   options.BackedUpCredentialPolicy = Configuration.GetValue<Fido2Configuration.CredentialBackupPolicy>("fido2:backedUpCredentialPolicy");
+          //   options.ServerDomain = Configuration["fido2:serverDomain"];
+          //   options.ServerName = "FIDO2 Test";
+          //   options.Origins = Configuration.GetSection("fido2:origins").Get<HashSet<string>>();
+          //   options.TimestampDriftTolerance = Configuration.GetValue<int>("fido2:timestampDriftTolerance");
+          //   options.MDSCacheDirPath = Configuration["fido2:MDSCacheDirPath"];
+          //   options.BackupEligibleCredentialPolicy = Configuration.GetValue<Fido2Configuration.CredentialBackupPolicy>("fido2:backupEligibleCredentialPolicy");
+          //   options.BackedUpCredentialPolicy = Configuration.GetValue<Fido2Configuration.CredentialBackupPolicy>("fido2:backedUpCredentialPolicy");
       });
 
 var app = builder.Build();

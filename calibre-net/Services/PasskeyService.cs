@@ -15,6 +15,7 @@ using MudBlazor.Extensions;
 
 namespace calibre_net.Services;
 
+[ScopedRegistration]
 public class PasskeyService
 {
     private readonly IFido2 fidoLib;
