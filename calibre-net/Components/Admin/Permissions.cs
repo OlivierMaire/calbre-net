@@ -1,3 +1,5 @@
+using calibre_net.Models;
+
 public class Permission
 {
     public string Name { get; set; } = string.Empty;
@@ -5,15 +7,21 @@ public class Permission
     public string Description { get; set; } = string.Empty;
 }
 
+public static class PermissionType
+{
+    public const string ADMIN = "Admin";
+}
 public static class PermissionStore
 {
+
+
     public static List<Permission> GetPermissions()
     {
         return new List<Permission>()
         {
             new()
             {
-                Name = "Admin",
+                Name = PermissionType.ADMIN,
                 Description = "Can access and edit Admin screens."
             },
             new()
@@ -121,7 +129,13 @@ public static class PermissionStore
                 Name = "RandomDetailView.Show",
                 Description = ""
             }
-            
+
         };
     }
+
+    public static bool HasPermission(this UserModel user, string permission)
+    {
+        return user.Permissions.Contains(permission);
+    }
+
 }
