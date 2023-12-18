@@ -1,0 +1,65 @@
+@inherits LayoutComponentBase
+@inject IJSRuntime JS
+
+@using calibre_net.Client.Components
+<calibre_net.Client.Components.MyMudProviders />
+<MyMudThemeProvider IsDarkMode="_isDarkMode" @bind-MudThemeProvider="_mudThemeProvider" />
+
+<CascadingValue Value="@themeChanged">
+    <CascadingValue Value="@_isDarkMode">
+        @Body
+    </CascadingValue>
+</CascadingValue>
+
+@code {
+    private bool _isDarkMode = false;
+    private MudThemeProvider _mudThemeProvider;
+
+    EventCallback _themeChanged = EventCallback.Empty;
+    EventCallback themeChanged
+    {
+        get
+        {
+            if (_themeChanged.Equals(EventCallback.Empty))
+                _themeChanged = EventCallback.Factory.Create(this, ToggleTheme);
+            return _themeChanged;
+        }
+    }
+
+    @* protected override void OnInitialized()
+{
+if (LocalStorage.ContainKey(nameof(isDarkTheme)))
+{
+isDarkTheme = LocalStorage.GetItem<bool>(nameof(isDarkTheme));
+}
+} *@
+
+    void ToggleTheme()
+    {
+        Console.WriteLine("ToggleTheme");
+        _isDarkMode = !_isDarkMode;
+        StateHasChanged();
+        @* LocalStorage.SetItem<bool>(nameof(isDarkTheme), isDarkTheme); *@
+        JS.InvokeVoidAsync("blazorDarkTheme.set", _isDarkMode);
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var result = await JS.InvokeAsync<string>("blazorDarkTheme.get");
+            _isDarkMode = result == "true";
+
+            //_isDarkMode = await _mudThemeProvider.GetSystemPreference();
+
+
+            await _mudThemeProvider.WatchSystemPreference(OnSystemPreferenceChanged);
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnSystemPreferenceChanged(bool newValue)
+    {
+        _isDarkMode = newValue;
+        StateHasChanged();
+    }
+}

@@ -49,13 +49,15 @@ main {
   background: var(--mud-palette-appbar-background);
 }
 
-.top-row ::deep a, .top-row ::deep .btn-link {
+.top-row ::deep a,
+.top-row ::deep .btn-link {
   white-space: nowrap;
   margin-left: 1.5rem;
   text-decoration: none;
 }
 
-.top-row ::deep a:hover, .top-row ::deep .btn-link:hover {
+.top-row ::deep a:hover,
+.top-row ::deep .btn-link:hover {
   text-decoration: underline;
 }
 
@@ -68,7 +70,8 @@ main {
   .top-row {
     justify-content: space-between;
   }
-  .top-row ::deep a, .top-row ::deep .btn-link {
+  .top-row ::deep a,
+.top-row ::deep .btn-link {
     margin-left: 0;
   }
 }
@@ -131,4 +134,7 @@ main {
     height: calc(100vh - 3.5rem);
     overflow-y: auto;
   }
+}
+.mud-toolbar-appbar .mud-navmenu.mud-navmenu-default .mud-nav-link.active:not(.mud-nav-link-disabled) {
+  background-color: var(--mud-palette-action-default);
 }
