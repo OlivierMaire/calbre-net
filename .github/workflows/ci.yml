@@ -1,0 +1,35 @@
+name: Publish to server
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push request event for the dev or master branch
+  push:    
+    branches: [dev, master]
+
+jobs:
+  deploy:
+    # Our previously created self-hosted runner
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        dotnet: ["8.0.x"]
+
+    # A sequence of tasks that will execute as part of the job
+    steps:
+      # Checks out repository so our job can access it
+      - uses: actions/checkout@v4
+      - name: Setup .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      # We will output publish files to the folder we previously created
+      - name: Publish
+        run: dotnet publish -c Release -o /opt/calibre-net
