@@ -4,7 +4,7 @@ name: Publish to server
 on:
   # Triggers the workflow on push request event for the dev or master branch
   push:    
-    branches: [dev, master]
+    branches: [dev, main]
 
 jobs:
   deploy:
@@ -32,4 +32,4 @@ jobs:
 
       # We will output publish files to the folder we previously created
       - name: Publish
-        run: dotnet publish -c Release -o /opt/calibre-net
+        run: dotnet publish calibre-net -c Release -o /opt/calibre-net
