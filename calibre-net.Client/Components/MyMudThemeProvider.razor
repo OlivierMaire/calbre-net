@@ -8,8 +8,22 @@
 
     [Parameter]
     public bool IsDarkMode {get;set;} = false;
+
+     private MudThemeProvider _mudThemeProvider;
     [Parameter]
-    public MudThemeProvider MudThemeProvider {get;set;} = null!;
+    public MudThemeProvider MudThemeProvider 
+    {
+
+          get => _mudThemeProvider;
+        set
+        {
+            if (_mudThemeProvider == value ) return;
+            _mudThemeProvider = value;
+            MudThemeProviderChanged.InvokeAsync(value);
+        }
+    }
+      [Parameter]
+    public EventCallback<MudThemeProvider> MudThemeProviderChanged { get; set; }   
 
     public static MudTheme MyTheme => new()
         {
