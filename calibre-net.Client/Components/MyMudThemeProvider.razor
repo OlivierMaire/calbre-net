@@ -1,8 +1,16 @@
-﻿<CascadingValue Value=false Name="UsePopoverProvider">
-    <MudThemeProvider Theme="MyTheme"></MudThemeProvider>
+﻿@rendermode InteractiveAuto
+
+<CascadingValue Value=false Name="UsePopoverProvider">
+    <MudThemeProvider Theme="MyTheme" @ref="MudThemeProvider" @bind-IsDarkMode="@IsDarkMode"></MudThemeProvider>
 </CascadingValue>
 
 @code {
+
+    [Parameter]
+    public bool IsDarkMode {get;set;} = false;
+    [Parameter]
+    public MudThemeProvider MudThemeProvider {get;set;} = null!;
+
     public static MudTheme MyTheme => new()
         {
             Palette = new PaletteLight()
@@ -18,4 +26,6 @@
                 AppbarBackground = "#594AE2"
             }
         };
+
+  
 }

@@ -1,9 +1,11 @@
 @using System.Globalization
 @using Microsoft.Extensions.Options
+@inject IJSRuntime JS
 @inject NavigationManager Navigation
 @inject IOptions<SupportedCulturesOptions> SupportedCultures
 
 <div class="culture-selector">
+    @(OperatingSystem.IsBrowser() ? "Wasm" : "Server")
     <MudSelect @bind-Value="Culture" ToStringFunc="@convertFunc" Dense="true"
         AdornmentIcon="@Icons.Material.Filled.Language" AdornmentColor="Color.Inherit" Adornment="Adornment.Start">
         @foreach (var culture in supportedCultures)
@@ -15,28 +17,32 @@
 
 @code
 {
-    private CultureInfo[] supportedCultures { get; set; } = [];
+    private CultureOption[] supportedCultures { get; set; } = [];
 
-
-    private CultureInfo cultureValue { get; set; } = CultureInfo.CurrentCulture;
-    private Func<CultureInfo, string> convertFunc = ci => ci.DisplayName;
+    private Func<CultureOption, string> convertFunc = ci =>
+    ci == null ? string.Empty : ci.DisplayName;
     protected override void OnInitialized()
     {
-        Culture = CultureInfo.CurrentCulture;
-        supportedCultures = SupportedCultures.Value.SupportedCultures.Select(c => new CultureInfo(c)).ToArray();
-        StateHasChanged();
+        supportedCultures = SupportedCultures.Value.SupportedCultureOptions;
+        @* StateHasChanged(); *@
     }
 
-    private CultureInfo Culture
+    private CultureOption Culture
     {
-        get => CultureInfo.CurrentCulture;
+        get =>  SupportedCultures.Value.SupportedCultureOptions.First(c => c.Value ==
+        CultureInfo.CurrentCulture.Name);
         set
         {
-            if (CultureInfo.CurrentCulture != value)
+            if (CultureInfo.CurrentCulture.Name != value.Value)
             {
+                // handle Client side
+                @* var js = (IJSInProcessRuntime)JS; *@
+                JS.InvokeVoidAsync("blazorCulture.set", value.Value);
+
+                // handle Server side
                 var uri = new Uri(Navigation.Uri)
                 .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
-                var cultureEscaped = Uri.EscapeDataString(value.Name);
+                var cultureEscaped = Uri.EscapeDataString(value.Value);
                 var uriEscaped = Uri.EscapeDataString(uri);
 
                 Navigation.NavigateTo(

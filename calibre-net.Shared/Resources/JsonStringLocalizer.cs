@@ -3,6 +3,8 @@ using System.Text.Json;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 
+namespace calibre_net.Shared.Resources;
+
 public class JsonStringLocalizer : IStringLocalizer
 {
     private IFileProvider FileProvider { get; }

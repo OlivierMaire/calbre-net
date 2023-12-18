@@ -9,6 +9,7 @@ using calibre_net.Middleware;
 using MudExtensions.Services;
 using calibre_net.Services;
 using calibre_net.Components;
+using calibre_net.Shared.Resources;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,9 +51,9 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 // builder.Services.AddLocalization();
 
 builder.Services.AddLocalization();
-var supportedCultures = new[] { "en-US", "fr-FR", "ja-Jp" };
-builder.Services.Configure<SupportedCulturesOptions>(options =>
-options.SupportedCultures = supportedCultures);
+SupportedCulturesOptions supportedCulturesOptions = new SupportedCulturesOptions();
+// builder.Services.Configure<SupportedCulturesOptions>(options =>
+// options.SupportedCultures = supportedCultures);
 builder.Services.Configure<JsonStringLocalizerOptions>(options =>
 {
     options.ResourcesPath = "Resources";
@@ -103,9 +104,9 @@ else
 
 
 var localizationOptions = new RequestLocalizationOptions()
-    .SetDefaultCulture(supportedCultures[0])
-    .AddSupportedCultures(supportedCultures)
-    .AddSupportedUICultures(supportedCultures);
+    .SetDefaultCulture(supportedCulturesOptions.SupportedCultures[0])
+    .AddSupportedCultures(supportedCulturesOptions.SupportedCultures)
+    .AddSupportedUICultures(supportedCulturesOptions.SupportedCultures);
 
 app.UseRequestLocalization(localizationOptions);
 
