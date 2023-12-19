@@ -16,7 +16,7 @@ window.blazorDarkTheme = {
         result = false;
       }
     }
-    return result;
+    return result.toString();
 
   },
   set: (value) => window.localStorage['BlazorDarkTheme'] = value

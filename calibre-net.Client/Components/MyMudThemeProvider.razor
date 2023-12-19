@@ -1,7 +1,15 @@
 ﻿@rendermode InteractiveAuto
 
 <CascadingValue Value=false Name="UsePopoverProvider">
-    <MudThemeProvider Theme="MyTheme" @ref="MudThemeProvider" @bind-IsDarkMode="@IsDarkMode"></MudThemeProvider>
+    @* <MudThemeProvider Theme="MyTheme" @ref="MudThemeProvider" @bind-IsDarkMode="@IsDarkMode"></MudThemeProvider> *@
+@if (OperatingSystem.IsBrowser()){
+<MudThemeProvider Theme="MyTheme" @bind-IsDarkMode="@IsDarkMode"  @ref="MudThemeProvider"   />
+
+}
+else{
+<MudThemeProvider Theme="MyTheme" @bind-IsDarkMode="@IsDarkMode"   />
+
+}
 </CascadingValue>
 
 @code {
