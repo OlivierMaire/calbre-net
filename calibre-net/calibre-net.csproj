@@ -21,7 +21,6 @@
     <PackageReference Include="HeimGuard" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.0" />
     <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.101.1.2" />
-    <ProjectReference Include="..\calibre-net.Client\calibre-net.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
