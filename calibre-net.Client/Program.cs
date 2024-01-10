@@ -6,6 +6,7 @@ using System.Globalization;
 using Microsoft.JSInterop;
 using calibre_net.Shared.Resources;
 using Microsoft.Extensions.Localization;
+using calibre_net.Client.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -32,6 +33,9 @@ builder.Services.Configure<JsonStringLocalizerOptions>(options =>
 
 });
 builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
+
+builder.Services.AddSingleton<IMessageService, MessageService>();
+builder.Services.AddScoped<WindowIdService>();
 
 var host = builder.Build();
 

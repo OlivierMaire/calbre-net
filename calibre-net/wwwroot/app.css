@@ -18,13 +18,19 @@
   --bs-nav-link-hover-color: var(--mud-palette-primary-darken) !important;
 }
 
+.culture-selector {
+  min-width: 100px;
+}
+.culture-selector .mud-select {
+  margin: 0;
+}
 .culture-selector .mud-typography-body2 {
   font-size: 12px;
 }
 .culture-selector .mud-input {
   font-size: 12px;
   margin: 0 !important;
-  color: #ffffff;
+  color: var(--mud-palette-appbar-text);
 }
 
 .page {

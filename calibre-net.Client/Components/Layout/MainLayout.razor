@@ -1,9 +1,9 @@
-﻿@using calibre_net.Client.Components
+﻿
 @inherits LayoutComponentBase
-@layout calibre_net.Client.Components.Layout.MyMudLayout
+@layout MudMainLayout
     
 <MudLayout>
-    <calibre_net.Client.Components.Layout.MainAppDrawerBar /> @* Here you can set what interactivity you want in the drawer without affecting the Body interactivity. *@
+    <MainAppDrawerBar/> @* Here you can set what interactivity you want in the drawer without affecting the Body interactivity. *@
     <MudMainContent>
         <MudContainer MaxWidth="MaxWidth.Large" Class="pt-6">
             @Body

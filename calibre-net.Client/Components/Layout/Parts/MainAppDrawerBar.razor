@@ -1,0 +1,20 @@
+<MudAppBar Fixed="true" Elevation="0" Dense="true">
+    <DrawerToggleButton DrawerClassName="my-layout-drawer" IsDrawerOpen="_initialDrawerState" />
+    <MudSpacer />
+    <ThemeToggleButton />
+    <CultureSelector />
+    <TopMenu />
+</MudAppBar>
+<MudDrawer Class="mud-drawer-fixed my-layout-drawer" ClipMode="DrawerClipMode.Never" Open="_initialDrawerState">
+    <MudDrawerHeader Class="top-row" Dense="true">
+        <MudText Style="@($"color:{Colors.Shades.White};")" Typo="Typo.h6">Calibre.Net</MudText>
+    </MudDrawerHeader>
+    <NavMenu />
+</MudDrawer>
+
+@code {
+
+    private bool _initialDrawerState = true;
+
+
+}
