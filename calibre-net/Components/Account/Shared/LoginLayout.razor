@@ -1,6 +1,8 @@
 @using calibre_net.Client.Components
 @inherits LayoutComponentBase
-@layout calibre_net.Components.Layout.MyMudLayout
+@layout calibre_net.Client.Components.Layout.MudMainLayout
+
+
 
 <MudLayout>
     <MudMainContent>
@@ -9,7 +11,7 @@
 
 
 <MudAppBar Bottom="true" Fixed="true" Elevation="1" Dense=true>
-            <CultureSelector @rendermode="InteractiveServer" />
+            <calibre_net.Client.Components.Layout.Parts.CultureSelector />
 </MudAppBar>
 </MudLayout>
 

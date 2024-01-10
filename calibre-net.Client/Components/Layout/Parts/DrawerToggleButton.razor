@@ -1,0 +1,85 @@
+@rendermode InteractiveAuto
+@inject IJSRuntime JSRuntime
+@inject IMessageService MessageService
+@inject WindowIdService WindowsIdService
+
+
+<MudIconButton Icon="@(IsDrawerOpen ? Icons.Material.Filled.MenuOpen : Icons.Material.Filled.Menu)"
+    Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
+
+
+<div class="container text-center my-3">
+    @foreach (var message in messages)
+    {
+        <div class="alert alert-sm alert-info">@message</div>
+    }
+</div>
+
+@code {
+    private List<string> messages = new List<string>();
+
+    [Parameter]
+    public string DrawerClassName { get; set; } = "my-layout-drawer";
+    [Parameter]
+    public bool IsDrawerOpen { get; set; } = true;
+
+
+    private IJSObjectReference? _jsModule;
+    private bool _shouldHandleDrawerToggled = false;
+    async Task ToggleDrawer()
+    {
+        IsDrawerOpen = !IsDrawerOpen;
+        _shouldHandleDrawerToggled = true;
+
+        @* MessageService.SendMessage(
+new MessageEventArgs
+{
+EventType = MessageType.DrawerToggle,
+Payload = IsDrawerOpen,
+PayloadType = IsDrawerOpen.GetType(),
+WindowId = WindowsIdService.MyGuid
+}
+); *@
+
+    }
+
+
+
+    @* protected override void OnInitialized()
+{
+// subscribe to OnMessage event
+
+MessageService.Subscribe(async (a) => await MessageHandler(a), WindowsIdService.MyGuid, MessageType.DrawerToggle);
+}
+
+public void Dispose()
+{
+// unsubscribe from OnMessage event
+MessageService.OnMessage -= async (a) => await MessageHandler(a);
+
+} *@
+
+    @* private async Task MessageHandler(MessageEventArgs message)
+{
+
+bool convertedObject = (bool) message.Payload;
+
+
+await this.InvokeAsync(() => this.StateHasChanged());
+} *@
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // handle title on the navbar getting hidden
+        if (firstRender)
+        {
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import",
+            "./Components/Layout/Parts/DrawerToggleButton.razor.js");
+        }
+        if (_shouldHandleDrawerToggled && _jsModule != null)
+        {
+            await _jsModule!.InvokeVoidAsync("HandleDrawerToggled", [IsDrawerOpen, DrawerClassName]);
+            _shouldHandleDrawerToggled = false;
+        }
+    }
+}

@@ -1,0 +1,40 @@
+﻿@rendermode InteractiveAuto
+@using calibre_net.CustomEvents
+@inject IJSRuntime JS
+
+<div class="themeChangedEventHandler" @onthemechangedevent="HandleCustomEvent" style="display: none;"></div>
+<CascadingValue Value=false Name="UsePopoverProvider">
+    <MudThemeProvider Theme="MyTheme" @bind-IsDarkMode="@_isDarkMode" />
+</CascadingValue>
+
+
+@code {
+    private bool _isDarkMode { get; set; } = false;
+
+    public static MudTheme MyTheme => new()
+        {
+            Palette = new PaletteLight()
+            {
+                Primary = "#594AE2",
+                AppbarBackground = "#594AE2",
+                White = "#FFFFFF"
+
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = "#594AE2",
+                AppbarBackground = "#594AE2"
+            }
+        };
+
+    private void HandleCustomEvent(ThemeChangedEvent eventArgs)
+    {
+        @* Console.WriteLine("Event fired"); *@
+        if (eventArgs != null)
+        {
+            @* Console.WriteLine($"Is Dark ? {eventArgs.IsDarkMode} "); *@
+            _isDarkMode = eventArgs.IsDarkMode;
+        }
+    }
+
+}

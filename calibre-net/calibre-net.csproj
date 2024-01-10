@@ -12,7 +12,7 @@
   <ItemGroup>
     <None Update="Data\app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Blazored.FluentValidation" Version="2.1.0" />
     <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.6.3" />
@@ -29,9 +29,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
   </ItemGroup>
 
-    <ItemGroup>
-    <EmbeddedResource Include="Resources\*.json" />
+  <ItemGroup>
     <EmbeddedResource Include="Data\aaguid.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\calibre-net.Client\calibre-net.Client.csproj" />
+    <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" />
   </ItemGroup>
 
 </Project>
