@@ -1,4 +1,5 @@
-using calibre_net.Models;
+
+namespace calibre_net.Shared.Models;
 
 public class Permission
 {

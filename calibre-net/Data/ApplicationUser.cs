@@ -7,5 +7,7 @@ public class ApplicationUser : IdentityUser
 {
 
     public virtual List<UserPermission> Permissions {get;set;} = [];
+
+    public string PreferredLocale {get;set;} = string.Empty;
 }
 

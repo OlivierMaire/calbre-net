@@ -13,7 +13,12 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
 
-builder.Services.AddAuthorizationCore();
+ builder.Services.AddAuthorizationCore();
+// builder.Services.AddAuthorizationCore(options =>
+// {
+//     options.AddPolicy("Admin",
+//         policy => policy.RequireClaim("Permissions", "Adminasasddas"));
+// });
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddSingleton<AuthenticationStateProvider, PersistentAuthenticationStateProvider>();
 
@@ -36,6 +41,27 @@ builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactor
 
 builder.Services.AddSingleton<IMessageService, MessageService>();
 builder.Services.AddScoped<WindowIdService>();
+
+
+
+// var apiOptions = builder.Configuration.GetSection(ApiServiceOptions.OptionName);
+var baseAddress = builder.HostEnvironment.BaseAddress;
+// var baseAddress = apiOptions["Host"];
+
+// System.Diagnostics.Debug.WriteLine("aaa" + baseAddress);
+
+builder.Services.AddHttpClient();
+
+builder.Services.AddHttpClient("AuthenticationApi", client => client.BaseAddress = new Uri(baseAddress));
+
+
+// builder.Services.AddTransient<AuthenticationDelegatingHandler>();
+
+builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress))
+ ;//.AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+
+builder.Services.RegisterServices(builder.Configuration);
+
 
 var host = builder.Build();
 

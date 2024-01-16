@@ -7,20 +7,24 @@ using Z.EntityFramework.Plus;
 
 public class UserPolicyHandler : IUserPolicyHandler
 {
-    private readonly AuthenticationStateProvider authenticationStateProvider;
+    // private readonly AuthenticationStateProvider authenticationStateProvider;
+    private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly ApplicationDbContext dbContext;
 
-    public UserPolicyHandler(AuthenticationStateProvider authenticationStateProvider,
+    public UserPolicyHandler(//AuthenticationStateProvider authenticationStateProvider,
+    IHttpContextAccessor _httpContextAccessor,
     ApplicationDbContext dbContext)
     {
-        this.authenticationStateProvider = authenticationStateProvider;
+        // this.authenticationStateProvider = authenticationStateProvider;
+        this._httpContextAccessor = _httpContextAccessor;
         this.dbContext = dbContext;
     }
     
     public async Task<IEnumerable<string>> GetUserPermissions()
     {
-        var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState?.User;
+        // var authState = await authenticationStateProvider.GetAuthenticationStateAsync();
+        var user = _httpContextAccessor?.HttpContext?.User;
+        // var user = authState?.User;
         if (user == null) throw new ArgumentNullException(nameof(user));
         var userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
       

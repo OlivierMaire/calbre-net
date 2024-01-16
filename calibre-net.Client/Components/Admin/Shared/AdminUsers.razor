@@ -1,0 +1,116 @@
+@inject UserClient UserClient
+@attribute [StreamRendering]
+@* @rendermode InteractiveAuto *@
+@inject ISnackbar Snackbar
+
+<MudText Typo="Typo.h4">Users</MudText>
+
+@Text
+
+@if (Users != null){
+<MudTable Items="@Users" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info"
+    CanCancelEdit="true" CommitEditTooltip="Commit Edit"
+     OnCommitEditClick="@(() => Snackbar.Add("Commit Edit Handler Invoked"))" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
+          RowEditCommit="ItemHasBeenCommitted" 
+          IsEditRowSwitchingBlocked="false" ApplyButtonPosition="TableApplyButtonPosition.End"
+           EditButtonPosition="TableEditButtonPosition.End" EditTrigger="TableEditTrigger.EditButton">
+    <HeaderContent>
+        <MudTh>Nr</MudTh>
+        <MudTh>UserName</MudTh>
+        <MudTh>Name</MudTh>
+
+        @foreach (var permission in Permissions)
+        {
+            <MudTh>@permission.Name</MudTh>
+        }
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">
+            <MudLink Href="@($"/Admin/User/{context.Id}")"> @context.Id</MudLink>
+            
+           </MudTd>
+        <MudTd DataLabel="UserName">@context.Name</MudTd>
+        <MudTd DataLabel="Name">@context.Email</MudTd>
+        @foreach (var permission in Permissions)
+        {
+            <MudTh DataLabel="@permission.Name">@context.HasPermission(permission.Name)</MudTh>
+        }
+
+
+    </RowTemplate>
+    <RowEditingTemplate>
+        <MudTd DataLabel="Nr">@context.Id</MudTd>
+              <MudTd DataLabel="Sign">@context.Name</MudTd>
+        <MudTd DataLabel="Name">@context.Email</MudTd>
+    @foreach (var permission in Permissions)
+        {
+            <MudTh DataLabel="@permission.Name">
+                <MudCheckBox Checked="@context.HasPermission(permission.Name)" />
+              </MudTh>
+        }
+
+       
+       
+    </RowEditingTemplate>
+        <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+    <EditButtonContent Context="button">
+        <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
+    </EditButtonContent>
+</MudTable>
+
+<MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3">Edit
+    Users</MudButton>
+}
+
+<MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
+    Class="mt-3 ml-3" Href="/Admin/User">Add a new User</MudButton>
+
+@code {
+
+    string Text = "Loading... ";
+    private bool _loading;
+    ICollection<UserModel> Users { get; set; } = null!;
+    ICollection<Permission> Permissions { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        await Task.Delay(1500);
+
+        Text = await UserClient.GetMyselfAsync();
+
+        Permissions = await UserClient.GetAllPermissionsAsync();
+        Users = await UserClient.GetAllUsersAsync();
+        _loading = false;
+    }
+
+    private UserModel elementBeforeEdit;
+    
+    private void BackupItem(object element)
+    {
+        elementBeforeEdit = new()
+            {
+                Email = ((UserModel)element).Email,
+                Id = ((UserModel)element).Id,
+                Permissions = ((UserModel)element).Permissions,
+            };
+        @* AddEditionEvent($"RowEditPreview event: made a backup of Element {((Element)element).Name}"); *@
+    }
+
+    private void ItemHasBeenCommitted(object element)
+    {
+        @* AddEditionEvent($"RowEditCommit event: Changes to Element {((Element)element).Name} committed"); *@
+    }
+
+    private void ResetItemToOriginalValues(object element)
+    {
+        ((UserModel)element).Email = elementBeforeEdit.Email;
+        ((UserModel)element).Id = elementBeforeEdit.Id;
+        ((UserModel)element).Permissions = elementBeforeEdit.Permissions;
+        @* AddEditionEvent($"RowEditCancel event: Editing of Element {((Element)element).Name} canceled"); *@
+    }
+
+}

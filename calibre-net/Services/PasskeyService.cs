@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
+using calibre_net.Client.Services;
 using calibre_net.Data;
 using calibre_net.Models;
 using Fido2NetLib;

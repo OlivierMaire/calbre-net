@@ -4,7 +4,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using calibre_net.Client.Components
 
-@attribute [Authorize]
+@attribute [Authorize(Policy = "Admin")]
 @rendermode InteractiveAuto
 
 @* <MyMudProviders /> *@
@@ -14,7 +14,7 @@
 <MudText Typo="Typo.h3" GutterBottom="true">You are authenticated</MudText>
 
 <AuthorizeView>
-<MudText Class="mb-4">Hello @context.User.Identity?.Name!</MudText>
+    <MudText Class="mb-4">Hello @context.User.Identity?.Name!</MudText>
 </AuthorizeView>
 
 <p>

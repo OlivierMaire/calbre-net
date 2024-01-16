@@ -26,6 +26,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         //         // ownedNavigationBuilder.OwnsOne(contactDetails => contactDetails.);
         //     });
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+{
+    optionsBuilder.EnableSensitiveDataLogging();
+}
 }
 
 

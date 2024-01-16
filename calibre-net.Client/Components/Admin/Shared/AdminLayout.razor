@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+@layout calibre_net.Client.Components.Layout.MainLayout
+
+<MudText Typo="Typo.h3" GutterBottom="true">Administration</MudText>
+
+    <hr />
+  <MudGrid>
+        <MudItem md="3">
+            <AdminNavMenu />
+        </MudItem>
+      <MudItem md="9">
+        <MudPaper Class="mud-width-full p-3">
+   @Body
+</MudPaper>
+      </MudItem>
+    </MudGrid>
+

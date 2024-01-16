@@ -1,6 +1,8 @@
 ﻿@rendermode InteractiveAuto
 @using calibre_net.CustomEvents
 @inject IJSRuntime JS
+@implements IDisposable
+@inject PersistentComponentState ApplicationState
 
 <div class="themeChangedEventHandler" @onthemechangedevent="HandleCustomEvent" style="display: none;"></div>
 <CascadingValue Value=false Name="UsePopoverProvider">
@@ -9,7 +11,9 @@
 
 
 @code {
-    private bool _isDarkMode { get; set; } = false;
+
+    [CascadingParameter(Name = "DarkModeCookie")]
+    private bool _isDarkMode { get; set; }
 
     public static MudTheme MyTheme => new()
         {
@@ -35,6 +39,31 @@
             @* Console.WriteLine($"Is Dark ? {eventArgs.IsDarkMode} "); *@
             _isDarkMode = eventArgs.IsDarkMode;
         }
+    }
+
+    private PersistingComponentStateSubscription persistingSubscription;
+
+    protected override async Task OnInitializedAsync()
+    {
+        persistingSubscription =
+        ApplicationState.RegisterOnPersisting(PersistData);
+
+        if (ApplicationState.TryTakeFromJson<bool>(
+        "DarkModeCookie", out var restored))
+            _isDarkMode = restored!;
+
+    }
+
+    private Task PersistData()
+    {
+        ApplicationState.PersistAsJson("DarkModeCookie", _isDarkMode);
+
+        return Task.CompletedTask;
+    }
+
+    void IDisposable.Dispose()
+    {
+        persistingSubscription.Dispose();
     }
 
 }

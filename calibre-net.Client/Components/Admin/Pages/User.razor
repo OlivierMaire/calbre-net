@@ -1,0 +1,176 @@
+@page "/Admin/User/{id}"
+@page "/Admin/User"
+@inject UserClient UserClient
+@inject Microsoft.Extensions.Options.IOptions<SupportedCulturesOptions> SupportedCultures
+@inject ILogger<User> Logger
+@inject IStringLocalizer<calibre_net.Shared.Resources.Admin> L
+@inject NavigationManager NavigationManager
+
+@attribute [Authorize(Policy = "Admin")]
+@attribute [StreamRendering]
+
+@if (this.IsNewUser)
+{
+    <MudText Typo="Typo.h4">@L["Add new User"]</MudText>
+}
+else
+{
+    <MudText Typo="Typo.h4">@L["Edit User {userName}", SelectedUser?.Name]</MudText>
+    <MudText Typo="Typo.caption">@Id</MudText>
+}
+
+@if (!_loading)
+{
+    <EditForm Model="SelectedUser" method="post" OnValidSubmit="SubmitForm" FormName="SelectedUser">
+        <DataAnnotationsValidator />
+        <MudTextField Label="Username" name="SelectedUser.Name" @bind-Value="@SelectedUser.Name" Variant="Variant.Text" />
+        <MudTextField Label="Email" name="SelectedUser.Email" @bind-Value="@SelectedUser.Email" Variant="Variant.Text"
+            InputType="InputType.Email" />
+        <MudTextField Label="Password" name="SelectedUser.Password" @bind-Value="@SelectedUser.Password"
+            Variant="Variant.Text" InputType="InputType.Password" />
+
+        <calibre_net.Client.Components.Shared.SsrSelect Name="SelectedUser.PreferredLocale"
+            @bind-Value="SelectedUser.PreferredLocale"
+            Options="@supportedCultures.Select(s => new KeyValuePair<string,string> (s.DisplayName, s.Value)).ToList()">
+        </calibre_net.Client.Components.Shared.SsrSelect>
+
+
+        <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
+            Class="mt-3 ml-3">Delete passkeys</MudButton>
+
+        <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
+            Class="mt-3 ml-3">Remove MFA</MudButton>
+
+        <div class="admin-permissions-list">
+            @foreach (var permission in Permissions)
+            {
+                <MudCheckBox name="@($"SelectedUser.PermissionsDictionary[{permission.Name}]")"
+                    Value="@(SelectedUser.HasPermission(permission.Name))">
+                    <div class="d-flex flex-column ">
+                        <MudText Typo="Typo.body1">@permission.Name</MudText>
+                        <MudText Typo="Typo.caption">@permission.Description</MudText>
+                        <MudText Typo="Typo.caption">Value: @(SelectedUser.HasPermission(permission.Name))</MudText>
+                    </div>
+
+                </MudCheckBox>
+
+                @* <MudSwitch name="SelectedUser.Permissions" Value="@(SelectedUser.HasPermission(permission.Name) ?
+        permission.Name : string.Empty)"
+        Converter="@(new CustomStringToBoolConverter(permission.Name))">
+
+        <div class="d-flex flex-column ">
+        <MudText Typo="Typo.body1">@permission.Name</MudText>
+        <MudText Typo="Typo.caption">@permission.Description</MudText>
+        </div></MudSwitch> *@
+
+                @* <InputCheckbox name="SelectedUser.Permissions" Value="@permission.Name" >
+        <div class="d-flex flex-column ">
+        <MudText Typo="Typo.body1">@permission.Name</MudText>
+        <MudText Typo="Typo.caption">@permission.Description</MudText>
+        </div>
+        </InputCheckbox> *@
+
+            }
+        </div>
+
+        <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3"
+            ButtonType="ButtonType.Submit">Save
+        </MudButton>
+
+
+        <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
+            Class="mt-3 ml-3" ButtonType="ButtonType.Reset">Cancel</MudButton>
+    </EditForm>
+}
+
+
+<MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Tertiary" Class="mt-3"
+    Disabled="true">Add
+    Allowed/Denied Tags</MudButton>
+<MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Tertiary" Class="mt-3"
+    Disabled="true">Add
+    Allowed/Denied Custom Column Values</MudButton>
+
+<EditForm Model="Id" method="post" OnValidSubmit="SubmitDeleteForm" FormName="DeleteUser">
+
+    <MudButton StartIcon="@Icons.Material.Filled.PersonOff" 
+    Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Submit"
+        Class="mt-3 ml-3" >Delete User</MudButton>
+
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private bool _loading = true;
+    [SupplyParameterFromForm]
+    private UserModelExtended? SelectedUser { get; set; }
+    private CultureOption[] supportedCultures { get; set; } = [];
+    private Func<CultureOption, string> convertFunc = ci =>
+    ci == null ? string.Empty : ci.DisplayName;
+
+    private bool IsNewUser => string.IsNullOrEmpty(Id);
+
+
+    ICollection<Permission> Permissions { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Logger.LogInformation(nameof(OnInitialized));
+
+
+        _loading = true;
+
+        supportedCultures = SupportedCultures.Value.SupportedCultureOptions;
+
+        Permissions = await UserClient.GetAllPermissionsAsync();
+        if (!IsNewUser)
+            SelectedUser ??= await UserClient.GetUserAsync(Id);
+        else
+            SelectedUser ??= new UserModelExtended();
+        SelectedUser.Permissions ??= [];
+
+        _loading = false;
+
+    }
+
+    public async Task SubmitForm()
+    {
+        Logger.LogInformation("Sumbit form");
+        Logger.LogInformation(SelectedUser.Name);
+
+        if (IsNewUser)
+        {
+            try
+            {
+                SelectedUser.Permissions ??= [];
+                SelectedUser.Id = string.Empty;
+                var temp = await UserClient.AddUserAsync(SelectedUser);
+                SelectedUser = temp;
+            }
+            catch (ApiException ae)
+            {
+                Logger.LogInformation(ae.Message);
+                Logger.LogInformation(ae.Response);
+            }
+        }
+        else
+        {
+            SelectedUser!.Id = Id;
+            SelectedUser = await UserClient.UpdateUserAsync(SelectedUser);
+        }
+
+
+
+    }
+
+    public async Task SubmitDeleteForm()
+    {
+        await UserClient.DeleteUserAsync(Id);
+        NavigationManager.NavigateTo("/Admin");
+    }
+
+
+}
