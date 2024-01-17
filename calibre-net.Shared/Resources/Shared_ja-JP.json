@@ -1,0 +1,6 @@
+{
+    "Site Title": "Calibre.jp",
+    "Body": "This Blazor component is defined in the <strong>{0}</strong> package and it is used from <strong id=\"{1}\">{2}</strong>.",
+    "ClickMe": "Click me!",
+    "EnterSomeText": "Enter some text:"
+  }

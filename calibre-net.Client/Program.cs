@@ -65,21 +65,21 @@ builder.Services.RegisterServices(builder.Configuration);
 
 var host = builder.Build();
 
-CultureInfo culture;
-var js = host.Services.GetRequiredService<IJSRuntime>();
-var result = await js.InvokeAsync<string>("blazorCulture.get");
+// CultureInfo culture;
+// var js = host.Services.GetRequiredService<IJSRuntime>();
+// var result = await js.InvokeAsync<string>("blazorCulture.get");
 
-if (result != null)
-{
-    culture = new CultureInfo(result);
-}
-else
-{
-    culture = new CultureInfo(supportedCulturesOptions.SupportedCultures[0]);
-    await js.InvokeVoidAsync("blazorCulture.set", "en-US");
-}
+// if (result != null)
+// {
+//     culture = new CultureInfo(result);
+// }
+// else
+// {
+//     culture = new CultureInfo(supportedCulturesOptions.SupportedCultures[0]);
+//     await js.InvokeVoidAsync("blazorCulture.set", "en-US");
+// }
 
-CultureInfo.DefaultThreadCurrentCulture = culture;
-CultureInfo.DefaultThreadCurrentUICulture = culture;
+// CultureInfo.DefaultThreadCurrentCulture = culture;
+// CultureInfo.DefaultThreadCurrentUICulture = culture;
 
 await host.RunAsync();

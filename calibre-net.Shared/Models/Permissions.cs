@@ -1,10 +1,14 @@
 
+using System.Text.Json.Serialization;
+
 namespace calibre_net.Shared.Models;
 
 public class Permission
 {
+    [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
+    [JsonPropertyName("description")]
     public string Description { get; set; } = string.Empty;
 }
 
@@ -137,6 +141,14 @@ public static class PermissionStore
     public static bool HasPermission(this UserModel user, string permission)
     {
         return user.Permissions.Contains(permission);
+    }
+
+    public static bool HasPermission(this UserModelExtended user, string permission)
+    {
+        // return user.Permissions.Contains(permission);
+        if (user.PermissionsDictionary == null)
+            return false;
+        return user.PermissionsDictionary.ContainsKey(permission) ? user.PermissionsDictionary[permission] == "on" : false;
     }
 
 }

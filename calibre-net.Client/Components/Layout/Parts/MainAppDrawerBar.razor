@@ -2,7 +2,9 @@
     <DrawerToggleButton DrawerClassName="my-layout-drawer" IsDrawerOpen="_initialDrawerState" />
     <MudSpacer />
     <ThemeToggleButton />
-    <CultureSelector />
+    @* <CultureSelector /> *@
+<div> @System.Globalization.CultureInfo.CurrentCulture.Name</div>
+
     <TopMenu />
 </MudAppBar>
 <MudDrawer Class="mud-drawer-fixed my-layout-drawer" ClipMode="DrawerClipMode.Never" Open="_initialDrawerState">

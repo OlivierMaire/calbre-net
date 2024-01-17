@@ -1,8 +1,10 @@
 using System.Collections.Concurrent;
+using System.Globalization;
 using calibre_net.Client.Models;
 using calibre_net.Data;
 using calibre_net.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 
 namespace calibre_net.Middleware;
 
@@ -52,6 +54,16 @@ public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
                 if (passkeyUser != null)
                 {
                     await signInMgr.SignInAsync(passkeyUser, true, "passkey");
+                    // set preferedLanguage;
+                    context.Response.Cookies.Append(
+                                    CookieRequestCultureProvider.DefaultCookieName,
+                                    CookieRequestCultureProvider.MakeCookieValue(
+                                        new RequestCulture(passkeyUser.PreferredLocale, passkeyUser.PreferredLocale)));
+
+                    var culture = new CultureInfo(passkeyUser.PreferredLocale);
+                    CultureInfo.DefaultThreadCurrentCulture = culture;
+                    CultureInfo.DefaultThreadCurrentUICulture = culture;
+
                     if (string.IsNullOrEmpty(signInInfo.ReturnUrl))
                         context.Response.Redirect("/");
                     else
@@ -79,6 +91,14 @@ public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
             if (result.Succeeded)
             {
                 SignIns.Remove(key);
+
+                // set preferedLanguage;
+                context.Response.Cookies.Append(
+                                CookieRequestCultureProvider.DefaultCookieName,
+                                CookieRequestCultureProvider.MakeCookieValue(
+                                    new RequestCulture(user.PreferredLocale, user.PreferredLocale)));
+
+
 
                 if (string.IsNullOrEmpty(signInInfo.ReturnUrl))
                     context.Response.Redirect("/");
