@@ -1,0 +1,87 @@
+<MudDialog>
+    <DialogContent>
+        Dialog Content
+        SelectedPath : @SelectedPath
+
+        <MudList Clickable="true">
+            <MudListItem Text=".." Icon="@Icons.Material.Outlined.Folder" OnClick="@(() => OpenDirectory(".."))" />
+
+            @foreach (var file in Directories)
+            {
+                <MudListItem Text="@file" Icon="@Icons.Material.Outlined.Folder" OnClick="() =>OpenDirectory(file)" />
+
+            }
+            @foreach (var file in Files)
+            {
+                <MudListItem Text="@file" Icon="@Icons.Material.Outlined.InsertDriveFile" />
+
+            }
+        </MudList>
+    </DialogContent>
+    <DialogActions>
+        <div class="flex flex-wrap">
+            @foreach (var drive in Drives)
+            {
+                <MudButton OnClick="() => OpenDrive(drive)">@drive</MudButton>
+            }
+            <MudButton OnClick="SelectRoot">Root</MudButton>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+            <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+        </div>
+    </DialogActions>
+</MudDialog>
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    [Parameter] public string SelectedPath { get; set; } = string.Empty;
+
+    [Parameter] public bool ChooseFolder { get; set; } = false;
+
+    string[] Directories { get; set; } = [];
+    string[] Files { get; set; } = [];
+
+    string[] Drives { get; set; } = [];
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(SelectedPath));
+    void Cancel() => MudDialog.Cancel();
+
+    void SelectRoot()
+    {
+        SelectedPath = System.IO.Directory.GetDirectoryRoot(SelectedPath);
+        ReadDirectory();
+    }
+
+    protected override void OnInitialized()
+    {
+        ReadDirectory();
+        ReadLogicalDrives();
+        base.OnInitialized();
+    }
+
+    void ReadLogicalDrives()
+    {
+        Drives = DriveInfo.GetDrives()
+        .Where(x => x.IsReady == true)
+        .Select(d => d.RootDirectory.Name).ToArray();
+    }
+
+    void ReadDirectory()
+    {
+        Directories = System.IO.Directory.GetDirectories(SelectedPath).Select(d => new DirectoryInfo(d).Name).ToArray();
+        if (!ChooseFolder)
+            Files = System.IO.Directory.GetFiles(SelectedPath).Select(f => new FileInfo(f).Name).ToArray();
+    }
+
+    void OpenDirectory(string path)
+    {
+
+        SelectedPath += SelectedPath.EndsWith("\\") ? path : $"\\{path}";
+        ReadDirectory();
+    }
+
+    void OpenDrive(string path)
+    {
+        SelectedPath = path;
+        ReadDirectory();
+    }
+}

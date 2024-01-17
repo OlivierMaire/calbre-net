@@ -1,0 +1,42 @@
+@page "/admin/configuration"
+@using calibre_net.Client.Components.Shared
+
+
+@inject ConfigurationClient ConfigurationClient 
+
+
+<PageTitle>Admin - Configuration</PageTitle>
+
+<MudText Typo="Typo.h4">Configuration</MudText>
+
+<MudText Typo="Typo.h5">Database</MudText>
+
+<EditForm Model="DatabaseSettings" method="post" OnValidSubmit="SubmitDatabaseForm" FormName="DatabaseSettings">
+
+    <MudTextField @bind-Value="DatabaseSettings.Location" Label="Location of Calibre Database"></MudTextField>
+    <FileManager  Label="Location of Calibre Database" ChooseFolder="true" />
+</EditForm>
+
+<MudText Typo="Typo.h5">Basic Configuration</MudText>
+
+
+<MudText Typo="Typo.h5">UI Configuration</MudText>
+
+
+
+@code {
+
+    private DatabaseConfiguration DatabaseSettings {get;set;} = new DatabaseConfiguration();
+
+
+    protected override async Task OnInitializedAsync(){
+
+        DatabaseSettings = await ConfigurationClient.GetDatabaseConfigurationAsync();
+
+    }
+
+
+
+    public void SubmitDatabaseForm(){
+    } 
+}
