@@ -166,6 +166,10 @@ namespace calibre_net.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("PreferredLocale")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("TEXT");
 
@@ -233,6 +237,19 @@ namespace calibre_net.Migrations
                     b.ToTable("UserCredentials");
                 });
 
+            modelBuilder.Entity("calibre_net.Data.UserPermission", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PermissionName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId", "PermissionName");
+
+                    b.ToTable("UserPermissions");
+                });
+
             modelBuilder.Entity("calibre_net.Data.UserCredential", b =>
                 {
                     b.HasOne("calibre_net.Data.ApplicationUser", "User")
@@ -242,6 +259,22 @@ namespace calibre_net.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("calibre_net.Data.UserPermission", b =>
+                {
+                    b.HasOne("calibre_net.Data.ApplicationUser", "User")
+                        .WithMany("Permissions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("calibre_net.Data.ApplicationUser", b =>
+                {
+                    b.Navigation("Permissions");
                 });
 #pragma warning restore 612, 618
         }

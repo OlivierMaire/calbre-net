@@ -1,7 +1,6 @@
 ﻿
 @inherits LayoutComponentBase
 @layout MudMainLayout
-    
 <MudLayout>
     <MainAppDrawerBar/> @* Here you can set what interactivity you want in the drawer without affecting the Body interactivity. *@
     <MudMainContent>
@@ -10,6 +9,8 @@
         </MudContainer>
     </MudMainContent>
 </MudLayout>
+
+<PageScript Src="/Components/Layout/MainLayout.razor.js" />
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

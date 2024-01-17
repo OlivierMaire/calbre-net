@@ -8,6 +8,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
 
     public virtual DbSet<UserCredential> UserCredentials { get; set; }
+    public virtual DbSet<UserPermission> UserPermissions { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -16,6 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.Entity<IdentityUserRole<string>>().HasKey(r => new { r.UserId, r.RoleId });
         modelBuilder.Entity<IdentityUserToken<string>>().HasKey(t => new { t.UserId, t.LoginProvider, t.Name });
        
+        modelBuilder.Entity<UserPermission>().HasKey(p => new {p.UserId, p.PermissionName});
         // modelBuilder.Entity<UserCredential>().OwnsOne(
         //     customer => customer.Descriptor, ownedNavigationBuilder =>
         //     {
@@ -24,6 +26,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         //         // ownedNavigationBuilder.OwnsOne(contactDetails => contactDetails.);
         //     });
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+{
+    optionsBuilder.EnableSensitiveDataLogging();
+}
 }
 
 

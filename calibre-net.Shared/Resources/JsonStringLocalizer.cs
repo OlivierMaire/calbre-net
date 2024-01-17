@@ -58,7 +58,7 @@ public class JsonStringLocalizer : IStringLocalizer
     {
         get
         {
-              var stringMap = LoadStringMap();
+            var stringMap = LoadStringMap();
             if (stringMap.ContainsKey(name))
                 return new LocalizedString(name, string.Format(stringMap[name], arguments));
 
@@ -94,6 +94,10 @@ public class JsonStringLocalizer : IStringLocalizer
                 FileProvider.GetFileInfo(
                     Path.Combine(ResourcesPath, $"{Name}.json"));
         }
+        if (!fileInfo.Exists)
+        {
+            return new Dictionary<string, string>();
+        }
 
         using var stream = fileInfo.CreateReadStream();
 
@@ -106,6 +110,11 @@ public class JsonStringLocalizer : IStringLocalizer
         var fileInfo =
              FileProvider.GetFileInfo(
                  Path.Combine(ResourcesPath, $"{Name}.json"));
+
+        if (!fileInfo.Exists)
+        {
+            return new Dictionary<string, string>();
+        }
 
         using var stream = fileInfo.CreateReadStream();
 
