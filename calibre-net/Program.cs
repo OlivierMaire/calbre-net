@@ -160,7 +160,7 @@ if (versionDescriptionProvider != null)
                 config.ApiGroupNames = new[] { description.GroupName };
             });
     }
-var baseAddress = "https://localhost:7046";
+var baseAddress = builder.Configuration["Calibre:ApiHost"];
 
 builder.Services.AddHttpClient();
 
