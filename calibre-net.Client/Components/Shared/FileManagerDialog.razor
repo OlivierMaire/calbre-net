@@ -82,7 +82,7 @@
     void OpenDirectory(string path)
     {
 
-        SelectedPath += SelectedPath.EndsWith("\\") ? path : $"\\{path}";
+        SelectedPath += SelectedPath.EndsWith(Path.DirectorySeparatorChar) ? path : $"{Path.DirectorySeparatorChar}{path}";
         ReadDirectory();
     }
 
