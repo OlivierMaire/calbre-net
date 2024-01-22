@@ -98,9 +98,14 @@ IConfiguration configuration)
 
     public async Task<string> GetConfigurationValue(string key)
     {
+        try{
         var value = configuration[key];
-        Console.WriteLine($"get value for {key} = {value}");
+        // Console.WriteLine($"get value for {key} = {value}");
         return value;
+        }
+        catch (){
+            return string.Empty;
+        }
     }
 
 }
