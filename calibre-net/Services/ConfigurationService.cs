@@ -103,7 +103,7 @@ IConfiguration configuration)
         // Console.WriteLine($"get value for {key} = {value}");
         return value;
         }
-        catch (){
+        catch {
             return string.Empty;
         }
     }
