@@ -12,8 +12,17 @@ using calibre_net.Components;
 using HeimGuard;
 using calibre_net.Shared.Resources;
 using calibre_net.Client.Services;
+using Namotion.Reflection;
+using calibre_net.Migrations;
+using calibre_net.Shared.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+builder.Configuration.AddJsonFile("customsettings.json", optional: true, reloadOnChange: true);
+
+var listeningPort = builder.Configuration["calibre:basic:server:port"];
+if (!string.IsNullOrEmpty(listeningPort))
+    builder.WebHost.UseUrls($"https://localhost:{listeningPort}");
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -77,8 +86,8 @@ builder.Services.Configure<JsonStringLocalizerOptions>(options =>
 builder.Services.AddSingleton
      <IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
-builder.Services.AddSingleton
-     <IMessageService, MessageService>();
+// builder.Services.AddSingleton
+//      <IMessageService, MessageService>();
 builder.Services.AddScoped<WindowIdService>();
 
 
@@ -89,6 +98,10 @@ builder.Services.AddScoped<PasskeyService>();
 // builder.Services.AddScoped<Fido2NetLib.Fido2>();
 
 builder.Services.RegisterServices(builder.Configuration);
+
+// builder.Services.AddOptions<CalibreConfiguration>().BindConfiguration(CalibreConfiguration.SectionName);
+builder.Services.Configure<CalibreConfiguration>(builder.Configuration.GetSection(CalibreConfiguration.SectionName));
+
 
 builder.Services.AddFido2(options =>
       {
@@ -161,6 +174,10 @@ if (versionDescriptionProvider != null)
             });
     }
 var baseAddress = builder.Configuration["Calibre:ApiHost"];
+if (string.IsNullOrEmpty(baseAddress))
+{
+    baseAddress = $"https://localhost:{listeningPort}";
+}
 
 builder.Services.AddHttpClient();
 

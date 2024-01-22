@@ -1,3 +1,4 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,6 +13,9 @@ public class CultureController : Controller
                 CookieRequestCultureProvider.DefaultCookieName,
                 CookieRequestCultureProvider.MakeCookieValue(
                     new RequestCulture(culture, culture)));
+
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(culture);
+            CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(culture);
         }
 
         return LocalRedirect(redirectUri);

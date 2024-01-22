@@ -1,6 +1,7 @@
 namespace calibre_net.Client.Services;
 
 
+[SingletonRegistration]
 public class MessageService : IMessageService
 {
 
@@ -13,6 +14,7 @@ public class MessageService : IMessageService
 
     public void SendMessage(MessageEventArgs message)
     {
+        Console.WriteLine($"Sending Message : {message.EventType}, GUID: {message.WindowId}");
         OnMessage?.Invoke(message);
     }
 

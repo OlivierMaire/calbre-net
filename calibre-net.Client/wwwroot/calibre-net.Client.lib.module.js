@@ -14,6 +14,17 @@ export function afterWebStarted(blazor) {
     }
   });
 
+  
+  
+  blazor.registerCustomEventType('calibremessageevent', {
+    browserEventName: 'calibreMessage',
+    createEventArgs: event => {
+      // console.log("calibreMessage event here ");
+      // console.log(event.detail);
+      return event.detail;
+    }
+  });
+
 
 
   customElements.define('page-script', class extends HTMLElement {
@@ -96,4 +107,6 @@ function onEnhancedLoad() {
     module?.onUpdate?.();
   }
 }
+
+
  

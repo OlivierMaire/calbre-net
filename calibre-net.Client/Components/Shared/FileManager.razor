@@ -1,0 +1,51 @@
+@rendermode InteractiveServer
+@inject IDialogService DialogService
+
+<MudTextField ReadOnly name="@Name" Label="@Label" @bind-Value="Value" Adornment="Adornment.End"
+    AdornmentIcon="@Icons.Material.Filled.FileOpen" OnAdornmentClick="OnSelectFile" />
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+
+    [Parameter] public bool ChooseFolder { get; set; } = false;
+
+    private string _value = ".";
+    [Parameter]
+    public string Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+
+    public async Task OnSelectFile()
+    {
+        Console.WriteLine("Select a file");
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<FileManagerDialog>();
+        parameters.Add(x => x.SelectedPath, Value);
+        parameters.Add(x => x.ChooseFolder, ChooseFolder);
+        var dialog = await DialogService.ShowAsync<FileManagerDialog>("Simple Dialog", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            if (!string.IsNullOrEmpty(result.Data.ToString()))
+                Value = result.Data.ToString();
+        }
+        Console.WriteLine(Value);
+    }
+}

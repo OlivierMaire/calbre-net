@@ -7,8 +7,11 @@ using Microsoft.JSInterop;
 using calibre_net.Shared.Resources;
 using Microsoft.Extensions.Localization;
 using calibre_net.Client.Services;
+using calibre_net.Shared.Models;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+// builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+// builder.Configuration.AddJsonFile("customsettings.json", optional: true, reloadOnChange: true);
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
@@ -39,7 +42,7 @@ builder.Services.Configure<JsonStringLocalizerOptions>(options =>
 });
 builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
-builder.Services.AddSingleton<IMessageService, MessageService>();
+// builder.Services.AddSingleton<IMessageService, MessageService>();
 builder.Services.AddScoped<WindowIdService>();
 
 
@@ -59,6 +62,9 @@ builder.Services.AddHttpClient("AuthenticationApi", client => client.BaseAddress
 
 builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress))
  ;//.AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+
+// builder.Services.Configure<CalibreConfiguration>(options => builder.Configuration.GetSection("calibre").Bind(options));
+
 
 builder.Services.RegisterServices(builder.Configuration);
 
