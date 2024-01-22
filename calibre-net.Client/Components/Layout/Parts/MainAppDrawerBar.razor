@@ -3,20 +3,17 @@
     <MudSpacer />
     <ThemeToggleButton />
     @* <CultureSelector /> *@
-<div> @System.Globalization.CultureInfo.CurrentCulture.Name</div>
+    <div> @System.Globalization.CultureInfo.CurrentCulture.Name</div>
 
     <TopMenu />
 </MudAppBar>
 <MudDrawer Class="mud-drawer-fixed my-layout-drawer" ClipMode="DrawerClipMode.Never" Open="_initialDrawerState">
     <MudDrawerHeader Class="top-row" Dense="true">
-        <MudText Style="@($"color:{Colors.Shades.White};")" Typo="Typo.h6">Calibre.Net</MudText>
+        <SiteTitle/>
     </MudDrawerHeader>
     <NavMenu />
 </MudDrawer>
 
 @code {
-
     private bool _initialDrawerState = true;
-
-
 }

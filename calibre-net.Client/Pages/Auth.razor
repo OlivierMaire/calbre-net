@@ -3,9 +3,16 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using calibre_net.Client.Components
+@using calibre_net.Shared.Models;
+@using calibre_net.Client.Services;
 
 @attribute [Authorize(Policy = "Admin")]
 @rendermode InteractiveAuto
+
+
+@inject IMessageService MessageService
+@inject WindowIdService WindowIdService
+
 
 @* <MyMudProviders /> *@
 
@@ -28,8 +35,25 @@
     <li><b>Number</b>: @number.ToString("N2")</li>
 </ul>
 
+@(OperatingSystem.IsBrowser() ? "Wasm" : "Server")
+
+
+        <MudButton Variant="Variant.Outlined" OnClick="SubmitSettingsForm" Class="ml-auto" Color="Color.Primary">
+            Save</MudButton>
+
 
 @code {
     private DateTime dt = DateTime.Now;
     private double number = 1999.69;
+
+        public async Task SubmitSettingsForm()
+    {
+        @* CalibreSettings = await ConfigurationClient.GetCalibreConfigurationAsync(); *@
+         MessageService.SendMessage(new MessageEventArgs(){
+EventType = MessageType.ConfigChanged, 
+        @* WindowId = WindowIdService.MyGuid *@
+         }
+); 
+    }
+
 }

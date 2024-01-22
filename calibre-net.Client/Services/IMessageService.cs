@@ -25,5 +25,6 @@ public class MessageEventArgs
 
    public enum MessageType {
         DrawerToggle,
-        Message
+        Message,
+        ConfigChanged
     }

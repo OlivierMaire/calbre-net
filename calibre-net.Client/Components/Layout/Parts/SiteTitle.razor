@@ -1,0 +1,79 @@
+@rendermode InteractiveAuto
+
+@using calibre_net.Client.ApiClients
+@using calibre_net.Client.CustomEvents
+
+@inject ConfigurationClient ConfigurationClient
+
+@implements IDisposable
+@inject PersistentComponentState ApplicationState
+
+<div class="calibreMessageHandler" @oncalibremessageevent="HandleMessageEvent" style="display: none;"></div>
+
+<MudText Class="cookie-regular" Style="@($"color:{Colors.Shades.White};")" Typo="Typo.h6">@(Title)
+</MudText>
+
+@code {
+    public string? Title { get; set; }
+    public int cnt = 0;
+    private IDisposable? monitorDisposable;
+
+    private PersistingComponentStateSubscription persistingSubscription;
+
+    protected override async Task OnInitializedAsync()
+    {
+        @* Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title"); *@
+
+        persistingSubscription =
+        ApplicationState.RegisterOnPersisting(PersistData);
+
+        if (ApplicationState.TryTakeFromJson<string>(
+        "SiteTitle", out var restored))
+            Title = restored!;
+            else
+            Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title");
+
+        await base.OnInitializedAsync();
+
+    }
+    private Task PersistData()
+    {
+        ApplicationState.PersistAsJson("SiteTitle", Title);
+
+        return Task.CompletedTask;
+    }
+    void IDisposable.Dispose()
+    {
+        persistingSubscription.Dispose();
+    }
+
+    public async Task ConfigUpdate(CalibreConfiguration config)
+    {
+
+        cnt++;
+        var oper = OperatingSystem.IsBrowser() ? "Wasm" : "Server";
+        Console.WriteLine($"{oper} counter {cnt}");
+        @* Title = config.UI.View.SiteTitle; *@
+        this.Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title");
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task HandleMessageEvent(CalibreMessageEvent eventArgs)
+    {
+        @* Console.WriteLine("event received");
+cnt++;
+var oper = OperatingSystem.IsBrowser() ? "Wasm" : "Server";
+Console.WriteLine($"JS Event {oper} counter {cnt}"); *@
+
+
+        if (eventArgs != null && eventArgs.EventType == MessageType.ConfigChanged)
+        {
+            @* Console.WriteLine("Config Changed Event"); *@
+            this.Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title");
+            @* Console.WriteLine($"New Title is {Title}"); *@
+            @* await InvokeAsync(StateHasChanged); *@
+        }
+    }
+
+}

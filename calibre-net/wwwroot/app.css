@@ -3,6 +3,7 @@
 	The file remains available at all times for demonstration purposes,
 	but it is exclusively employed in the 'App.razor' component when authentication is enabled.
 */
+@import url("https://fonts.googleapis.com/css2?family=Cookie&display=swap");
 .btn-primary {
   text-transform: uppercase;
   --bs-btn-bg: var(--mud-palette-primary) !important;
@@ -143,4 +144,23 @@ main {
 }
 .mud-toolbar-appbar .mud-navmenu.mud-navmenu-default .mud-nav-link.active:not(.mud-nav-link-disabled) {
   background-color: var(--mud-palette-action-default);
+}
+
+.mud-collapse-entered {
+  height: auto;
+}
+
+.cookie-regular {
+  font-family: "Cookie", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.mud-drawer-header.top-row {
+  overflow: hidden;
+  height: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 4);
+}
+
+.mud-typography-h6.cookie-regular {
+  font-size: 2rem;
 }

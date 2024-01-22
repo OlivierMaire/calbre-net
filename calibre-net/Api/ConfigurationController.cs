@@ -14,20 +14,60 @@ public class ConfigurationController(ConfigurationService configurationService) 
 {
     private readonly ConfigurationService configurationService = configurationService;
 
-    [HttpGet("database")]
-    [ProducesResponseType(typeof(DatabaseConfiguration), StatusCodes.Status200OK)]
+    // [HttpGet("database")]
+    // [ProducesResponseType(typeof(DatabaseConfiguration), StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // public async Task<IActionResult> GetDatabaseConfigurationAsync()
+    // {
+    //     return Ok(await configurationService.GetDatabaseConfigurationAsync());
+    // }
+
+    // [HttpPost("database")]
+    // [ProducesResponseType(typeof(DatabaseConfiguration), StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // public async Task<IActionResult> SetDatabaseConfigurationAsync(DatabaseConfiguration model)
+    // {
+    //     return Ok(await configurationService.SetDatabaseConfigurationAsync(model));
+    // }
+
+    // [HttpGet("basic")]
+    // [ProducesResponseType(typeof(BasicConfiguration), StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // public async Task<IActionResult> GetBasicConfigurationAsync()
+    // {
+    //     return Ok(await configurationService.GetBasicConfigurationAsync());
+    // }
+
+    // [HttpPost("basic")]
+    // [ProducesResponseType(typeof(BasicConfiguration), StatusCodes.Status200OK)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // public async Task<IActionResult> SetBasicConfigurationAsync(BasicConfiguration model)
+    // {
+    //     return Ok(await configurationService.SetBasicConfigurationAsync(model));
+    // }
+
+    [HttpGet("calibre")]
+    [ProducesResponseType(typeof(CalibreConfiguration), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetDatabaseConfigurationAsync()
+    public async Task<IActionResult> GetCalibreConfigurationAsync()
     {
-        return Ok(await configurationService.GetDatabaseConfigurationAsync());
+        return Ok(await configurationService.GetCalibreConfigurationAsync());
     }
 
-    [HttpPost("database")]
-    [ProducesResponseType(typeof(DatabaseConfiguration), StatusCodes.Status200OK)]
+    [HttpPost("calibre")]
+    [ProducesResponseType(typeof(CalibreConfiguration), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> SetDatabaseConfigurationAsync(DatabaseConfiguration model)
+    public async Task<IActionResult> SetCalibreConfigurationAsync(CalibreConfiguration model)
     {
-        return Ok(await configurationService.SetDatabaseConfigurationAsync(model));
+        return Ok(await configurationService.SetCalibreConfigurationAsync(model));
+    }
+
+    [HttpGet(nameof(GetConfigurationValue))]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetConfigurationValue(string key)
+    {
+        return Ok(await configurationService.GetConfigurationValue(key));
     }
 
 }

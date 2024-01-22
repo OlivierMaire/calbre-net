@@ -157,3 +157,24 @@ main {
     background-color: var(--mud-palette-action-default);
 }
 }
+
+.mud-collapse-entered{
+    height: auto;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Cookie&display=swap');
+
+.cookie-regular {
+    font-family: "Cookie", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .mud-drawer-header.top-row{
+    overflow: hidden;
+    height: calc(var(--mud-appbar-height) - var(--mud-appbar-height)/4);
+  }
+
+  .mud-typography-h6.cookie-regular{
+    font-size: 2rem;
+  }

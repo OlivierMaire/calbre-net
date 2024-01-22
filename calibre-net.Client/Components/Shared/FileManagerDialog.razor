@@ -45,11 +45,7 @@
     void Submit() => MudDialog.Close(DialogResult.Ok(SelectedPath));
     void Cancel() => MudDialog.Cancel();
 
-    void SelectRoot()
-    {
-        SelectedPath = System.IO.Directory.GetDirectoryRoot(SelectedPath);
-        ReadDirectory();
-    }
+
 
     protected override void OnInitialized()
     {
@@ -57,6 +53,13 @@
         ReadLogicalDrives();
         base.OnInitialized();
     }
+
+    void SelectRoot()
+    {
+        SelectedPath = System.IO.Directory.GetDirectoryRoot(SelectedPath);
+        ReadDirectory();
+    }
+
 
     void ReadLogicalDrives()
     {
@@ -67,9 +70,13 @@
 
     void ReadDirectory()
     {
-        Directories = System.IO.Directory.GetDirectories(SelectedPath).Select(d => new DirectoryInfo(d).Name).ToArray();
-        if (!ChooseFolder)
-            Files = System.IO.Directory.GetFiles(SelectedPath).Select(f => new FileInfo(f).Name).ToArray();
+        try
+        {
+            Directories = System.IO.Directory.GetDirectories(SelectedPath).Select(d => new DirectoryInfo(d).Name).ToArray();
+            if (!ChooseFolder)
+                Files = System.IO.Directory.GetFiles(SelectedPath).Select(f => new FileInfo(f).Name).ToArray();
+        }
+        catch { }
     }
 
     void OpenDirectory(string path)

@@ -1,13 +1,8 @@
 export function onLoad() {
-    console.log('Loaded');
-
-
-
     onUpdate();
 }
 
 export function onUpdate() {
-    console.log('Updated');
 
     document.querySelectorAll(".mud-input input.mud-input-slot")
         .forEach((e) => {
@@ -33,6 +28,16 @@ export function onUpdate() {
 
             }));
 
+    // document.querySelectorAll(".mud-expand-panel .mud-expand-panel-header")
+    //     .forEach((e) =>
+    //         e.addEventListener('click', (event) => {
+    //             if (!event.defaultPrevented) {
+    //                 expandpanel(event.currentTarget);
+    //             }
+    //             event.stopPropagation();
+    //             event.preventDefault();
+    //         }));
+
 }
 
 function onblur(e) {
@@ -53,6 +58,14 @@ function checkboxonchange(e) {
         e.parentNode.querySelector(".mud-icon-root").innerHTML =
             '<path d="M0 0h24v24H0z" fill="none"></path><path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>';
     }
+}
+
+function expandpanel(e) {
+    e.querySelector(".mud-expand-panel-icon").classList.toggle("mud-transform");
+    e.parentNode.classList.toggle("mud-panel-expanded");
+    e.parentNode.querySelector(".mud-collapse-container").classList.toggle("mud-collapse-entered");
+    e.parentNode.querySelector(".mud-collapse-container").style = "";
+
 }
 
 export function onDispose() {

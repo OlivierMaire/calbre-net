@@ -10,7 +10,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public virtual DbSet<UserCredential> UserCredentials { get; set; }
     public virtual DbSet<UserPermission> UserPermissions { get; set; }
-    public virtual DbSet<CalibreConfiguration> Configurations {get;set;}
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
