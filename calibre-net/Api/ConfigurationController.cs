@@ -49,9 +49,9 @@ public class ConfigurationController(ConfigurationService configurationService) 
     [HttpGet("calibre")]
     [ProducesResponseType(typeof(CalibreConfiguration), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetCalibreConfigurationAsync()
+    public IActionResult GetCalibreConfiguration()
     {
-        return Ok(await configurationService.GetCalibreConfigurationAsync());
+        return Ok(configurationService.GetCalibreConfiguration());
     }
 
     [HttpPost("calibre")]
@@ -65,9 +65,9 @@ public class ConfigurationController(ConfigurationService configurationService) 
     [HttpGet(nameof(GetConfigurationValue))]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetConfigurationValue(string key)
+    public IActionResult GetConfigurationValue(string key)
     {
-        return Ok(await configurationService.GetConfigurationValue(key));
+        return Ok(configurationService.GetConfigurationValue(key));
     }
 
 }

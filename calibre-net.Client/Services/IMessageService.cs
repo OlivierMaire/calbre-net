@@ -15,10 +15,10 @@ public class MessageEventArgs
 {
     public MessageType EventType { get; set; }
 
-    public object Payload {get;set;}
+    public object? Payload {get;set;} 
 
-    public Type PayloadType {get;set;}
-    public string Message { get; set; }
+    public Type? PayloadType {get;set;}
+    public string Message { get; set; } = string.Empty;
 
     public Guid WindowId { get; set; }
 }

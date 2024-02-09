@@ -31,7 +31,7 @@
     </DialogActions>
 </MudDialog>
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
     [Parameter] public string SelectedPath { get; set; } = string.Empty;
 
@@ -72,9 +72,9 @@
     {
         try
         {
-            Directories = System.IO.Directory.GetDirectories(SelectedPath).Select(d => new DirectoryInfo(d).Name).ToArray();
+            Directories = System.IO.Directory.GetDirectories(SelectedPath).Select(d => new DirectoryInfo(d).Name).OrderBy(n => n).ToArray();
             if (!ChooseFolder)
-                Files = System.IO.Directory.GetFiles(SelectedPath).Select(f => new FileInfo(f).Name).ToArray();
+                Files = System.IO.Directory.GetFiles(SelectedPath).Select(f => new FileInfo(f).Name).OrderBy(n => n).ToArray();
         }
         catch { }
     }

@@ -13,11 +13,10 @@
 
 
 
-
 <PageTitle>Admin - Configuration</PageTitle>
 
 <MudText Typo="Typo.h4">Configuration</MudText>
-
+@{ #pragma warning disable CS8602 }
 @if (CalibreSettings != null)
 {
     <EditForm Model="CalibreSettings" method="post" OnValidSubmit="SubmitSettingsForm" FormName="CalibreSettings">
@@ -42,7 +41,7 @@
                                 <MudText Typo="Typo.h6">Server Configuration</MudText>
                             </TitleContent>
                             <ChildContent>
-                                <MudTextField @bind-Value="CalibreSettings.Basic.Server.Port"
+                                <MudTextField @bind-Value="@CalibreSettings.Basic.Server.Port"
                                     Name="CalibreSettings.Basic.Server.Port" Label="Server Port" />
                                 <MudTextField @bind-Value="CalibreSettings.Basic.Server.SslCertfilePath"
                                     Name="CalibreSettings.Basic.Server.SslCertfilePath"
@@ -287,6 +286,7 @@
     </EditForm>
 
 }
+@{ #pragma warning restore CS8602 }
 
 @code {
 
