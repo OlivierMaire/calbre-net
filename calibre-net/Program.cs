@@ -75,7 +75,7 @@ var calibreDbLocation = builder.Configuration["calibre:database:location"] ?? th
 builder.Services.AddDbContext<CalibreDbContext>(options =>
 {
     // Console.WriteLine("Connect to : " + $"Data Source={calibreDbLocation}\\metadata.db;");
-    var connection = CalibreDbContext.Configure($"Data Source={calibreDbLocation}\\metadata.db;");
+    var connection = CalibreDbContext.Configure($"Data Source={calibreDbLocation}{Path.DirectorySeparatorChar}metadata.db;");
     options.UseSqlite(connection);
 }, ServiceLifetime.Scoped);
 
