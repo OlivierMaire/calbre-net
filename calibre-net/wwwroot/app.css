@@ -164,3 +164,16 @@ main {
 .mud-typography-h6.cookie-regular {
   font-size: 2rem;
 }
+
+a {
+  -webkit-text-decoration: underline 0.15em rgba(0, 0, 0, 0) !important;
+          text-decoration: underline 0.15em rgba(0, 0, 0, 0) !important;
+  transition: -webkit-text-decoration-color 300ms;
+  transition: text-decoration-color 300ms;
+  transition: text-decoration-color 300ms, -webkit-text-decoration-color 300ms;
+}
+
+a:hover {
+  -webkit-text-decoration-color: var(--bs-link-hover-color-rgb) !important;
+          text-decoration-color: var(--bs-link-hover-color-rgb) !important;
+}

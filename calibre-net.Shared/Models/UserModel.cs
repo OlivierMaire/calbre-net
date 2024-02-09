@@ -6,7 +6,7 @@ namespace calibre_net.Shared.Models;
 public class UserModel
 {
     [JsonPropertyName("id")]
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [JsonPropertyName("name")]
     public string? Name { get; set; }
     [JsonPropertyName("email")]
@@ -14,7 +14,7 @@ public class UserModel
     [JsonPropertyName("permissions")]
     public List<string> Permissions { get; set; } = [];
     [JsonPropertyName("preferedlocale")]
-    public string PreferredLocale { get; set; }
+    public string PreferredLocale { get; set; } = string.Empty;
 }
 
 public class UserModelExtended: UserModel{

@@ -32,7 +32,7 @@
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
-    private PersistingComponentStateSubscription persistingSubscription;
+    @* private PersistingComponentStateSubscription persistingSubscription; *@
     protected override void OnInitialized()
     {
         HttpContext?.Response.Cookies.Append(
@@ -43,7 +43,7 @@
         CultureInfo.CurrentUICulture)));
     }
 
-    private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path.StartsWithSegments("/Account")
+    @* private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path.StartsWithSegments("/Account")
     ? null
-    : InteractiveAuto;
+    : InteractiveAuto; *@
 }

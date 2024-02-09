@@ -5,6 +5,7 @@ using calibre_net.Shared.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Namotion.Reflection;
+using Z.EntityFramework.Plus;
 
 namespace calibre_net.Services;
 
@@ -96,6 +97,10 @@ ILogger<UserService> logger)
             }
         }
 
+
+        // On Permission update Expire the tag with:
+        QueryCacheManager.ExpireTag("permissions", user.Id);
+
         await dbContext.SaveChangesAsync();
 
         return await GetUserAsync(model.Id);
@@ -162,7 +167,7 @@ ILogger<UserService> logger)
             }
             if (userId == currentUser?.Id)
             {
-                  await signInManager.SignOutAsync();
+                await signInManager.SignOutAsync();
             }
         }
     }

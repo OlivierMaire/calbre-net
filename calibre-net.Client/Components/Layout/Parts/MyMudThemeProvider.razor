@@ -43,7 +43,7 @@
 
     private PersistingComponentStateSubscription persistingSubscription;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         persistingSubscription =
         ApplicationState.RegisterOnPersisting(PersistData);

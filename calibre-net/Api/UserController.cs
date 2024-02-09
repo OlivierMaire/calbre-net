@@ -20,9 +20,9 @@ public class UserController : ControllerBase
     [HttpGet("me")]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetMyself()
+    public async Task<IActionResult> GetMyselfAsync()
     {
-
+        await Task.CompletedTask;
 
         return Ok("hello api world");
     }

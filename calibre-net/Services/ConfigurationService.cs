@@ -26,7 +26,7 @@ IConfiguration configuration)
     // private readonly IOptions<ServerConfiguration> serverOptions = serverOptions;
 
 
-    public async Task<CalibreConfiguration> GetCalibreConfigurationAsync()
+    public CalibreConfiguration GetCalibreConfiguration()
     {
         return configSnap.Value;
     }
@@ -92,11 +92,11 @@ IConfiguration configuration)
 
         }
 
-        return await GetCalibreConfigurationAsync();
+        return  GetCalibreConfiguration();
     }
 
 
-    public async Task<string> GetConfigurationValue(string key)
+    public string GetConfigurationValue(string key)
     {
         return configuration[key] ?? string.Empty;
     }

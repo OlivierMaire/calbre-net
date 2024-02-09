@@ -1,7 +1,7 @@
 @rendermode InteractiveServer
 @inject IDialogService DialogService
 
-<MudTextField ReadOnly name="@Name" Label="@Label" @bind-Value="Value" Adornment="Adornment.End"
+<MudTextField ReadOnly name="@Name" Label="@Label" @bind-Value="InnerValue" Adornment="Adornment.End"
     AdornmentIcon="@Icons.Material.Filled.FileOpen" OnAdornmentClick="OnSelectFile" />
 
 @code {
@@ -15,7 +15,8 @@
 
     private string _value = ".";
     [Parameter]
-    public string Value
+    public string Value { get; set; }  = ".";
+    private string InnerValue
     {
         get => _value;
         set
@@ -30,6 +31,10 @@
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 
+    protected override void OnInitialized()
+    {
+        InnerValue = Value;
+    }
 
     public async Task OnSelectFile()
     {
@@ -44,7 +49,7 @@
         if (!result.Canceled)
         {
             if (!string.IsNullOrEmpty(result.Data.ToString()))
-                Value = result.Data.ToString();
+                Value = result.Data.ToString() ?? string.Empty;
         }
         Console.WriteLine(Value);
     }

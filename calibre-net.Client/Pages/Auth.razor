@@ -38,22 +38,12 @@
 @(OperatingSystem.IsBrowser() ? "Wasm" : "Server")
 
 
-        <MudButton Variant="Variant.Outlined" OnClick="SubmitSettingsForm" Class="ml-auto" Color="Color.Primary">
-            Save</MudButton>
 
 
 @code {
     private DateTime dt = DateTime.Now;
     private double number = 1999.69;
 
-        public async Task SubmitSettingsForm()
-    {
-        @* CalibreSettings = await ConfigurationClient.GetCalibreConfigurationAsync(); *@
-         MessageService.SendMessage(new MessageEventArgs(){
-EventType = MessageType.ConfigChanged, 
-        @* WindowId = WindowIdService.MyGuid *@
-         }
-); 
-    }
+     
 
 }

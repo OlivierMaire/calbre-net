@@ -15,11 +15,11 @@
 }
 else
 {
-    <MudText Typo="Typo.h4">@L["Edit User {userName}", SelectedUser?.Name]</MudText>
+    <MudText Typo="Typo.h4">@L["Edit User {userName}", SelectedUser?.Name ?? string.Empty]</MudText>
     <MudText Typo="Typo.caption">@Id</MudText>
 }
 
-@if (!_loading)
+@if (!_loading && SelectedUser != null)
 {
     <EditForm Model="SelectedUser" method="post" OnValidSubmit="SubmitForm" FormName="SelectedUser">
         <DataAnnotationsValidator />
@@ -138,6 +138,9 @@ else
 
     public async Task SubmitForm()
     {
+        if (SelectedUser == null)
+            return;
+
         Logger.LogInformation("Sumbit form");
         Logger.LogInformation(SelectedUser.Name);
 

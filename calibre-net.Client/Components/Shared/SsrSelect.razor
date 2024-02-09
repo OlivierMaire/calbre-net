@@ -6,7 +6,7 @@
         <div class="mud-input-control-input-container">
             <div
                 class="mud-input mud-input-text mud-input-adorned-start mud-input-underline mud-shrink mud-select-input">
-                <InputSelect Name="@Name" @bind-Value="@Value"
+                <InputSelect Name="@Name" @bind-Value="@InnerValue" 
                     Class="input-select mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-start mud-select-input">
                     @foreach (var opt in Options)
                     {
@@ -25,9 +25,12 @@
 </div>
 
 @code {
+    private string _value = string.Empty;
+
     [Parameter]
-    public string Value
-    {
+    public string Value {get;set;} = string.Empty;
+
+    public string InnerValue   {
         get => _value;
         set
         {
@@ -47,13 +50,13 @@
     [Parameter]
     public string Name { get; set; } = string.Empty;
 
-    private string _value;
 
     [Parameter]
     public List<KeyValuePair<string, string>> Options { get; set; } = new List<KeyValuePair<string, string>>();
 
 protected override void OnInitialized()
     {
+        InnerValue = Value;
         if (String.IsNullOrEmpty(this.Name))
             this.Name = ParseFieldName();
     }

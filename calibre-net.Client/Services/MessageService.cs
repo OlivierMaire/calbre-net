@@ -4,14 +4,7 @@ namespace calibre_net.Client.Services;
 [SingletonRegistration]
 public class MessageService : IMessageService
 {
-
-
-
-    public event Action<MessageEventArgs> OnMessage;
-
-
-
-
+    public event Action<MessageEventArgs>? OnMessage;
     public void SendMessage(MessageEventArgs message)
     {
         Console.WriteLine($"Sending Message : {message.EventType}, GUID: {message.WindowId}");

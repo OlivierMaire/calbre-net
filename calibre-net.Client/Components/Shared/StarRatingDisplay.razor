@@ -1,0 +1,25 @@
+<div class="star-rating">
+@for (int i = 0; i < fullStar; i++)
+{
+    <MudIcon Icon="@Icons.Material.Filled.Star" />
+}
+@for (int i = 0; i < halfStar; i++)
+{
+    <MudIcon Icon="@Icons.Material.Filled.StarHalf" />
+}
+@for (int i = 0; i < emptyStar; i++)
+{
+    <MudIcon Icon="@Icons.Material.Filled.StarOutline" />
+}
+</div>
+
+@code{
+
+    [Parameter] public int Value {get;set;}  = 0;
+
+    public int fullStar => (int)Math.Floor(Value / 2.0m);
+
+    public int halfStar => Value - (fullStar * 2);
+    public int emptyStar => 5 - fullStar - halfStar;
+
+}

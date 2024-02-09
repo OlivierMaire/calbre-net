@@ -15,6 +15,7 @@ using calibre_net.Client.Services;
 using Namotion.Reflection;
 using calibre_net.Migrations;
 using calibre_net.Shared.Models;
+using Calibre_net.Data.Calibre;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -69,6 +70,14 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+var calibreDbLocation = builder.Configuration["calibre:database:location"] ?? throw new InvalidOperationException("Connection string 'calibre:database:location' not found.");
+builder.Services.AddDbContext<CalibreDbContext>(options =>
+{
+    // Console.WriteLine("Connect to : " + $"Data Source={calibreDbLocation}\\metadata.db;");
+    var connection = CalibreDbContext.Configure($"Data Source={calibreDbLocation}\\metadata.db;");
+    options.UseSqlite(connection);
+}, ServiceLifetime.Scoped);
 
 // builder.Services.AddLocalization();
 

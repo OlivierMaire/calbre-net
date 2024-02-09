@@ -1,0 +1,38 @@
+@page "/books"
+@inject ApiClients.BookClient BookClient
+@using calibre_net.Client.Pages.Shared
+
+@attribute [StreamRendering]
+
+<PageTitle>Books</PageTitle>
+<MudText Typo="Typo.h3" GutterBottom="true">Books</MudText>
+
+@if (BookList == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+
+<MudContainer Class="d-flex flex-row gap-2 flex-wrap flex-wrap-anim" MaxWidth="MaxWidth.False">
+        @foreach (var book in BookList)
+        {
+            <BookThumb CalibreBook="@book"/>
+        }
+</MudContainer>
+
+   
+}
+
+
+@code {
+
+    ICollection<BookDto> BookList { get; set; } = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        BookList = await BookClient.GetBooksAsync();
+        Console.WriteLine($"{BookList.Count} books found");
+        StateHasChanged();
+    }
+}
