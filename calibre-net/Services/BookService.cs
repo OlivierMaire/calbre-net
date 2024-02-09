@@ -18,6 +18,7 @@ public class BookService(CalibreDbContext calibreDb)
         .Include(b => b.Authors)
         .Include(b => b.Series)
         .Include(b => b.Ratings)
+        .AsSplitQuery()
         .FromCache("books");
         
         return books.ProjectToDto().ToList();
@@ -29,6 +30,7 @@ public class BookService(CalibreDbContext calibreDb)
         .Include(b => b.Authors)
         .Include(b => b.Series)
         .Include(b => b.Ratings)
+        .AsSplitQuery()
         .Where(b => b.Id == id)
         .FromCache("book", id.ToString())
         .FirstOrDefault();
