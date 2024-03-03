@@ -125,9 +125,9 @@ else
 
         supportedCultures = SupportedCultures.Value.SupportedCultureOptions;
 
-        Permissions = await UserClient.GetAllPermissionsAsync();
+        Permissions = await UserClient.AllPermissionsAsync();
         if (!IsNewUser)
-            SelectedUser ??= await UserClient.GetUserAsync(Id);
+            SelectedUser ??= await UserClient.UserGetAsync(Id.ToString());
         else
             SelectedUser ??= new UserModelExtended();
         SelectedUser.Permissions ??= [];
@@ -150,7 +150,7 @@ else
             {
                 SelectedUser.Permissions ??= [];
                 SelectedUser.Id = string.Empty;
-                var temp = await UserClient.AddUserAsync(SelectedUser);
+                var temp = await UserClient.AddAsync(SelectedUser);
                 SelectedUser = temp;
             }
             catch (ApiException ae)
@@ -162,7 +162,7 @@ else
         else
         {
             SelectedUser!.Id = Id;
-            SelectedUser = await UserClient.UpdateUserAsync(SelectedUser);
+            SelectedUser = await UserClient.UpdateAsync(SelectedUser);
         }
 
 
@@ -171,7 +171,7 @@ else
 
     public async Task SubmitDeleteForm()
     {
-        await UserClient.DeleteUserAsync(Id);
+        await UserClient.UserDeleteAsync(Id.ToString());
         NavigationManager.NavigateTo("/Admin");
     }
 

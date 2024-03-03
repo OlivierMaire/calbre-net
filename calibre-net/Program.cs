@@ -14,8 +14,12 @@ using calibre_net.Shared.Resources;
 using calibre_net.Client.Services;
 using Namotion.Reflection;
 using calibre_net.Migrations;
-using calibre_net.Shared.Models;
+using calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
+using EPubBlazor;
+using FastEndpoints;
+using FastEndpoints.Swagger;
+using FastEndpoints.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -25,12 +29,13 @@ var listeningPort = builder.Configuration["calibre:basic:server:port"];
 if (!string.IsNullOrEmpty(listeningPort))
     builder.WebHost.UseUrls($"https://localhost:{listeningPort}");
 
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
-builder.Services.AddControllers();
+// builder.Services.AddControllers();
 
 
 builder.Services.AddMudServices();
@@ -105,6 +110,7 @@ builder.Services.AddScoped<PasskeyService>();
 
 // builder.Services.AddScoped<Fido2NetLib.Fido2Configuration>();
 // builder.Services.AddScoped<Fido2NetLib.Fido2>();
+builder.Services.AddEPubBlazor();
 
 builder.Services.RegisterServices(builder.Configuration);
 
@@ -131,57 +137,80 @@ builder.Services.AddFido2(options =>
 
 // builder.Services.AddOpenApiDocument(); 
 
-builder.Services.AddApiVersioning(o =>
-        {
-            o.AssumeDefaultVersionWhenUnspecified = true;
-            o.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
-            o.ReportApiVersions = true;
-            o.ApiVersionReader = Asp.Versioning.ApiVersionReader.Combine(
-                new Asp.Versioning.UrlSegmentApiVersionReader(),
-                new Asp.Versioning.QueryStringApiVersionReader("api-version"),
-                new Asp.Versioning.HeaderApiVersionReader("X-Version")
-            // new MediaTypeApiVersionReader("ver")
-            );
-        })
-        //.AddMvc()
-        .AddApiExplorer(
-        options =>
-        {
-            options.GroupNameFormat = "'v'VVV";
-            options.SubstituteApiVersionInUrl = true;
-        });
 
-var versionDescriptionProvider = builder.Services.BuildServiceProvider().GetService<Asp.Versioning.ApiExplorer.IApiVersionDescriptionProvider>();
-if (versionDescriptionProvider != null)
-    foreach (var description in versionDescriptionProvider.ApiVersionDescriptions)
+// builder.Services.AddApiVersioning(o =>
+//         {
+//             o.AssumeDefaultVersionWhenUnspecified = true;
+//             o.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+//             o.ReportApiVersions = true;
+//             o.ApiVersionReader = Asp.Versioning.ApiVersionReader.Combine(
+//                 new Asp.Versioning.UrlSegmentApiVersionReader(),
+//                 new Asp.Versioning.QueryStringApiVersionReader("api-version"),
+//                 new Asp.Versioning.HeaderApiVersionReader("X-Version")
+//             // new MediaTypeApiVersionReader("ver")
+//             );
+//         })
+//         //.AddMvc()
+//         .AddApiExplorer(
+//         options =>
+//         {
+//             options.GroupNameFormat = "'v'VVV";
+//             options.SubstituteApiVersionInUrl = true;
+//         });
+
+// var versionDescriptionProvider = builder.Services.BuildServiceProvider().GetService<Asp.Versioning.ApiExplorer.IApiVersionDescriptionProvider>();
+// if (versionDescriptionProvider != null)
+//     foreach (var description in versionDescriptionProvider.ApiVersionDescriptions)
+//     {
+//         builder.Services.AddOpenApiDocument(config =>
+//             {
+//                 config.DocumentName = description.GroupName;
+//                 config.PostProcess = document =>
+//                 {
+//                     document.Info.Version = description.GroupName;
+//                     document.Info.Title = "Calibre.Net Api";
+//                     document.Info.Description = "Calibre.Net Api Services.";
+//                     document.Info.TermsOfService = "None";
+//                     document.Info.Contact = new NSwag.OpenApiContact
+//                     {
+//                         Name = "Olivier Maire",
+//                         Email = string.Empty,
+//                         Url = ""
+//                     };
+//                 };
+//                 // config.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT token"));
+//                 // config.AddSecurity("JWT token", new OpenApiSecurityScheme
+//                 // {
+//                 //     Type = OpenApiSecuritySchemeType.ApiKey,
+//                 //     Name = "Authorization",
+//                 //     Description = "Copy 'Bearer ' + valid JWT token into field",
+//                 //     In = OpenApiSecurityApiKeyLocation.Header
+//                 // });
+//                 config.ApiGroupNames = new[] { description.GroupName };
+//             });
+//     }
+
+
+builder.Services.AddFastEndpoints()
+.AddResponseCaching();
+
+
+builder.Services
+.SwaggerDocument(o =>
+{
+    o.ShortSchemaNames = true;
+    // o.ExcludeNonFastEndpoints = true;
+     o.MaxEndpointVersion = 1;
+    o.DocumentSettings = s =>
     {
-        builder.Services.AddOpenApiDocument(config =>
-            {
-                config.DocumentName = description.GroupName;
-                config.PostProcess = document =>
-                {
-                    document.Info.Version = description.GroupName;
-                    document.Info.Title = "Calibre.Net Api";
-                    document.Info.Description = "Calibre.Net Api Services.";
-                    document.Info.TermsOfService = "None";
-                    document.Info.Contact = new NSwag.OpenApiContact
-                    {
-                        Name = "Olivier Maire",
-                        Email = string.Empty,
-                        Url = ""
-                    };
-                };
-                // config.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT token"));
-                // config.AddSecurity("JWT token", new OpenApiSecurityScheme
-                // {
-                //     Type = OpenApiSecuritySchemeType.ApiKey,
-                //     Name = "Authorization",
-                //     Description = "Copy 'Bearer ' + valid JWT token into field",
-                //     In = OpenApiSecurityApiKeyLocation.Header
-                // });
-                config.ApiGroupNames = new[] { description.GroupName };
+        s.Version = "v1";
+        s.DocumentName = "v1";
+        s.Title = "Calibre.Net Api";
+        s.Description = "Calibre.Net Api Services.";
+            };
+
             });
-    }
+
 var baseAddress = builder.Configuration["Calibre:ApiHost"];
 if (string.IsNullOrEmpty(baseAddress))
 {
@@ -198,7 +227,15 @@ builder.Services.AddHttpClient("AuthenticationApi", client => client.BaseAddress
 
 builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress));
 
+builder.WebHost.ConfigureKestrel(o =>
+{
+    // o.Limits.
+    o.Limits.MaxResponseBufferSize = null;
+    // o.Limits.MaxRequestBodySize = 1073741824; //set to max allowed file size of your system
+});
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -206,20 +243,21 @@ if (app.Environment.IsDevelopment())
     app.UseWebAssemblyDebugging();
     app.UseMigrationsEndPoint();
 
+
     // Add OpenAPI 3.0 document serving middleware
     // Available at: http://localhost:<port>/swagger/v1/swagger.json
-    app.UseOpenApi();
+    // app.UseOpenApi();
 
     // Add web UIs to interact with the document
     // Available at: http://localhost:<port>/swagger
-    app.UseSwaggerUi();
+    // app.UseSwaggerUi();
 
     // Add ReDoc UI to interact with the document
     // Available at: http://localhost:<port>/redoc
-    app.UseReDoc(options =>
-    {
-        options.Path = "/redoc";
-    });
+    // app.UseReDoc(options =>
+    // {
+    //     options.Path = "/redoc";
+    // });
 }
 else
 {
@@ -243,15 +281,30 @@ app.UseAntiforgery();
 
 app.UseMiddleware<BlazorCookieAuthenticationMiddleware<ApplicationUser>>();
 
-app.MapControllers();
+// Add additional endpoints required by the Identity /Account Razor components.
+app.MapAdditionalIdentityEndpoints();
+
+app.UseAuthentication() //add this
+   .UseAuthorization(); //add this
+
+app.UseResponseCaching()
+.UseFastEndpoints(c => {
+    c.Versioning.Prefix = "v";
+    c.Versioning.PrependToRoute = true;
+    c.Endpoints.RoutePrefix = "api";
+});
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerGen();
+}
+
+// app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(calibre_net.Client.Pages.Counter).Assembly);
 
-// Add additional endpoints required by the Identity /Account Razor components.
-app.MapAdditionalIdentityEndpoints();
 
 
 app.Run();

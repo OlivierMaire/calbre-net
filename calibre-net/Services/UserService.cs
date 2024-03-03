@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using calibre_net.Client.Services;
 using calibre_net.Data;
-using calibre_net.Shared.Models;
+using calibre_net.Shared.Contracts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Namotion.Reflection;

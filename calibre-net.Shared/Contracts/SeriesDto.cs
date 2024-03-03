@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Shared.Models;
-public partial class AuthorDto
+namespace calibre_net.Shared.Contracts;
+public partial class SeriesDto
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
@@ -16,9 +16,10 @@ public partial class AuthorDto
     public string Link { get; set; } = null!;
 
     [JsonPropertyName("books")]
-    public List<BookDto> Books { get; set; } = [];
+    public List<BookDto> Books {get;set;} = [];
 
+    
     [JsonIgnore]
-    public string AuthorLink => $"/author/{Id}";
+    public string SeriesLink => $"/series/{Id}";
 
 }

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Shared.Models;
+namespace calibre_net.Shared.Contracts;
 public partial class BookDto
 {
     [JsonPropertyName("id")]
@@ -53,8 +53,36 @@ public partial class BookDto
 
 
     [JsonPropertyName("rating")]
-    public RatingDto Ratings {get;set;} = null!;
+    public RatingDto Rating {get;set;} = null!;
+    
+    [JsonPropertyName("languages")]
+    public List<LanguageDto> Languages {get;set;} = [];
+
+    [JsonPropertyName("identifiers")]
+    public List<IdentifierDto> Identifiers {get;set;} = [];
+
+    [JsonPropertyName("tags")]
+    public List<TagDto> Tags {get;set;} = [];
+
+    [JsonPropertyName("publisher")]
+    public PublisherDto Publisher {get;set;} = null!;
+
+    [JsonPropertyName("custom_columns")]
+    virtual public IDictionary<int, CustomColumnDto> CustomColumns {get;set;} = new Dictionary<int,CustomColumnDto>();
+
+
+    [JsonPropertyName("comments")]
+    public CommentDto Comments {get;set;} = null!;
+
+    
+    [JsonPropertyName("data")]
+    public List<DataDto> Data {get;set;} = [];
 
     [JsonIgnore]
     public string BookLink => $"/book/{Id}";
+
+    
+    [JsonIgnore]
+    public string CoverUrl => this.HasCover ?? false ? $"/api/v1/book/cover/{this.Id}" :
+    "/image/no-cover.jpg";
 }

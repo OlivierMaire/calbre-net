@@ -80,10 +80,10 @@
         _loading = true;
         await Task.Delay(1500);
 
-        Text = await UserClient.GetMyselfAsync();
+        Text = await UserClient.MeAsync();
 
-        Permissions = await UserClient.GetAllPermissionsAsync();
-        Users = await UserClient.GetAllUsersAsync();
+        Permissions = await UserClient.AllPermissionsAsync();
+        Users = await UserClient.AllAsync();
         _loading = false;
     }
 

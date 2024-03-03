@@ -295,7 +295,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        CalibreSettings ??= await ConfigurationClient.GetCalibreConfigurationAsync();
+        CalibreSettings ??= (CalibreConfiguration)await ConfigurationClient.ConfigurationGetAsync();
     }
 
     private IJSObjectReference? _jsModule;
@@ -310,7 +310,7 @@
 
     public async Task SubmitSettingsForm()
     {
-        await ConfigurationClient.SetCalibreConfigurationAsync(CalibreSettings);
+        await ConfigurationClient.ConfigurationPostAsync(CalibreSettings);
         @* CalibreSettings = await ConfigurationClient.GetCalibreConfigurationAsync(); *@
 
         await SendMessageWithDelay(350);

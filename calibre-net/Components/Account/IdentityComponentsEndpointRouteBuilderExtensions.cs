@@ -19,7 +19,8 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        var accountGroup = endpoints.MapGroup("/Account");
+
+        var accountGroup = endpoints.MapGroup("/Account").WithTags("Identity");
 
         accountGroup.MapPost("/PerformExternalLogin", (
             HttpContext context,

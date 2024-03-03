@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Configuration;
 
-namespace calibre_net.Shared.Models;
+namespace calibre_net.Shared.Contracts;
 
 // [JsonPropertyName("calibre")]
 public class CalibreConfiguration

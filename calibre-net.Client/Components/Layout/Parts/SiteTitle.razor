@@ -31,7 +31,7 @@
         "SiteTitle", out var restored))
             Title = restored!;
             else
-            Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title");
+            Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
 
         await base.OnInitializedAsync();
 
@@ -54,7 +54,7 @@
         var oper = OperatingSystem.IsBrowser() ? "Wasm" : "Server";
         Console.WriteLine($"{oper} counter {cnt}");
         @* Title = config.UI.View.SiteTitle; *@
-        this.Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title");
+        this.Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
         await InvokeAsync(StateHasChanged);
     }
 
@@ -70,7 +70,7 @@ Console.WriteLine($"JS Event {oper} counter {cnt}"); *@
         if (eventArgs != null && eventArgs.EventType == MessageType.ConfigChanged)
         {
             @* Console.WriteLine("Config Changed Event"); *@
-            this.Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title");
+            this.Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
             @* Console.WriteLine($"New Title is {Title}"); *@
             @* await InvokeAsync(StateHasChanged); *@
         }

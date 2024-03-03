@@ -1,14 +1,14 @@
-using Asp.Versioning;
+// using Asp.Versioning;
 using calibre_net.Data;
 using calibre_net.Services;
-using calibre_net.Shared.Models;
+using calibre_net.Shared.Contracts;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace calibre_net.Api;
 
 [ApiController]
-[ApiVersion("1.0")]
+// [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class ConfigurationController(ConfigurationService configurationService) : ControllerBase
 {

@@ -16,6 +16,11 @@ public class BaseApiClient
         return Task.FromResult(this.httpClientFactory.CreateClient("calibre-net.Api"));
     }
 
+
+        static protected void UpdateJsonSerializerSettings(System.Text.Json.JsonSerializerOptions settings){
+            settings.PropertyNameCaseInsensitive = true;
+        }
+
 }
 
 // [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.0.0.0 (NJsonSchema v11.0.0.0 (Newtonsoft.Json v13.0.0.0))")]

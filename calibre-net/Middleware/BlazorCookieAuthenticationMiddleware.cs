@@ -1,5 +1,8 @@
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Net;
+using System.Net.Mime;
+using System.Text.Json;
 using calibre_net.Client.Models;
 using calibre_net.Data;
 using calibre_net.Services;
@@ -29,10 +32,12 @@ public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
     #endregion
 
     private readonly RequestDelegate _next;
+    private readonly ILogger<Middleware.BlazorCookieAuthenticationMiddleware<TUser>> _logger;
 
-    public BlazorCookieAuthenticationMiddleware(RequestDelegate next)
+    public BlazorCookieAuthenticationMiddleware(RequestDelegate next, ILogger<Middleware.BlazorCookieAuthenticationMiddleware<TUser>> logger)
     {
         _next = next;
+        this._logger = logger;
     }
 
     public async Task Invoke(HttpContext context,
@@ -172,7 +177,40 @@ public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
         }
 
         //Continue http middleware chain:
-        await _next.Invoke(context);
+        try
+        {
+            await _next.Invoke(context);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            await HandleCustomExceptionResponseAsync(context, ex);
+        }
     }
 
+    private async Task HandleCustomExceptionResponseAsync(HttpContext context, Exception ex)
+    {
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        var response = new ErrorModel(context.Response.StatusCode, ex.Message, ex.StackTrace?.ToString());
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        var json = JsonSerializer.Serialize(response, options);
+        await context.Response.WriteAsync(json);
+    }
+
+ public class ErrorModel
+    {
+        public int StatusCode { get; set; }
+        public string? Message { get; set; }
+        public string? Details { get; set; } 
+
+        public ErrorModel(int statusCode, string? message, string? details = null)
+        {
+            StatusCode = statusCode;
+            Message = message;
+            Details = details;
+        }
+    }
 }

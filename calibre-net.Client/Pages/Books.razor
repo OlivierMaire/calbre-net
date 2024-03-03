@@ -30,7 +30,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        BookList = await BookClient.GetBooksAsync();
+        BookList = await BookClient.AllAsync();
         Console.WriteLine($"{BookList.Count} books found");
         StateHasChanged();
     }

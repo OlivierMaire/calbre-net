@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Shared.Models;
+namespace calibre_net.Shared.Contracts;
 public partial class RatingDto
 {
     [JsonPropertyName("id")]

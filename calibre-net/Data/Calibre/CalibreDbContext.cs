@@ -41,7 +41,7 @@ public partial class CalibreDbContext : DbContext
 
     public virtual DbSet<BooksAuthorsLink> BooksAuthorsLinks { get; set; }
 
-    public virtual DbSet<BooksCustomColumn1Link> BooksCustomColumn1Links { get; set; }
+    // public virtual DbSet<BooksCustomColumn1Link> BooksCustomColumn1Links { get; set; }
 
     public virtual DbSet<BooksLanguagesLink> BooksLanguagesLinks { get; set; }
 
@@ -61,7 +61,7 @@ public partial class CalibreDbContext : DbContext
 
     public virtual DbSet<CustomColumn> CustomColumns { get; set; }
 
-    public virtual DbSet<CustomColumn1> CustomColumn1s { get; set; }
+    // public virtual DbSet<CustomColumn1> CustomColumn1 { get; set; }
 
     public virtual DbSet<Datum> Data { get; set; }
 
@@ -329,20 +329,20 @@ public partial class CalibreDbContext : DbContext
             entity.Property(e => e.Book).HasColumnName("book");
         });
 
-        modelBuilder.Entity<BooksCustomColumn1Link>(entity =>
-        {
-            entity.ToTable("books_custom_column_1_link");
+        // modelBuilder.Entity<BooksCustomColumn1Link>(entity =>
+        // {
+        //     entity.ToTable("books_custom_column_1_link");
 
-            entity.HasIndex(e => new { e.Book, e.Value }, "IX_books_custom_column_1_link_book_value").IsUnique();
+        //     entity.HasIndex(e => new { e.Book, e.Value }, "IX_books_custom_column_1_link_book_value").IsUnique();
 
-            entity.HasIndex(e => e.Value, "books_custom_column_1_link_aidx");
+        //     entity.HasIndex(e => e.Value, "books_custom_column_1_link_aidx");
 
-            entity.HasIndex(e => e.Book, "books_custom_column_1_link_bidx");
+        //     entity.HasIndex(e => e.Book, "books_custom_column_1_link_bidx");
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Book).HasColumnName("book");
-            entity.Property(e => e.Value).HasColumnName("value");
-        });
+        //     entity.Property(e => e.Id).HasColumnName("id");
+        //     entity.Property(e => e.Book).HasColumnName("book");
+        //     entity.Property(e => e.Value).HasColumnName("value");
+        // });
 
         modelBuilder.Entity<BooksLanguagesLink>(entity =>
         {
@@ -511,22 +511,22 @@ public partial class CalibreDbContext : DbContext
                 .HasColumnName("normalized");
         });
 
-        modelBuilder.Entity<CustomColumn1>(entity =>
-        {
-            entity.ToTable("custom_column_1");
+        // modelBuilder.Entity<CustomColumn1>(entity =>
+        // {
+        //     entity.ToTable("custom_column_1");
 
-            entity.HasIndex(e => e.Value, "IX_custom_column_1_value").IsUnique();
+        //     entity.HasIndex(e => e.Value, "IX_custom_column_1_value").IsUnique();
 
-            entity.HasIndex(e => e.Value, "custom_column_1_idx");
+        //     entity.HasIndex(e => e.Value, "custom_column_1_idx");
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Link)
-                .HasDefaultValue("")
-                .HasColumnName("link");
-            entity.Property(e => e.Value)
-                .UseCollation("NOCASE")
-                .HasColumnName("value");
-        });
+        //     entity.Property(e => e.Id).HasColumnName("id");
+        //     entity.Property(e => e.Link)
+        //         .HasDefaultValue("")
+        //         .HasColumnName("link");
+        //     entity.Property(e => e.Value)
+        //         .UseCollation("NOCASE")
+        //         .HasColumnName("value");
+        // });
 
         modelBuilder.Entity<Datum>(entity =>
         {
@@ -685,7 +685,7 @@ public partial class CalibreDbContext : DbContext
         {
             entity.ToTable("ratings");
 
-            entity.HasIndex(e => e.Rating1, "IX_ratings_rating").IsUnique();
+            entity.HasIndex(e => e.RatingValue, "IX_ratings_rating").IsUnique();
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
@@ -693,7 +693,7 @@ public partial class CalibreDbContext : DbContext
             entity.Property(e => e.Link)
                 .HasDefaultValue("")
                 .HasColumnName("link");
-            entity.Property(e => e.Rating1).HasColumnName("rating");
+            entity.Property(e => e.RatingValue).HasColumnName("rating");
         });
 
         modelBuilder.Entity<Series>(entity =>
