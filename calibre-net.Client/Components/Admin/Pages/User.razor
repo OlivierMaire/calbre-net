@@ -9,6 +9,7 @@
 @attribute [Authorize(Policy = "Admin")]
 @attribute [StreamRendering]
 
+
 @if (this.IsNewUser)
 {
     <MudText Typo="Typo.h4">@L["Add new User"]</MudText>

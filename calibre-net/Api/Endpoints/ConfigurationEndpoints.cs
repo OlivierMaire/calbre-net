@@ -11,7 +11,7 @@ public class Configuration : Group{
     }
 }
 
-public sealed class GetCalibreConfigurationEndpoint(ConfigurationService configurationService) : EndpointWithoutRequest
+public sealed class GetCalibreConfigurationEndpoint(ConfigurationService configurationService) : EndpointWithoutRequest<CalibreConfiguration>
 {
     private readonly ConfigurationService configurationService = configurationService;
     public override void Configure()

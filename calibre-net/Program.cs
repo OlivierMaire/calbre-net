@@ -54,6 +54,40 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
+
+//  builder.Services.ConfigureApplicationCookie(options => {
+//             options.AccessDeniedPath = "/Account/Login3333";
+//  });
+
+builder.Services.ConfigureApplicationCookie(options =>
+options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents()
+{
+    OnRedirectToReturnUrl = (response) =>
+        {
+            if (response.Request.Path.StartsWithSegments("/api") && response.RedirectUri.Contains("Account/Login"))
+            {
+                response.Response.StatusCode = 401;
+            }
+            return Task.CompletedTask;
+        },
+    OnRedirectToLogin = (response) =>
+   {
+       if (response.Request.Path.StartsWithSegments("/api") && response.Response.StatusCode == 200)
+       {
+           response.Response.StatusCode = 401;
+       }
+       return Task.CompletedTask;
+   },
+    OnRedirectToAccessDenied = (response) =>
+  {
+      if (response.Request.Path.StartsWithSegments("/api") && response.Response.StatusCode == 200)
+      {
+          response.Response.StatusCode = 403;
+      }
+      return Task.CompletedTask;
+  }
+});
+
 builder.Services.AddHeimGuard<UserPolicyHandler>()
     .AutomaticallyCheckPermissions()
     .MapAuthorizationPolicies();
@@ -192,7 +226,8 @@ builder.Services.AddFido2(options =>
 
 
 builder.Services.AddFastEndpoints()
-.AddResponseCaching();
+.AddResponseCaching()
+.AddAntiforgery();
 
 
 builder.Services
@@ -200,16 +235,16 @@ builder.Services
 {
     o.ShortSchemaNames = true;
     // o.ExcludeNonFastEndpoints = true;
-     o.MaxEndpointVersion = 1;
+    o.MaxEndpointVersion = 1;
     o.DocumentSettings = s =>
     {
         s.Version = "v1";
         s.DocumentName = "v1";
         s.Title = "Calibre.Net Api";
         s.Description = "Calibre.Net Api Services.";
-            };
+    };
 
-            });
+});
 
 var baseAddress = builder.Configuration["Calibre:ApiHost"];
 if (string.IsNullOrEmpty(baseAddress))
@@ -277,7 +312,6 @@ app.UseRequestLocalization(localizationOptions);
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseAntiforgery();
 
 app.UseMiddleware<BlazorCookieAuthenticationMiddleware<ApplicationUser>>();
 
@@ -287,8 +321,12 @@ app.MapAdditionalIdentityEndpoints();
 app.UseAuthentication() //add this
    .UseAuthorization(); //add this
 
+app.UseAntiforgery();
+
 app.UseResponseCaching()
-.UseFastEndpoints(c => {
+.UseAntiforgeryFE()
+.UseFastEndpoints(c =>
+{
     c.Versioning.Prefix = "v";
     c.Versioning.PrependToRoute = true;
     c.Endpoints.RoutePrefix = "api";

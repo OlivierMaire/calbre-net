@@ -62,9 +62,8 @@ public sealed class GetAllPermissionsEndpoint : EndpointWithoutRequest<List<Perm
     }
 }
 
-public sealed class GetUserEndpoint(UserService userService) : EndpointWithoutRequest<UserModelExtended>
+public sealed class GetUserEndpoint(UserService userService) : Endpoint<GetUserRequest, UserModelExtended>
 {
-    private string Id { get; set; }
     private readonly UserService service = userService;
 
     public override void Configure()
@@ -74,9 +73,9 @@ public sealed class GetUserEndpoint(UserService userService) : EndpointWithoutRe
         Group<User>();
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(GetUserRequest req, CancellationToken ct)
     {
-        await SendOkAsync(await service.GetUserAsync(Id));
+        await SendOkAsync(await service.GetUserAsync(req.Id));
     }
 }
 
@@ -112,14 +111,16 @@ public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserMode
         {
             var user = await service.AddUserAsync(req);
             await SendOkAsync(user);
-            return; 
+            return;
         }
         catch (ServiceException se)
         {
             if (se.StatusCode == 400)
+            {
                 await SendResultAsync(TypedResults.BadRequest(se.Errors));
-            // SendBadRequestAsync(se.Errors);
-            return; 
+                // SendBadRequestAsync(se.Errors);
+                return;
+            }
         }
         await SendResultAsync(TypedResults.BadRequest());
         // return BadRequest();
