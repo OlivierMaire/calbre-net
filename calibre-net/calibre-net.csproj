@@ -50,4 +50,10 @@
     <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,17 @@
 <MudNavMenu>
     <MudNavLink Href="/Admin" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Users</MudNavLink>
-    <MudNavLink Href="/Admin/Configuration" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Settings">Configuration</MudNavLink>
+    <MudNavLink Href="/Admin/Configuration" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Settings">
+        Configuration</MudNavLink>
 
 </MudNavMenu>
+
+<div class="fixed" style="bottom: 2px;">
+    <MudText Typo="Typo.caption">v.@Version</MudText><br/>
+    <MudText Typo="Typo.caption">build @Build</MudText>
+</div>
+@code {
+    private string? Version => typeof(Program).Assembly.GetName().Version?.ToString();
+    private string? Build => ((System.Reflection.AssemblyInformationalVersionAttribute?)typeof(Program).Assembly
+        .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), inherit: true)
+        .FirstOrDefault())?.InformationalVersion;
+}
