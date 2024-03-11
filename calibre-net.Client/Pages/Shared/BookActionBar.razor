@@ -1,5 +1,7 @@
 @using calibre_net.Shared
-
+@inject BookClient BookClient
+@inject AudioPlayerBlazor.QueuePlayerService audioService
+@* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
 <div>
 
     @if (Book.Data != null)
@@ -60,14 +62,14 @@ else if (Readables.Count == 1)
                 <ChildContent>
                     @foreach (var data in Listenables)
                     {
-                        <MudMenuItem Target="_blank" Href="@data.ReadUrl">@data.Format</MudMenuItem>
+                        <MudMenuItem Target="_blank" OnClick="async () => await  Listen(data)" >@data.Format</MudMenuItem>
                     }
                 </ChildContent>
             </MudMenu>
 }
 else if (Listenables.Count == 1)
 {
-                <MudButton  Target="_blank" StartIcon="@Icons.Material.Filled.Audiotrack" Href="@Listenables.First().ReadUrl" >Listen (@Listenables.First().Format)</MudButton>
+                <MudButton  Target="_blank" StartIcon="@Icons.Material.Filled.Audiotrack" OnClick="async () => await  Listen(Listenables.First())" >Listen (@Listenables.First().Format)</MudButton>
 
 }
           
@@ -81,4 +83,18 @@ else if (Listenables.Count == 1)
 
     private List<DataDto> Readables => Book.Data.Where(d => d.IsReadable).ToList();
     private List<DataDto> Listenables => Book.Data.Where(d => d.IsListenable).ToList();
+
+        public async Task Listen(DataDto data)
+        {
+            // get metadata
+            var meta = await BookClient.MetadataAsync(data.Book, data.Format);
+            if (meta is AudioPlayerBlazor.AudioMetadata)
+            { 
+                meta.AudioSourceUrl = data.DownloadUrl;
+                var bookmark = await BookClient.GetBookmarkAsync(data.Book, data.Format);
+                uint position = 0;
+                uint.TryParse(bookmark.Position, out position);
+                audioService.AddToQueue(meta, $"{data.Book}-{data.Format}", position);
+            }
+        }
 }

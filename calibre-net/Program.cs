@@ -17,6 +17,7 @@ using calibre_net.Migrations;
 using calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
 using EPubBlazor;
+using AudioPlayerBlazor;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FastEndpoints.Security;
@@ -110,13 +111,13 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-var calibreDbLocation = builder.Configuration["calibre:database:location"] ?? throw new InvalidOperationException("Connection string 'calibre:database:location' not found.");
-builder.Services.AddDbContext<CalibreDbContext>(options =>
-{
-    // Console.WriteLine("Connect to : " + $"Data Source={calibreDbLocation}\\metadata.db;");
-    var connection = CalibreDbContext.Configure($"Data Source={calibreDbLocation}{Path.DirectorySeparatorChar}metadata.db;");
-    options.UseSqlite(connection);
-}, ServiceLifetime.Scoped);
+// var calibreDbLocation = builder.Configuration["calibre:database:location"] ?? throw new InvalidOperationException("Connection string 'calibre:database:location' not found.");
+// builder.Services.AddDbContext<CalibreDbContext>(options =>
+// {
+//     // Console.WriteLine("Connect to : " + $"Data Source={calibreDbLocation}\\metadata.db;");
+//     var connection = CalibreDbContext.Configure($"Data Source={calibreDbLocation}{Path.DirectorySeparatorChar}metadata.db;");
+//     options.UseSqlite(connection);
+// }, ServiceLifetime.Scoped);
 
 // builder.Services.AddLocalization();
 
@@ -144,7 +145,8 @@ builder.Services.AddScoped<PasskeyService>();
 
 // builder.Services.AddScoped<Fido2NetLib.Fido2Configuration>();
 // builder.Services.AddScoped<Fido2NetLib.Fido2>();
-builder.Services.AddEPubBlazor();
+builder.Services.AddEPubBlazor(ServiceLifetime.Scoped);
+builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
 
 builder.Services.RegisterServices(builder.Configuration);
 

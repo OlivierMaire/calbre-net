@@ -1,23 +1,16 @@
-using calibre_net.Client;
 using calibre_net.Client.Services;
 using calibre_net.Data.Calibre;
 using calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
 using Dapper;
-using Microsoft.EntityFrameworkCore;
-using Z.EntityFramework.Plus;
 
 namespace calibre_net.Services;
 
 [ScopedRegistration]
-public class BookService(
-    CalibreDbDapperContext dbContext,
-    CalibreDbContext calibreDb, CustomColumnService customColumnService)
+public class BookService(CalibreDbDapperContext dbContext)
 
 {
     private readonly CalibreDbDapperContext dbContext = dbContext;
-    private readonly CalibreDbContext calibreDb = calibreDb;
-    private readonly CustomColumnService customColumnService = customColumnService;
 
     public List<BookDto> GetBooks()
     {
@@ -122,39 +115,7 @@ public class BookService(
                 return book.ToDto();
             }
         }
-
-
-        // var customColumns = customColumnService.GetCustomColumns();
-
-        // var customTables = customColumnService.GetCustomColumnTables();
-
-        // var test = customTables[1].Include(ct => ct.ColumnLink)
-        // .Where(cc => cc.ColumnLink.Any(cl => cl.Book == id)).ToList();
-
-        // Console.WriteLine($"{test.Count}");
-        // foreach (var t in test)
-        // {
-
-        //     Console.WriteLine($"{t.Value}");
-        // }
-        // calibreDb.Set<GenericCustomColumn>("custom_column_1").whe
-
-        // var book = calibreDb.Books
-        // .Include(b => b.Authors)
-        // .Include(b => b.Series)
-        // .Include(b => b.Rating)
-        // .Include(b => b.Languages)
-        // .Include(b => b.Identifiers)
-        // .Include(b => b.Tags)
-        // .Include(b => b.Publisher)
-        // .AsSplitQuery()
-        // .Where(b => b.Id == id)
-        // .FromCache("book", id.ToString())
-        // .FirstOrDefault();
-
-        // if (book == null)
-        //     return null;
-        // return book.ToDto();
+ 
     }
 
     public string GetBookCover(int id)
@@ -166,18 +127,14 @@ public class BookService(
             SELECT b.path FROM books as b
             WHERE b.Id == @id
             """, new { id });
-            return bookPath ?? string.Empty;
+            var path = bookPath ?? string.Empty;
+            path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
+            path += "cover.jpg";
+            return path;
         }
-        // var bookPath = calibreDb.Books
-        // .Where(b => b.Id == id)
-        // .Select(b => b.Path)
-        // .FromCache("book_cover", id.ToString())
-        // .FirstOrDefault();
-
-        // return bookPath ?? string.Empty;
     }
-    
-        public string GetBookFile(int id, string format)
+
+    public string GetBookFile(int id, string format)
     {
         using (var ctx = dbContext.ConnectionCreate())
         {
@@ -187,14 +144,12 @@ public class BookService(
             JOIN data as d on d.book = b.id
             WHERE b.Id == @id
             and d.format = @format
-            """, new { id , format });
+            """, new { id, format });
             var path = bookPath;
             path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
             path += fileName + "." + format.ToLowerInvariant();
-
-
-            return path ;
+            return path;
         }
-        
+
     }
 }
