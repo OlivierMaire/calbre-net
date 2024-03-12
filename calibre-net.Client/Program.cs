@@ -9,6 +9,7 @@ using Microsoft.Extensions.Localization;
 using calibre_net.Client.Services;
 using calibre_net.Shared.Contracts;
 using EPubBlazor;
+using AudioPlayerBlazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 // builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -66,7 +67,8 @@ builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress =
 
 // builder.Services.Configure<CalibreConfiguration>(options => builder.Configuration.GetSection("calibre").Bind(options));
 
-builder.Services.AddEPubBlazor();
+builder.Services.AddEPubBlazor(ServiceLifetime.Singleton);
+builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
 
 builder.Services.RegisterServices(builder.Configuration);
 

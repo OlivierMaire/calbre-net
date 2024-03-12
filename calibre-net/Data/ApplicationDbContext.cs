@@ -11,6 +11,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public virtual DbSet<UserCredential> UserCredentials { get; set; }
     public virtual DbSet<UserPermission> UserPermissions { get; set; }
 
+    public virtual DbSet<Bookmark> Bookmarks {get;set;}
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,6 +28,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         //         // ownedNavigationBuilder.OwnsOne( a => a.Id).
         //         // ownedNavigationBuilder.OwnsOne(contactDetails => contactDetails.);
         //     });
+
+        modelBuilder.Entity<Bookmark>().HasKey(x => new {x.UserId, x.BookId, x.Format});
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

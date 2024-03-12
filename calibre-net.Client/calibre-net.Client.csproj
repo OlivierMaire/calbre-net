@@ -27,9 +27,12 @@
 
   <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
     <ProjectReference Include="..\EPubBlazor\EPubBlazor.csproj" />
+    <ProjectReference Include="..\AudioPlayerBlazor\AudioPlayerBlazor.csproj" /> 
+
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
     <PackageReference Include="EPubBlazor" Version="0.0.2-alpha" />
+    <PackageReference Include="AudioPlayerBlazor" Version="0.2.0-alpha.7" />
   </ItemGroup>
 
   

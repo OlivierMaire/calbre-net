@@ -29,7 +29,7 @@ public partial class DataDto
     public bool IsListenable => 
         ListenableFormat.Contains(Format.ToLowerInvariant());
     [JsonIgnore]
-    public string DownloadUrl => $"/book/download/{Book}/{Format}";
+    public string DownloadUrl => $"/api/v1/book/download/{Book}/{Format}";
     [JsonIgnore]
     public string ReadUrl => $"/book/read/{Book}/{Format}";
 }

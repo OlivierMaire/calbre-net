@@ -4,7 +4,6 @@ using FluentValidation;
 
 namespace calibre_net.Api.Validators;
 
-
 public class GetConfigurationValueValidator : Validator<GetConfigurationValueRequest>
 {
     public GetConfigurationValueValidator()
@@ -12,6 +11,5 @@ public class GetConfigurationValueValidator : Validator<GetConfigurationValueReq
         RuleFor(x => x.Value)
             .NotEmpty()
             .WithMessage("Value can't be empty");
-               
     }
 }

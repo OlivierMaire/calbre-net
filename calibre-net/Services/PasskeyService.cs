@@ -142,7 +142,6 @@ public class PasskeyService
 
     private async Task<AaGuidModel?> GetPasskeyProviderAsync(Guid aaGuid)
     {
-
         if (AaGuids == null || AaGuids.Count == 0)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
