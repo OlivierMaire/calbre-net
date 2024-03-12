@@ -35,7 +35,7 @@ jobs:
 
       - name: Install Ef tooling
         run: |
-          dotnet tool update dotnet-ef
+          dotnet tool update --global dotnet-ef
           dotnet tool restore
       - name: Apply Db Migrations
         run: dotnet-ef migrations bundle -p ./calibre-net -c ApplicationDbContext --self-contained
