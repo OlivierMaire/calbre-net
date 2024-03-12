@@ -27,5 +27,9 @@ jobs:
     - name: Build
       # run: dotnet build --no-restore
       run: dotnet build 
+    - name: Install Ef tooling
+      run: dotnet tool install --global dotnet-ef
+    - name: Apply Db Migrations
+      run: dotnet ef migrations bundle -p ./calibre-net -c ApplicationDbContext --self-contained
     - name: Test
       run: dotnet test --no-build --verbosity normal
