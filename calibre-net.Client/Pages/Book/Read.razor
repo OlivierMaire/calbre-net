@@ -5,14 +5,22 @@
 @* <div>
 @NavManager.Uri
 </div> *@
+@* // Ebook : EPUB, AZW3,CUE *@
 @if (Format.ToLower() == "epub")
 {
     <EPubBlazor.Display Url="@Url" Name="EPUB Reader" @rendermode="InteractiveAuto" />
 }
+@* // Comics : CBZ, CBR, PDF *@
+@if (Format.ToLower() == "cbz" ||
+Format.ToLower() == "cbr" ||
+Format.ToLower() == "pdf")
+{
+    <ComicsBlazor.ComicsBlazor Url="@Url" Name="Comics Reader" @rendermode="InteractiveAuto" />
+}
 
-@code{
-    [Parameter] public int Id {get;set;} 
-    [Parameter] public string Format {get;set;} 
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string Format { get; set; }
 
     private string Url => NavManager.BaseUri + $"api/v1/book/download/{Id}/{Format}";
 }

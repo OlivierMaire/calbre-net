@@ -406,3 +406,7 @@ app.db-wal
 EPubBlazor
 # AudioPlayerBlazor
 AudioPlayerBlazor
+# ComicsBlazor
+ComicsBlazor
+# ComicMeta
+ComicMeta
