@@ -34,14 +34,14 @@ jobs:
         run: dotnet build --configuration Release #--no-restore
 
       - name: Install EF Core CLI
-        run: dotnet tool update dotnet-ef --global
+        run: dotnet tool update dotnet-ef --global 
         shell: bash
       # - name: Install Ef tooling
       #   run: |
       #     dotnet tool update --global dotnet-ef
       #     dotnet tool restore
       - name: Apply Db Migrations
-        run: dotnet ef migrations bundle -p ./calibre-net -c ApplicationDbContext --self-contained
+        run: ~/.dotnet/tools/dotnet-ef migrations bundle -p ./calibre-net -c ApplicationDbContext --self-contained
 
       # We will output publish files to the folder we previously created
       - name: Publish
