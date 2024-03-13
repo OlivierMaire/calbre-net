@@ -15,30 +15,25 @@ public class ComicService(CalibreDbDapperContext dbContext, ILogger<ComicService
     private readonly CalibreDbDapperContext dbContext = dbContext;
     private readonly ILogger<ComicService> logger = logger;
 
-    public object GetComicInfo(string filePath)
+    public ComicMeta.Metadata.GenericMetadata? GetComicInfo(string filePath)
     {
         logger.LogInformation($"Get info for {filePath}");
         var ca = new ComicArchive(filePath);
         if (ca.IsComicArchive)
         {
-            ComicArchive.MetadataStyle style;
+            ComicArchive.MetadataStyle style = ComicArchive.MetadataStyle.CIX;
             if (ca.HasMetadata(ComicArchive.MetadataStyle.CIX))
                 style = ComicArchive.MetadataStyle.CIX;
-            if (ca.HasMetadata(ComicArchive.MetadataStyle.CBI))
+            else if (ca.HasMetadata(ComicArchive.MetadataStyle.CBI))
                 style = ComicArchive.MetadataStyle.CBI;
-            if (ca.HasMetadata(ComicArchive.MetadataStyle.COMET))
+            else if (ca.HasMetadata(ComicArchive.MetadataStyle.COMET))
                 style = ComicArchive.MetadataStyle.COMET;
 
-        }
+            var read_metadata = ca.ReadMetadata(style);
 
-        return new
-        {
-            fileName = filePath,
-            isComicArchive = ca.IsComicArchive,
-            isCIX = ca.HasMetadata(ComicArchive.MetadataStyle.CIX),
-            isCBI = ca.HasMetadata(ComicArchive.MetadataStyle.CBI),
-            isCOMET = ca.HasMetadata(ComicArchive.MetadataStyle.COMET),
-        };
+            return read_metadata;
+        }
+        return null;
     }
 
 
