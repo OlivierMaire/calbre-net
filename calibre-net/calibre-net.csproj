@@ -15,27 +15,30 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.FluentValidation" Version="2.1.0" />
-    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.9.0" />
-    <PackageReference Include="dapper" Version="2.1.28" />
+    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.9.1" />
+    <PackageReference Include="dapper" Version="2.1.35" />
     <PackageReference Include="FastEndpoints" Version="5.23.0" />
     <PackageReference Include="FastEndpoints.Security" Version="5.23.0" />
     <PackageReference Include="FastEndpoints.Swagger" Version="5.23.0" />
-    <PackageReference Include="Fido2" Version="4.0.0-beta4" />
-    <PackageReference Include="Fido2.AspNet" Version="4.0.0-beta4" />
+    <PackageReference Include="Fido2" Version="4.0.0-beta.12" />
+    <PackageReference Include="Fido2.AspNet" Version="4.0.0-beta.12" />
     <PackageReference Include="HeimGuard" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.3" />
     <!-- <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" /> -->
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.3" />
     <PackageReference Include="Riok.Mapperly" Version="3.4.0" />
     <PackageReference Include="VersOne.Epub" Version="3.3.1" />
-    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.101.1.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.2" />
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.102.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="z440.atl.core" Version="5.20.0" />
   </ItemGroup>
 
@@ -51,6 +54,9 @@
   
   <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
     <ProjectReference Include="..\ComicMeta\ComicMeta.csproj" /> 
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
+    <PackageReference Include="ComicMeta" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

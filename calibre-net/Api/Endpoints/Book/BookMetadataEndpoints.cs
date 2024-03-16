@@ -9,7 +9,7 @@ namespace calibre_net.Api.Endpoints;
 
 public sealed class MetadataBookEndpoint(BookService bookService, ConfigurationService configService
 , ComicService comicService) : Endpoint<DownloadBookRequest,
-Results<Ok<AudioPlayerBlazor.AudioMetadata>, Ok<object>, NotFound>>
+Results<Ok<GetMetadataResponse>, NotFound>>
 {
     private readonly BookService bookService = bookService;
     private readonly ConfigurationService configService = configService;
@@ -26,27 +26,33 @@ Results<Ok<AudioPlayerBlazor.AudioMetadata>, Ok<object>, NotFound>>
         Get("/metadata/{Id:int}/{format}");
         Version(1);
         Group<Book>();
-        ResponseCache(_7DaysInSeconds); //cache for 7 days
+        // ResponseCache(_7DaysInSeconds); //cache for 7 days
 
     }
 
-    public override async Task<Results<Ok<AudioPlayerBlazor.AudioMetadata>, Ok<object>, NotFound>> ExecuteAsync(DownloadBookRequest req, CancellationToken ct)
+    public override async Task<Results<Ok<GetMetadataResponse>, NotFound>> ExecuteAsync(DownloadBookRequest req, CancellationToken ct)
     {
 
+
+        // Audio Metadata
         if (AUDIO_FORMATS.Contains(req.Format.ToUpper()))
         {
             var meta = GetAudioMetadata(req);
             if (meta != null)
-                return TypedResults.Ok(meta);
+                return TypedResults.Ok(new GetMetadataResponse { AudioMetadata = meta.ToDto() });
         }
-
+        // Comics Metadata
         if (COMICS_FORMATS.Contains(req.Format.ToUpper()))
         {
-            var meta = GetComicsMeta(req, comicService);
+            var meta = GetComicsMeta(req);
             if (meta != null)
-                return TypedResults.Ok(meta);
+                return TypedResults.Ok(new GetMetadataResponse { ComicMetadata = meta.ToDto() });
 
         }
+        // Epub Metadata
+
+
+
         return TypedResults.NotFound();
     }
 
@@ -89,7 +95,7 @@ Results<Ok<AudioPlayerBlazor.AudioMetadata>, Ok<object>, NotFound>>
         return null;
     }
 
-    private object? GetComicsMeta(DownloadBookRequest req, ComicService comicService)
+    private ComicMeta.Metadata.GenericMetadata? GetComicsMeta(DownloadBookRequest req)
     {
         var conf = configService.GetCalibreConfiguration();
 
@@ -103,10 +109,33 @@ Results<Ok<AudioPlayerBlazor.AudioMetadata>, Ok<object>, NotFound>>
             if (System.IO.File.Exists(path))
             {
                 var comic = comicService.GetComicInfo(path);
+                if (comic != null)
+                {
+                    // Get Calibre data and add missing data
+                    var book = bookService.GetBook(req.Id);
+                    if (book != null)
+                    {
+                        if (String.IsNullOrEmpty(comic.Title))
+                            comic.Title = book.Title;
+                        if (String.IsNullOrEmpty(comic.Series))
+                            comic.Series = book.Series.Name;
+                        if (comic.Writers == null || comic.Writers.Length == 0)
+                            comic.Writers = book.Authors.Select(a => a.Name).ToArray();
+                        if (String.IsNullOrEmpty(comic.CommunityRating))
+                            comic.CommunityRating = (book.Rating.Rating / 2.0m).ToString();
+                        if (comic.Tags == null || comic.Tags.Length == 0)
+                            comic.Tags = book.Tags.Select(t => t.Name).ToArray();
+                        if (String.IsNullOrEmpty(comic.Summary))
+                            comic.Summary = book.Comments.Text;
+                    }
+                }
                 return comic;
             }
         }
 
         return null;
     }
+
+
+
 }

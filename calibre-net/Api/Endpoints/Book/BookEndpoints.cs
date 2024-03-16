@@ -61,7 +61,7 @@ public sealed class GetBookEndpoint(BookService service) : Endpoint<GetBookReque
     }
 }
 
-public sealed class GetBookCoverEndpoint(BookService bookService, ConfigurationService configService) : Endpoint<GetBookRequest, BookDto>
+public sealed class GetBookCoverEndpoint(BookService bookService, ConfigurationService configService) : Endpoint<GetBookRequest, byte[]>
 {
     private readonly BookService bookService = bookService;
     private readonly ConfigurationService configService = configService;

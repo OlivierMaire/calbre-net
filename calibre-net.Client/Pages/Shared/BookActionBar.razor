@@ -87,14 +87,14 @@ else if (Listenables.Count == 1)
         public async Task Listen(DataDto data)
         {
             // get metadata
-            var meta = await BookClient.MetadataAsync(data.Book, data.Format);
+            @* var meta = await BookClient.MetadataAsync(data.Book, data.Format);
             if (meta is AudioPlayerBlazor.AudioMetadata)
             { 
-                meta.AudioSourceUrl = data.DownloadUrl;
+                (AudioPlayerBlazor.AudioMetadata)meta.AudioSourceUrl = data.DownloadUrl;
                 var bookmark = await BookClient.GetBookmarkAsync(data.Book, data.Format);
                 uint position = 0;
                 uint.TryParse(bookmark.Position, out position);
-                audioService.AddToQueue(meta, $"{data.Book}-{data.Format}", position);
-            }
+                audioService.AddToQueue((AudioPlayerBlazor.AudioMetadata)meta, $"{data.Book}-{data.Format}", position);
+            } *@
         }
 }

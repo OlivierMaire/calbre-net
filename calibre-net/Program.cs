@@ -18,6 +18,7 @@ using calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
 using EPubBlazor;
 using AudioPlayerBlazor;
+using ComicsBlazor;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FastEndpoints.Security;
@@ -147,6 +148,7 @@ builder.Services.AddScoped<PasskeyService>();
 // builder.Services.AddScoped<Fido2NetLib.Fido2>();
 builder.Services.AddEPubBlazor(ServiceLifetime.Scoped);
 builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
+builder.Services.AddComicsBlazor(ServiceLifetime.Scoped);
 
 builder.Services.RegisterServices(builder.Configuration);
 

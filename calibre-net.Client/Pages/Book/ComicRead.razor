@@ -1,0 +1,45 @@
+@rendermode InteractiveAuto
+@inject NavigationManager NavManager
+@inject BookClient BookClient
+
+@if (Metadata != null)
+{
+    <ComicsBlazor.ComicsBlazorView Url="@Url" Name="Comics Reader" Metadata="@Metadata" GetPage="GetComicPage"
+        @rendermode="InteractiveAuto" />
+}
+else
+{
+    <div>Loading...</div>
+}
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string Format { get; set; }
+
+    private ComicsBlazor.ComicMetadata? Metadata { get; set; }
+
+
+    private string Url => NavManager.BaseUri + $"api/v1/book/download/{Id}/{Format}";
+
+    override protected async Task OnInitializedAsync()
+    {
+        var meta = await BookClient.MetadataAsync(Id, Format);
+        if (meta.ComicMetadata != null)
+        {
+            Metadata = meta.ComicMetadata.ToComicsBlazorMetadata();
+        }
+    }
+
+    private async Task<ComicsBlazor.PageData?> GetComicPage(int pageNmber)
+    {
+        var page = await BookClient.PageAsStreamAsync(Id, Format, pageNmber);
+
+        if (page != null)
+            return new ComicsBlazor.PageData(page.PageContent, page.contentType);
+
+        return null;
+    }
+
+
+}

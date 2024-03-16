@@ -5,6 +5,7 @@ using ComicMeta;
 using calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
 using Dapper;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace calibre_net.Services;
 
@@ -17,24 +18,35 @@ public class ComicService(CalibreDbDapperContext dbContext, ILogger<ComicService
 
     public ComicMeta.Metadata.GenericMetadata? GetComicInfo(string filePath)
     {
-        logger.LogInformation($"Get info for {filePath}");
         var ca = new ComicArchive(filePath);
         if (ca.IsComicArchive)
         {
-            ComicArchive.MetadataStyle style = ComicArchive.MetadataStyle.CIX;
-            if (ca.HasMetadata(ComicArchive.MetadataStyle.CIX))
-                style = ComicArchive.MetadataStyle.CIX;
-            else if (ca.HasMetadata(ComicArchive.MetadataStyle.CBI))
-                style = ComicArchive.MetadataStyle.CBI;
-            else if (ca.HasMetadata(ComicArchive.MetadataStyle.COMET))
-                style = ComicArchive.MetadataStyle.COMET;
-
-            var read_metadata = ca.ReadMetadata(style);
+            var read_metadata = ca.ReadMetadata();
 
             return read_metadata;
         }
         return null;
     }
 
+    public bool IsComicArchive(string filePath)
+    {
+        var ca = new ComicArchive(filePath);
+        return ca.IsComicArchive;
+    }
+
+    public (Stream?, string?) GetPage(string filePath, int pageId)
+    {
+        var ca = new ComicArchive(filePath);
+        var metadata = ca.ReadMetadata();
+
+        var page = metadata.Pages.FirstOrDefault(p => p.PageNumber == pageId);
+        if (page == null)
+            return (null, null);
+
+        new FileExtensionContentTypeProvider()
+                .TryGetContentType(page.Key, out var contentType);
+
+        return (ca.GetPageAsStream(page.Key), contentType);
+    }
 
 }
