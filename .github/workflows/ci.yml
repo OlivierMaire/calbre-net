@@ -25,6 +25,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ matrix.dotnet-version }}
+        
+      - name: Setup .NET wasm-tools
+        run: dotnet workload install wasm-tools
 
       - name: Restore dependencies
         run: dotnet restore
