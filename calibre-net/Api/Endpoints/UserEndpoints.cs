@@ -130,7 +130,7 @@ public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserMode
 
 public sealed class DeleteUserEndpoint(UserService userService) : EndpointWithoutRequest<UserModelExtended>
 {
-    private string Id { get; set; }
+    private string Id { get; set; } = string.Empty;
     private readonly UserService service = userService;
 
     public override void Configure()
@@ -142,6 +142,7 @@ public sealed class DeleteUserEndpoint(UserService userService) : EndpointWithou
 
     public override async Task HandleAsync(CancellationToken ct)
     {
+        /* TODO set current user */ 
         await service.DeleteUser(Id, null);
         await SendOkAsync();
     }

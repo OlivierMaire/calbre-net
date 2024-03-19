@@ -8,7 +8,6 @@ using calibre_net.Models;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.FileProviders;
@@ -262,9 +261,6 @@ public class PasskeyService
         uint storedSignatureCounter,
         CancellationToken cancellationToken = default)
     {
-
-        if (assertionResponse.Response.AttestationObject?.Length == 0)
-            assertionResponse.Response.AttestationObject = null;
 
         var res = await fidoLib.MakeAssertionAsync(
                       assertionResponse,

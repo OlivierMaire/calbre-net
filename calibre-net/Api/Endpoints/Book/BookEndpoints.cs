@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.StaticFiles;
 using ATL.AudioData;
 using ATL;
-using ZXing;
 using static ATL.PictureInfo;
 using calibre_net.Data;
 
@@ -62,7 +61,7 @@ public sealed class GetBookEndpoint(BookService service) : Endpoint<GetBookReque
     }
 }
 
-public sealed class GetBookCoverEndpoint(BookService bookService, ConfigurationService configService) : Endpoint<GetBookRequest, BookDto>
+public sealed class GetBookCoverEndpoint(BookService bookService, ConfigurationService configService) : Endpoint<GetBookRequest, byte[]>
 {
     private readonly BookService bookService = bookService;
     private readonly ConfigurationService configService = configService;
@@ -152,66 +151,7 @@ public sealed class DownloadBookEndpoint(BookService bookService, ConfigurationS
     }
 }
 
-
-public sealed class MetadataBookEndpoint(BookService bookService, ConfigurationService configService) : Endpoint<DownloadBookRequest, Results<Ok<AudioPlayerBlazor.AudioMetadata>, NotFound>>
-{
-    private readonly BookService bookService = bookService;
-    private readonly ConfigurationService configService = configService;
-    private const int _7DaysInSeconds = 86400;
-
-    public override void Configure()
-    {
-        Get("/metadata/{Id:int}/{format}");
-        Version(1);
-        Group<Book>();
-        ResponseCache(_7DaysInSeconds); //cache for 7 days
-
-    }
-
-    public override async Task<Results<Ok<AudioPlayerBlazor.AudioMetadata>, NotFound>> ExecuteAsync(DownloadBookRequest req, CancellationToken ct)
-    {
-        var conf = configService.GetCalibreConfiguration();
-
-        // get book
-        var bookPath = bookService.GetBookFile(req.Id, req.Format);
-        if (!String.IsNullOrEmpty(bookPath))
-        {
-            var path = conf.Database?.Location ?? string.Empty;
-            path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
-            path += bookPath;
-            if (System.IO.File.Exists(path))
-            {
-                Track audioTrack = new Track(path);
-                // validate picture
-                if (audioTrack.EmbeddedPictures.Count == 0
-                || !audioTrack.EmbeddedPictures.Any(p => p.PicType == PIC_TYPE.Generic || p.PicType == PIC_TYPE.Front))
-                {
-                    var coverPath = bookService.GetBookCover(req.Id);
-                    path = conf.Database?.Location ?? string.Empty;
-                    path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
-                    path += coverPath;
-
-                    if (System.IO.File.Exists(path))
-                    {
-                        var stream = System.IO.File.OpenRead(path);
-                        audioTrack.EmbeddedPictures.Add(PictureInfo.fromBinaryData(stream, (int)stream.Length,
-                         PIC_TYPE.Generic, MetaDataIOFactory.TagType.ANY, 0));
-                    }
-                }
-
-                var meta = audioTrack.ToAudioMetadata();
-
-
-                return TypedResults.Ok(meta);
-
-            }
-
-        }
-        return TypedResults.NotFound();
-    }
-}
-
-public sealed class SetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoint<SetBookmarkRequest>
+public sealed class SetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoint<SetBookmarkRequest, Ok>
 {
     private readonly ApplicationDbContext dbContext = dbContext;
 

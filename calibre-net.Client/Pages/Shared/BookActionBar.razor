@@ -4,7 +4,7 @@
 @* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
 <div>
 
-    @if (Book.Data != null)
+    @if (Book?.Data != null)
     {
         <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
 
@@ -81,20 +81,20 @@ else if (Listenables.Count == 1)
 
     [Parameter] public BookDto? Book { get; set; }
 
-    private List<DataDto> Readables => Book.Data.Where(d => d.IsReadable).ToList();
-    private List<DataDto> Listenables => Book.Data.Where(d => d.IsListenable).ToList();
+    private List<DataDto> Readables => Book?.Data.Where(d => d.IsReadable).ToList() ?? [];
+    private List<DataDto> Listenables => Book?.Data.Where(d => d.IsListenable).ToList() ?? [];
 
         public async Task Listen(DataDto data)
         {
             // get metadata
             var meta = await BookClient.MetadataAsync(data.Book, data.Format);
-            if (meta is AudioPlayerBlazor.AudioMetadata)
+            if (meta.AudioMetadata != null)
             { 
-                meta.AudioSourceUrl = data.DownloadUrl;
+                meta.AudioMetadata.AudioSourceUrl = data.DownloadUrl;
                 var bookmark = await BookClient.GetBookmarkAsync(data.Book, data.Format);
                 uint position = 0;
                 uint.TryParse(bookmark.Position, out position);
-                audioService.AddToQueue(meta, $"{data.Book}-{data.Format}", position);
+                audioService.AddToQueue(meta.AudioMetadata.ToAudioPlayerBlazorMetadata(), $"{data.Book}-{data.Format}", position);
             }
         }
 }

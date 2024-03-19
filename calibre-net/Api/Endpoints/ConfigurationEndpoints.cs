@@ -39,7 +39,7 @@ public sealed class SetCalibreConfigurationEndpoint(ConfigurationService configu
 
     public override async Task HandleAsync(CalibreConfiguration req, CancellationToken ct)
     {
-        await configurationService.SetCalibreConfigurationAsync(req);
+        configurationService.SetCalibreConfiguration(req);
         await SendOkAsync(ct);
 
     }

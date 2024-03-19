@@ -40,7 +40,7 @@ jobs:
       #   run: |
       #     dotnet tool update --global dotnet-ef
       #     dotnet tool restore
-      - name: Apply Db Migrations
+      - name: Generate efbundle for Migrations
         run: ~/.dotnet/tools/dotnet-ef migrations bundle --configuration Release --no-build -p ./calibre-net -c ApplicationDbContext --self-contained
 
       # We will output publish files to the folder we previously created

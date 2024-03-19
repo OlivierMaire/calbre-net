@@ -31,7 +31,7 @@ IConfiguration configuration)
         return configSnap.Value;
     }
 
-    public async Task<CalibreConfiguration> SetCalibreConfigurationAsync(CalibreConfiguration model)
+    public  CalibreConfiguration SetCalibreConfiguration(CalibreConfiguration model)
     {
         try
         {

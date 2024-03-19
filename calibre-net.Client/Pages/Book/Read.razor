@@ -1,18 +1,33 @@
 @page "/book/read/{id:int}/{format}"
 @layout Components.Layout.EmptyLayout
 @inject NavigationManager NavManager
+@inject BookClient BookClient
 
 @* <div>
 @NavManager.Uri
 </div> *@
+@* // Ebook : EPUB, AZW3,CUE *@
 @if (Format.ToLower() == "epub")
 {
     <EPubBlazor.Display Url="@Url" Name="EPUB Reader" @rendermode="InteractiveAuto" />
 }
+@* // Comics : CBZ, CBR, PDF *@
+@if (Format.ToLower() == "cbz" ||
+Format.ToLower() == "cbr" ||
+Format.ToLower() == "pdf")
+{
+  
+  <ComicRead Id="@Id" Format="@Format" />
+}
 
-@code{
-    [Parameter] public int Id {get;set;} 
-    [Parameter] public string Format {get;set;} 
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string Format { get; set; } = string.Empty;
+
+
 
     private string Url => NavManager.BaseUri + $"api/v1/book/download/{Id}/{Format}";
+
+
+
 }
