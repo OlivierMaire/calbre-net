@@ -32,5 +32,5 @@ public partial class CustomColumnDto
 
     
     [JsonPropertyName("data")]
-    public List<GenericCustomColumnDto> Data { get; set; }
+    public List<GenericCustomColumnDto> Data { get; set; } = [];
 }

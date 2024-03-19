@@ -4,7 +4,7 @@ namespace calibre_net.Shared;
 public class FileSizeFormatProvider : IFormatProvider, ICustomFormatter
 {
     // Implement the GetFormat method
-    public object GetFormat(Type formatType)
+    public object? GetFormat(Type? formatType)
     {
         if (formatType == typeof(ICustomFormatter))
             return this;
@@ -12,20 +12,20 @@ public class FileSizeFormatProvider : IFormatProvider, ICustomFormatter
     }
 
     // Implement the Format method
-    public string Format(string format, object arg, IFormatProvider formatProvider)
+    public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     {
         // Check if the format is valid
         if (format == null || !format.StartsWith("fs"))
         {
             // Use the default format
-            return defaultFormat(format, arg, formatProvider);
+            return defaultFormat(format, arg ?? default!, formatProvider ?? default!);
         }
 
         // Check if the argument is a number
         if (arg is string)
         {
             // Use the default format
-            return defaultFormat(format, arg, formatProvider);
+            return defaultFormat(format, arg, formatProvider ?? default!);
         }
 
         // Convert the argument to a decimal value
@@ -37,7 +37,7 @@ public class FileSizeFormatProvider : IFormatProvider, ICustomFormatter
         catch (InvalidCastException)
         {
             // Use the default format
-            return defaultFormat(format, arg, formatProvider);
+            return defaultFormat(format, arg ?? default!, formatProvider ?? default!);
         }
 
         // Define the file size units
@@ -61,14 +61,15 @@ public class FileSizeFormatProvider : IFormatProvider, ICustomFormatter
     }
 
     // A helper method for using the default format
-    private static string defaultFormat(string format, object arg, IFormatProvider formatProvider)
+    private static string defaultFormat(string? format, object arg, IFormatProvider formatProvider)
     {
-        IFormattable formattableArg = arg as IFormattable;
-        if (formattableArg != null)
+        if (arg == null)
+            return string.Empty;
+        if (arg is IFormattable formattableArg)
         {
             return formattableArg.ToString(format, formatProvider);
         }
-        return arg.ToString();
+        return arg.ToString() ?? string.Empty;
     }
 }
 
@@ -77,33 +78,34 @@ public class FileSizeFormatProvider : IFormatProvider, ICustomFormatter
 // Console.WriteLine(String.Format(new FileSizeFormatProvider(), "File size: {0:fs}", fileSize));
 // // Output: File size: 117.74 MB
 
-public static class IntExtension { 
-
-// Define a simple method
-public static string BytesToString(this int byteCount)
+public static class IntExtension
 {
-    // Define the file size units
-    string[] sizes = { "B", "KB", "MB", "GB", "TB" };
 
-    // Check if the byte count is zero
-    if (byteCount == 0)
-        return "0" + sizes[0];
+    // Define a simple method
+    public static string BytesToString(this int byteCount)
+    {
+        // Define the file size units
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
 
-    // Get the absolute value of the byte count
-    int bytes = Math.Abs(byteCount);
+        // Check if the byte count is zero
+        if (byteCount == 0)
+            return "0" + sizes[0];
 
-    // Calculate the order of magnitude
-    int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
+        // Get the absolute value of the byte count
+        int bytes = Math.Abs(byteCount);
 
-    // Calculate the number with the appropriate scale
-    double num = Math.Round(bytes / Math.Pow(1024, place), 1);
+        // Calculate the order of magnitude
+        int place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
 
-    // Return the formatted file size string
-    return (Math.Sign(byteCount) * num).ToString() + sizes[place];
-}
+        // Calculate the number with the appropriate scale
+        double num = Math.Round(bytes / Math.Pow(1024, place), 1);
 
-// // Use the simple method
-// int fileSize = 123456789;
-// Console.WriteLine("File size: " + BytesToString(fileSize));
-// // Output: File size: 117.7MB
+        // Return the formatted file size string
+        return (Math.Sign(byteCount) * num).ToString() + sizes[place];
+    }
+
+    // // Use the simple method
+    // int fileSize = 123456789;
+    // Console.WriteLine("File size: " + BytesToString(fileSize));
+    // // Output: File size: 117.7MB
 }

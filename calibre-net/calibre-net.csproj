@@ -52,13 +52,13 @@
   </ItemGroup>
 
   
+  <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
+    <PackageReference Include="ComicMeta" Version="1.0.4" />
+  </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
     <ProjectReference Include="..\ComicMeta\ComicMeta.csproj" /> 
   </ItemGroup>
-  <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
-    <PackageReference Include="ComicMeta" Version="1.0.1" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
       <PrivateAssets>All</PrivateAssets>

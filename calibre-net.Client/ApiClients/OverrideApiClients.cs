@@ -10,14 +10,14 @@ public partial class BookClient : BaseApiClient
 
     public async System.Threading.Tasks.Task<GetPageResponse?> PageAsStreamAsync(int bookId, string bookFormat, int pageId, System.Threading.CancellationToken cancellationToken)
     {
-        if (bookId == null)
-            throw new System.ArgumentNullException("bookId");
+        // if (bookId == null)
+        //     throw new System.ArgumentNullException("bookId");
 
         if (bookFormat == null)
             throw new System.ArgumentNullException("bookFormat");
 
-        if (pageId == null)
-            throw new System.ArgumentNullException("pageId");
+        // if (pageId == null)
+        //     throw new System.ArgumentNullException("pageId");
 
         var client_ = await CreateHttpClientAsync(cancellationToken).ConfigureAwait(false);
         var disposeClient_ = true;

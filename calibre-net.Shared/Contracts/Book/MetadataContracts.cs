@@ -6,14 +6,25 @@ namespace calibre_net.Shared.Contracts;
 
 public class GetMetadataResponse
 {
+    public GetMetadataResponse(){}
+    public GetMetadataResponse(AudioMetadata AudioMetadata)
+    {
+        this.AudioMetadata = AudioMetadata;
+    }
 
+    public GetMetadataResponse(ComicMetadata ComicMetadata)
+    {
+        this.ComicMetadata = ComicMetadata;
+    }
+
+    [JsonIgnore]
     public object Metadata => ComicMetadata == null ? AudioMetadata! : ComicMetadata!;
 
-    public AudioMetadata? AudioMetadata {get;set;}
-    public ComicMetadata? ComicMetadata {get;set;}
+    public AudioMetadata? AudioMetadata { get; set; }
+    public ComicMetadata? ComicMetadata { get; set; }
 }
- 
- 
+
+
 public record AudioMetadata
 {
     //
@@ -247,7 +258,7 @@ public record AudioMetadata
     //     Contains any other metadata field that is not represented by a getter in the
     //     above interface Use MetaDataHolder.DATETIME_PREFIX + DateTime.ToFileTime() to
     //     set dates. ATL will format them properly.
-    public IDictionary<string, string> AdditionalFields { get; init; }= new Dictionary<string, string>();
+    public IDictionary<string, string> AdditionalFields { get; init; } = new Dictionary<string, string>();
 
     //
     // Summary:
@@ -284,7 +295,7 @@ public record AudioMetadata
     //
     // Summary:
     //     Format of the audio data
-    public FormatDto AudioFormat { get;  set; } = null!;
+    public FormatDto AudioFormat { get; set; } = null!;
 
     //
     // Summary:
@@ -314,8 +325,9 @@ public record AudioMetadata
 
 }
 
-public record FormatDto{
- 
+public record FormatDto
+{
+
 
     //
     // Summary:
@@ -332,7 +344,7 @@ public record FormatDto{
     //     Internal unique ID
     public int ID { get; set; }
 
-   
+
     //
     // Summary:
     //     MIME types associated with the format
@@ -632,7 +644,7 @@ public record ComicMetadata()
     public string? CoverImage { get; set; }
 
 
-    public Dictionary<JobTag, string[]> Credits {get;set;}
+    public Dictionary<JobTag, string[]> Credits { get; set; } = [];
 
     public class PageInfo
     {

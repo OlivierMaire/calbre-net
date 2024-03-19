@@ -5,7 +5,7 @@
 @if (Metadata != null)
 {
     <ComicsBlazor.ComicsBlazorView Url="@Url" Name="Comics Reader" Metadata="@Metadata" GetPage="GetComicPage"
-        @rendermode="InteractiveAuto" />
+        SaveBookmark="SaveBookmark" @rendermode="new InteractiveAutoRenderMode(prerender: false)" />
 }
 else
 {
@@ -15,7 +15,7 @@ else
 
 @code {
     [Parameter] public int Id { get; set; }
-    [Parameter] public string Format { get; set; }
+    [Parameter] public string Format { get; set; } = string.Empty;
 
     private ComicsBlazor.ComicMetadata? Metadata { get; set; }
 
@@ -25,9 +25,15 @@ else
     override protected async Task OnInitializedAsync()
     {
         var meta = await BookClient.MetadataAsync(Id, Format);
+        var bookmark = await BookClient.GetBookmarkAsync(Id, Format);
         if (meta.ComicMetadata != null)
         {
             Metadata = meta.ComicMetadata.ToComicsBlazorMetadata();
+            if (bookmark != null)
+            {
+                int.TryParse(bookmark.Position, out var position);
+                Metadata.LastReadPosition = position;
+            }
         }
     }
 
@@ -39,6 +45,11 @@ else
             return new ComicsBlazor.PageData(page.PageContent, page.contentType);
 
         return null;
+    }
+
+    private async void SaveBookmark(string position)
+    {
+        await BookClient.SetBookmarkAsync(Id, Format, position);
     }
 
 

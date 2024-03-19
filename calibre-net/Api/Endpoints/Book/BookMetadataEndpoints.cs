@@ -33,24 +33,22 @@ Results<Ok<GetMetadataResponse>, NotFound>>
     public override async Task<Results<Ok<GetMetadataResponse>, NotFound>> ExecuteAsync(DownloadBookRequest req, CancellationToken ct)
     {
 
-
         // Audio Metadata
         if (AUDIO_FORMATS.Contains(req.Format.ToUpper()))
         {
             var meta = GetAudioMetadata(req);
             if (meta != null)
-                return TypedResults.Ok(new GetMetadataResponse { AudioMetadata = meta.ToDto() });
+                return TypedResults.Ok(new GetMetadataResponse(meta.ToDto()));
         }
         // Comics Metadata
         if (COMICS_FORMATS.Contains(req.Format.ToUpper()))
         {
             var meta = GetComicsMeta(req);
             if (meta != null)
-                return TypedResults.Ok(new GetMetadataResponse { ComicMetadata = meta.ToDto() });
+                return TypedResults.Ok(new GetMetadataResponse(meta.ToDto()));
 
         }
         // Epub Metadata
-
 
 
         return TypedResults.NotFound();
@@ -115,8 +113,8 @@ Results<Ok<GetMetadataResponse>, NotFound>>
                     var book = bookService.GetBook(req.Id);
                     if (book != null)
                     {
-                        if (String.IsNullOrEmpty(comic.Title))
-                            comic.Title = book.Title;
+                        // if (String.IsNullOrEmpty(comic.Title))
+                            comic.Title = book.Title; // always override
                         if (String.IsNullOrEmpty(comic.Series))
                             comic.Series = book.Series.Name;
                         if (comic.Writers == null || comic.Writers.Length == 0)

@@ -32,9 +32,9 @@
     <ProjectReference Include="..\ComicsBlazor\ComicsBlazor.csproj" /> 
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
-    <PackageReference Include="EPubBlazor" Version="0.0.2-alpha" />
-    <PackageReference Include="AudioPlayerBlazor" Version="0.2.0-alpha.7" />
-    <!-- <ProjectReference Include="..\ComicsBlazor\ComicsBlazor.csproj" />  -->
+    <PackageReference Include="EPubBlazor" Version="0.2.0-alpha.14" />
+    <PackageReference Include="AudioPlayerBlazor" Version="1.0.0" />
+    <PackageReference Include="ComicsBlazor" Version="1.0.3" />
   </ItemGroup>
 
   

@@ -151,7 +151,7 @@ public sealed class DownloadBookEndpoint(BookService bookService, ConfigurationS
     }
 }
 
-public sealed class SetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoint<SetBookmarkRequest>
+public sealed class SetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoint<SetBookmarkRequest, Ok>
 {
     private readonly ApplicationDbContext dbContext = dbContext;
 
