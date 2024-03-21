@@ -7,6 +7,8 @@ using ATL.AudioData;
 using ATL;
 using static ATL.PictureInfo;
 using calibre_net.Data;
+using Microsoft.AspNetCore.Authorization;
+using FastEndpoints.Security;
 
 namespace calibre_net.Api.Endpoints;
 
@@ -14,7 +16,7 @@ public class Book : Group
 {
     public Book()
     {
-        Configure("book", ep => ep.Description(x => x.AllowAnonymous().WithGroupName("book")));
+        Configure("book", ep => ep.Description(x => x.WithGroupName("book")));
     }
 }
 

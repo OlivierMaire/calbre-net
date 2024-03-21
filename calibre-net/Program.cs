@@ -22,6 +22,7 @@ using ComicsBlazor;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FastEndpoints.Security;
+using calibre_net;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -53,6 +54,7 @@ builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
         options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+        options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
     })
     .AddIdentityCookies();
 
@@ -61,34 +63,34 @@ builder.Services.AddAuthentication(options =>
 //             options.AccessDeniedPath = "/Account/Login3333";
 //  });
 
-builder.Services.ConfigureApplicationCookie(options =>
-options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents()
-{
-    OnRedirectToReturnUrl = (response) =>
-        {
-            if (response.Request.Path.StartsWithSegments("/api") && response.RedirectUri.Contains("Account/Login"))
-            {
-                response.Response.StatusCode = 401;
-            }
-            return Task.CompletedTask;
-        },
-    OnRedirectToLogin = (response) =>
-   {
-       if (response.Request.Path.StartsWithSegments("/api") && response.Response.StatusCode == 200)
-       {
-           response.Response.StatusCode = 401;
-       }
-       return Task.CompletedTask;
-   },
-    OnRedirectToAccessDenied = (response) =>
-  {
-      if (response.Request.Path.StartsWithSegments("/api") && response.Response.StatusCode == 200)
-      {
-          response.Response.StatusCode = 403;
-      }
-      return Task.CompletedTask;
-  }
-});
+// builder.Services.ConfigureApplicationCookie(options =>
+// options.Events = new Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationEvents()
+// {
+//     OnRedirectToReturnUrl = (response) =>
+//         {
+//             if (response.Request.Path.StartsWithSegments("/api") && response.RedirectUri.Contains("Account/Login"))
+//             {
+//                 response.Response.StatusCode = 401;
+//             }
+//             return Task.CompletedTask;
+//         },
+//     OnRedirectToLogin = (response) =>
+//    {
+//        if (response.Request.Path.StartsWithSegments("/api") && response.Response.StatusCode == 200)
+//        {
+//            response.Response.StatusCode = 401;
+//        }
+//        return Task.CompletedTask;
+//    },
+//     OnRedirectToAccessDenied = (response) =>
+//   {
+//       if (response.Request.Path.StartsWithSegments("/api") && response.Response.StatusCode == 200)
+//       {
+//           response.Response.StatusCode = 403;
+//       }
+//       return Task.CompletedTask;
+//   }
+// });
 
 builder.Services.AddHeimGuard<UserPolicyHandler>()
     .AutomaticallyCheckPermissions()
@@ -96,8 +98,8 @@ builder.Services.AddHeimGuard<UserPolicyHandler>()
 
 // builder.Services.AddAuthorizationCore(options =>
 // {
-//     options.AddPolicy("Admin",
-//         policy => policy.RequireClaim("Permissions", "Admin"));
+//     // options.AddPolicy("Admin",
+//     //     policy => policy.RequireClaim("Permissions", "Admin"));
 // });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
@@ -230,6 +232,8 @@ builder.Services.AddFido2(options =>
 
 
 builder.Services.AddFastEndpoints()
+//  .AddAuthenticationCookie(validFor: TimeSpan.FromMinutes(10))
+// .AddAuthorization() //add this
 .AddResponseCaching()
 .AddAntiforgery();
 
@@ -262,10 +266,10 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("AuthenticationApi", client => client.BaseAddress = new Uri(baseAddress));
 
 
-// builder.Services.AddTransient<AuthenticationDelegatingHandler>();
-
-builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress));
-
+builder.Services.AddScoped<ServerAuthenticationDelegatingHandler>();
+builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress))
+    .AddHttpMessageHandler<ServerAuthenticationDelegatingHandler>();
+ 
 builder.WebHost.ConfigureKestrel(o =>
 {
     // o.Limits.
@@ -322,13 +326,15 @@ app.UseMiddleware<BlazorCookieAuthenticationMiddleware<ApplicationUser>>();
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 
+
 app.UseAuthentication() //add this
    .UseAuthorization(); //add this
 
-app.UseAntiforgery();
+app.UseAntiforgery(); // should be after UseAuthentication
+
 
 app.UseResponseCaching()
-.UseAntiforgeryFE()
+// .UseAntiforgeryFE()
 .UseFastEndpoints(c =>
 {
     c.Versioning.Prefix = "v";

@@ -1,7 +1,9 @@
 @page "/books"
 @inject ApiClients.BookClient BookClient
+@inject ApiClients.IdentityClient IdentityClient
 
 @attribute [StreamRendering]
+@attribute [Authorize]
 
 <PageTitle>Books</PageTitle>
 <MudText Typo="Typo.h3" GutterBottom="true">Books</MudText>
@@ -30,8 +32,9 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        @* await IdentityClient.DownloadPersonalDataAsync(); *@
         BookList = await BookClient.AllAsync();
-        Console.WriteLine($"{BookList.Count} books found");
+        Console.WriteLine($"{BookList?.Count} books found");
         StateHasChanged();
     }
 }
