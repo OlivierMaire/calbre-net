@@ -35,11 +35,11 @@ public class CalibreNetClaimsPrincipalFactory :
                 .FromCacheAsync("permissions", user.Id))
                 .ToArray();
 
-            // foreach(var p in permissions)
-            // {
-            // ((ClaimsIdentity)principal.Identity).AddClaims(
-            //     new[] { new Claim("Permissions", p) });
-            // }
+            foreach (var p in permissions)
+            {
+                ((ClaimsIdentity)principal.Identity).AddClaims(
+                    new[] { new Claim("Permissions", p) });
+            }
 
         }
 

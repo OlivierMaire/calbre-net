@@ -26,8 +26,8 @@ Results<Ok<GetMetadataResponse>, NotFound>>
         Get("/metadata/{Id:int}/{format}");
         Version(1);
         Group<Book>();
-        // ResponseCache(_7DaysInSeconds); //cache for 7 days
-
+        ResponseCache(_7DaysInSeconds); //cache for 7 days
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task<Results<Ok<GetMetadataResponse>, NotFound>> ExecuteAsync(DownloadBookRequest req, CancellationToken ct)

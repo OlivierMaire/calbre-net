@@ -1,4 +1,6 @@
 @page "/book/{id:int}"
+@attribute [Authorize]
+
 @using System.Globalization
 @inject ApiClients.BookClient BookClient
 @inject IStringLocalizer<calibre_net.Shared.Resources.Shared> L

@@ -23,6 +23,7 @@ using FastEndpoints;
 using FastEndpoints.Swagger;
 using FastEndpoints.Security;
 using calibre_net;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -100,6 +101,7 @@ builder.Services.AddHeimGuard<UserPolicyHandler>()
 // {
 //     // options.AddPolicy("Admin",
 //     //     policy => policy.RequireClaim("Permissions", "Admin"));
+//     options.AddPolicy("IdIsMyself", policy => policy.RequireClaim(ClaimTypes.NameIdentifier,  policy.))
 // });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");

@@ -15,6 +15,7 @@ public class Permission
 public static class PermissionType
 {
     public const string ADMIN = "Admin";
+    public const string BOOK_VIEW = "Book.View";
 }
 public static class PermissionStore
 {
@@ -133,7 +134,51 @@ public static class PermissionStore
             {
                 Name = "RandomDetailView.Show",
                 Description = ""
+            },
+            new()
+            {
+                Name = "User.Add",
+                Description = "Add a User"
+            },
+            new()
+            {
+                Name = "User.Edit",
+                Description = "Edit a User"
+            },
+            new()
+            {
+                Name = "User.Delete",
+                Description = "Delete a User"
+            },
+            new()
+            {
+                Name = "User.EditSelf",
+                Description = "Edit yourself"
+            },
+            new()
+            {
+                Name = "User.DeleteSelf",
+                Description = "Delete yourself"
             }
+,
+            new()
+            {
+                Name = PermissionType.BOOK_VIEW,
+                Description = "List, View Details, Read"
+            },
+            new()
+            {
+                Name = "Book.Download",
+                Description = "Download Book files"
+            },
+            new()
+            {
+                Name = "Book.Bookmark",
+                Description = "Delete yourself"
+            }
+
+
+
 
         };
     }
