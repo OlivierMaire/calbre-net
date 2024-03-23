@@ -3,6 +3,7 @@
 @inject NavigationManager NavManager
 @inject BookClient BookClient
 
+@attribute [Authorize(PermissionType.BOOK_VIEW)]
 @rendermode InteractiveAuto
 
 @* // Ebook : EPUB, AZW3,CUE *@
