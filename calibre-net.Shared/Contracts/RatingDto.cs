@@ -15,4 +15,6 @@ public partial class RatingDto
     [JsonPropertyName("books")]
     public List<BookDto> Books {get;set;} = [];
 
+    [JsonIgnore]
+    public string RatingLink => $"/books/rating/{Id}";
 }

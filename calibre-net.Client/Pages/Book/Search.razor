@@ -1,0 +1,94 @@
+@using calibre_net.Shared.Contracts
+@using calibre_net.Shared
+
+@page "/books/{*pageRoute}"
+@attribute [StreamRendering]
+
+@inject ApiClients.BookClient BookClient
+
+
+Search
+
+<p>
+    PageRoute: @PageRoute
+</p>
+
+<p>
+    @foreach(var (k,v) in DICT)
+    {
+        <p>@k : @v</p>
+    }
+</p>
+
+<p>
+   AUTHOR:  @req.Author
+</p>
+
+
+@if (BookList == null)
+{
+    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+}
+else
+{
+
+<MudContainer Class="d-flex flex-row gap-2 flex-wrap flex-wrap-anim" MaxWidth="MaxWidth.False">
+        @foreach (var book in BookList)
+        {
+            <BookThumb CalibreBook="@book"/>
+        }
+</MudContainer>
+
+   
+}
+
+
+@code {
+    [Parameter]
+    public string? PageRoute { get; set; }
+
+    public Dictionary<string,object> DICT = [];
+        public SearchRequest req = new();
+
+    ICollection<BookDto> BookList { get; set; } = null!;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var dict = ParseStringToDictionary(PageRoute);
+        DICT = dict;
+
+        @* calibre_net.Shared.Contacts.SearchRequest req = new(); *@
+        var req = dict.ToObject<SearchRequest>();
+
+Console.WriteLine($"AuthorID: {req.Author}");
+
+
+            
+        BookList = await BookClient.SearchAsync(req);
+        Console.WriteLine($"{BookList?.Count} books found");
+
+        StateHasChanged();
+
+
+    }
+
+
+    static Dictionary<string, object> ParseStringToDictionary(string input)
+    {
+        var dictionary = new Dictionary<string, object>();
+        var pairs = input.Split('/');
+
+        for (int i = 0; i < pairs.Length; i += 2)
+        {
+            string key = pairs[i];
+            string value = pairs[i + 1];
+
+            // You can convert the value to the appropriate type (e.g., int, double, etc.) if needed.
+            dictionary[key] = value;
+        }
+
+        return dictionary;
+    }
+
+
+}

@@ -20,6 +20,6 @@ public partial class SeriesDto
 
     
     [JsonIgnore]
-    public string SeriesLink => $"/series/{Id}";
+    public string SeriesLink => $"/books/series/{Id}";
 
 }

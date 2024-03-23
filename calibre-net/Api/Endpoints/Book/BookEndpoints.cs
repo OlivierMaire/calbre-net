@@ -35,7 +35,7 @@ public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutReque
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        await SendOkAsync(service.GetBooks(), ct);
+        await SendOkAsync(service.GetBooks(new SearchRequest()), ct);
     }
 }
 
@@ -213,5 +213,25 @@ public sealed class GetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
             await SendOkAsync(new GetBookmarkResponse((int)bookmark.BookId, bookmark.Format, bookmark.Position));
         else
             await SendOkAsync(new GetBookmarkResponse((int)req.BookId, req.BookFormat, ""));
+    }
+}
+
+
+public sealed class SearchBooksEndpoint(BookService service) : Endpoint<SearchRequest, List<BookDto>>
+{
+    private readonly BookService service = service;
+
+    public override void Configure()
+    {
+        Post("/search");
+        Version(1);
+        Group<Book>();
+        ResponseCache(60); //cache for 60 seconds
+        Policies(PermissionType.BOOK_VIEW);
+    }
+
+    public override async Task HandleAsync(SearchRequest req, CancellationToken ct)
+    {
+        await SendOkAsync(service.GetBooks(req), ct);
     }
 }

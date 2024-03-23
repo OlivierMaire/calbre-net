@@ -46,12 +46,9 @@
         @if (CalibreBook.Rating != null)
         {
             <div class="book-rating">
-                <a href="/rating/@CalibreBook.Rating.Id">
+                <a href="@CalibreBook.Rating.RatingLink">
                     <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(CalibreBook.Rating.Rating ?? 0)" />
-
-
                 </a>
-
             </div>
         }
 

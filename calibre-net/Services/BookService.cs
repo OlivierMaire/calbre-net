@@ -12,7 +12,7 @@ public class BookService(CalibreDbDapperContext dbContext)
 {
     private readonly CalibreDbDapperContext dbContext = dbContext;
 
-    public List<BookDto> GetBooks()
+    public List<BookDto> GetBooks(SearchRequest req)
     {
         // var books = calibreDb.Books
         // .Include(b => b.Authors)
@@ -37,13 +37,25 @@ public class BookService(CalibreDbDapperContext dbContext)
             LEFT JOIN series s on s.Id = bsl.series
             LEFT JOIN books_ratings_link brl on brl.book = b.id
             LEFT JOIN ratings r on r.Id = brl.rating
-            """, (book, author, serie, rating) =>
+            WHERE 
+            (@authorId IS NULL OR a.Id = @authorId )
+            AND (@seriesId IS NULL OR s.Id = @seriesId )
+            AND (@ratingId IS NULL OR r.Id = @ratingId )
+            """,
+            (book, author, serie, rating) =>
    {
        book.Authors.Add(author);
        book.Series.Add(serie);
        book.Rating.Add(rating);
        return book;
-   }, splitOn: "Id,Id,Id,Id");
+   },
+   param: new
+   {
+       authorId = req.Author,
+       seriesId = req.Series,
+       ratingId = req.Rating
+   },
+    splitOn: "Id,Id,Id,Id");
 
             books = books.GroupBy(b => b.Id)
                 .Select(g =>
@@ -115,7 +127,7 @@ public class BookService(CalibreDbDapperContext dbContext)
                 return book.ToDto();
             }
         }
- 
+
     }
 
     public string GetBookCover(int id)

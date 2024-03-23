@@ -19,6 +19,6 @@ public partial class AuthorDto
     public List<BookDto> Books { get; set; } = [];
 
     [JsonIgnore]
-    public string AuthorLink => $"/author/{Id}";
+    public string AuthorLink => $"/books/author/{Id}";
 
 }
