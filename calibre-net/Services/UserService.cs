@@ -98,10 +98,11 @@ ILogger<UserService> logger)
         }
 
 
-        // On Permission update Expire the tag with:
-        QueryCacheManager.ExpireTag("permissions", user.Id);
 
         await dbContext.SaveChangesAsync();
+
+        // On Permission update Expire the tag with:
+        QueryCacheManager.ExpireTag("permissions", user.Id);
 
         return await GetUserAsync(model.Id);
     }
@@ -154,9 +155,8 @@ ILogger<UserService> logger)
         return (IUserEmailStore<ApplicationUser>)userStore;
     }
 
-    public async Task DeleteUser(string userId, ClaimsPrincipal User)
+    public async Task DeleteUser(string userId, string currentUserId)
     {
-        var currentUser = await userManager.GetUserAsync(User);
         var user = await userManager.FindByIdAsync(userId);
         if (user != null)
         {
@@ -165,7 +165,7 @@ ILogger<UserService> logger)
             {
                 throw new InvalidOperationException("Unexpected error occurred deleting user.");
             }
-            if (userId == currentUser?.Id)
+            if (userId == currentUserId)
             {
                 await signInManager.SignOutAsync();
             }

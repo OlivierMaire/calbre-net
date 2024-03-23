@@ -7,7 +7,7 @@ using FluentValidation.Results;
 public class Configuration : Group{
     public Configuration()
     {
-        Configure("configuration", ep => ep.Description(x => x.AllowAnonymous().WithGroupName("configuration")));
+        Configure("configuration", ep => ep.Description(x => x.WithGroupName("configuration")));
     }
 }
 
@@ -19,6 +19,7 @@ public sealed class GetCalibreConfigurationEndpoint(ConfigurationService configu
         Get("/");
         Version(1);
         Group<Configuration>();
+        Policies(PermissionType.CONFIGURATION_VIEWALL);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -35,6 +36,7 @@ public sealed class SetCalibreConfigurationEndpoint(ConfigurationService configu
         Post("/");
         Version(1);
         Group<Configuration>();
+        Policies(PermissionType.CONFIGURATION_EDIT);
     }
 
     public override async Task HandleAsync(CalibreConfiguration req, CancellationToken ct)
@@ -53,6 +55,7 @@ public sealed class GetConfigurationValueEndpoint(ConfigurationService configura
         Get("/getvalue");
         Version(1);
         Group<Configuration>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(GetConfigurationValueRequest req, CancellationToken ct)

@@ -1,72 +1,79 @@
+@using calibre_net.Shared.Contracts
 @inject UserClient UserClient
 @attribute [StreamRendering]
 @* @rendermode InteractiveAuto *@
 @inject ISnackbar Snackbar
 
+
 <MudText Typo="Typo.h4">Users</MudText>
 
 @Text
 
-@if (Users != null){
-<MudTable Items="@Users" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info"
-    CanCancelEdit="true" CommitEditTooltip="Commit Edit"
-     OnCommitEditClick="@(() => Snackbar.Add("Commit Edit Handler Invoked"))" RowEditPreview="BackupItem" RowEditCancel="ResetItemToOriginalValues"
-          RowEditCommit="ItemHasBeenCommitted" 
-          IsEditRowSwitchingBlocked="false" ApplyButtonPosition="TableApplyButtonPosition.End"
-           EditButtonPosition="TableEditButtonPosition.End" EditTrigger="TableEditTrigger.EditButton">
-    <HeaderContent>
-        <MudTh>Nr</MudTh>
-        <MudTh>UserName</MudTh>
-        <MudTh>Name</MudTh>
+@if (Users != null)
+{
+    <MudTable Items="@Users" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Info"
+        CanCancelEdit="true" CommitEditTooltip="Commit Edit"
+        OnCommitEditClick="@(() => Snackbar.Add("Commit Edit Handler Invoked"))" RowEditPreview="BackupItem"
+        RowEditCancel="ResetItemToOriginalValues" RowEditCommit="ItemHasBeenCommitted" IsEditRowSwitchingBlocked="false"
+        ApplyButtonPosition="TableApplyButtonPosition.End" EditButtonPosition="TableEditButtonPosition.End"
+        EditTrigger="TableEditTrigger.EditButton">
+        <HeaderContent>
+            <MudTh>Nr</MudTh>
+            <MudTh>UserName</MudTh>
+            <MudTh>Name</MudTh>
 
-        @foreach (var permission in Permissions)
-        {
-            <MudTh>@permission.Name</MudTh>
-        }
+            @foreach (var permission in Permissions)
+            {
+                <MudTh>@permission.Name</MudTh>
+            }
 
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Nr">
-            <MudLink Href="@($"/Admin/User/{context.Id}")"> @context.Id</MudLink>
-            
-           </MudTd>
-        <MudTd DataLabel="UserName">@context.Name</MudTd>
-        <MudTd DataLabel="Name">@context.Email</MudTd>
-        @foreach (var permission in Permissions)
-        {
-            <MudTh DataLabel="@permission.Name">@context.HasPermission(permission.Name)</MudTh>
-        }
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nr">
+                <MudLink Href="@($"/Admin/User/{context.Id}")"> @context.Id</MudLink>
+
+            </MudTd>
+            <MudTd DataLabel="UserName">@context.Name</MudTd>
+            <MudTd DataLabel="Name">@context.Email</MudTd>
+            @foreach (var permission in Permissions)
+            {
+                <MudTh DataLabel="@permission.Name">@context.HasPermission(permission.Name)</MudTh>
+            }
 
 
-    </RowTemplate>
-    <RowEditingTemplate>
-        <MudTd DataLabel="Nr">@context.Id</MudTd>
-              <MudTd DataLabel="Sign">@context.Name</MudTd>
-        <MudTd DataLabel="Name">@context.Email</MudTd>
-    @foreach (var permission in Permissions)
-        {
-            <MudTh DataLabel="@permission.Name">
-                <MudCheckBox Checked="@context.HasPermission(permission.Name)" />
-              </MudTh>
-        }
+        </RowTemplate>
+        <RowEditingTemplate>
+            <MudTd DataLabel="Nr">@context.Id</MudTd>
+            <MudTd DataLabel="Sign">@context.Name</MudTd>
+            <MudTd DataLabel="Name">@context.Email</MudTd>
+            @foreach (var permission in Permissions)
+            {
+                <MudTh DataLabel="@permission.Name">
+                    <MudCheckBox Checked="@context.HasPermission(permission.Name)" />
+                </MudTh>
+            }
 
-       
-       
-    </RowEditingTemplate>
+
+
+        </RowEditingTemplate>
         <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-    <EditButtonContent Context="button">
-        <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0" OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
-    </EditButtonContent>
-</MudTable>
-
-<MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3">Edit
-    Users</MudButton>
+            <MudTablePager />
+        </PagerContent>
+        <EditButtonContent Context="button">
+            <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" Class="pa-0"
+                OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
+        </EditButtonContent>
+    </MudTable>
+<AuthorizeView Policy="@PermissionType.ADMIN_USER">
+    <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3">Edit
+        Users</MudButton>
+</AuthorizeView>
 }
 
-<MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
-    Class="mt-3 ml-3" Href="/Admin/User">Add a new User</MudButton>
+<AuthorizeView Policy="@PermissionType.ADMIN_USER">
+    <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
+        Class="mt-3 ml-3" Href="/Admin/User">Add a new User</MudButton>
+</AuthorizeView>
 
 @code {
 
@@ -88,7 +95,7 @@
     }
 
     private UserModel elementBeforeEdit = new UserModel();
-    
+
     private void BackupItem(object element)
     {
         elementBeforeEdit = new()

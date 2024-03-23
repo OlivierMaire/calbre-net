@@ -7,6 +7,8 @@ using ATL.AudioData;
 using ATL;
 using static ATL.PictureInfo;
 using calibre_net.Data;
+using Microsoft.AspNetCore.Authorization;
+using FastEndpoints.Security;
 
 namespace calibre_net.Api.Endpoints;
 
@@ -14,7 +16,7 @@ public class Book : Group
 {
     public Book()
     {
-        Configure("book", ep => ep.Description(x => x.AllowAnonymous().WithGroupName("book")));
+        Configure("book", ep => ep.Description(x => x.WithGroupName("book")));
     }
 }
 
@@ -28,6 +30,7 @@ public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutReque
         Version(1);
         Group<Book>();
         ResponseCache(60); //cache for 60 seconds
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -48,7 +51,7 @@ public sealed class GetBookEndpoint(BookService service) : Endpoint<GetBookReque
         Version(1);
         Group<Book>();
         ResponseCache(60); //cache for 60 seconds
-
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task HandleAsync(GetBookRequest req, CancellationToken ct)
@@ -73,6 +76,7 @@ public sealed class GetBookCoverEndpoint(BookService bookService, ConfigurationS
         Version(1);
         Group<Book>();
         ResponseCache(_7DaysInSeconds); //cache for 7 days
+        Policies(PermissionType.BOOK_VIEW);
 
     }
 
@@ -116,6 +120,7 @@ public sealed class DownloadBookEndpoint(BookService bookService, ConfigurationS
         Version(1);
         Group<Book>();
         ResponseCache(_7DaysInSeconds); //cache for 7 days
+        Policies(PermissionType.BOOK_VIEW);
 
     }
 
@@ -160,6 +165,7 @@ public sealed class SetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
         Get("/setBookmark");
         Version(1);
         Group<Book>();
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task HandleAsync(SetBookmarkRequest req, CancellationToken ct)
@@ -195,6 +201,7 @@ public sealed class GetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
         Get("/getBookmark");
         Version(1);
         Group<Book>();
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task HandleAsync(GetBookmarkRequest req, CancellationToken ct)

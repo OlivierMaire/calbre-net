@@ -3,30 +3,35 @@
 <MudNavMenu Class="d-flex flex-row-reverse">
 	<AuthorizeView>
 		<Authorized>
-			<MudNavLink Class="w-auto" Href="Account/Logout" 
-			 Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Logout" IconColor="Color.Inherit">Logout</MudNavLink>
-			<MudNavLink Class="w-auto" Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.AccountBox" IconColor="Color.Inherit">@context.User.Identity?.Name</MudNavLink>
-            @* Need to display for Admin only *@
-			<MudNavLink Class="w-auto" Href="Admin" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.SettingsApplications" IconColor="Color.Inherit">Admin</MudNavLink>
+			<MudNavLink Class="w-auto" Href="Account/Logout" Match="NavLinkMatch.Prefix"
+				Icon="@Icons.Material.Filled.Logout" IconColor="Color.Inherit">Logout</MudNavLink>
+			<MudNavLink Class="w-auto" Href="Account/Manage" Match="NavLinkMatch.Prefix"
+				Icon="@Icons.Material.Filled.AccountBox" IconColor="Color.Inherit">@context.User.Identity?.Name
+			</MudNavLink>
+			<AuthorizeView Policy="Admin" Context="AuthContext">
+				<MudNavLink Class="w-auto" Href="Admin" Match="NavLinkMatch.Prefix"
+					Icon="@Icons.Material.Filled.SettingsApplications" IconColor="Color.Inherit">Admin</MudNavLink>
+			</AuthorizeView>
 
-    
-    	</Authorized>
+		</Authorized>
 		<NotAuthorized>
-			<MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login" IconColor="Color.Inherit">Login</MudNavLink>
-			<MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonAdd" IconColor="Color.Inherit">Register</MudNavLink>
+			<MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login"
+				IconColor="Color.Inherit">Login</MudNavLink>
+			<MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonAdd"
+				IconColor="Color.Inherit">Register</MudNavLink>
 		</NotAuthorized>
 	</AuthorizeView>
 
 </MudNavMenu>
 
 @code {
-    private string? currentUrl;
+	private string? currentUrl;
 
-    protected override void OnInitialized()
-    {
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        @* NavigationManager.LocationChanged += OnLocationChanged; *@
-    }
-
-     
+	protected override void OnInitialized()
+	{
+		currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+		@* NavigationManager.LocationChanged += OnLocationChanged; *@
 	}
+
+
+}

@@ -34,7 +34,6 @@ public class UserPolicyHandler : IUserPolicyHandler
             .Select(p => p.PermissionName)
             .FromCacheAsync("permissions", userId))
             .ToArray();
-
         // On Permission update Expire the tag with:
         // QueryCacheManager.ExpireTag("permissions", userId);
 

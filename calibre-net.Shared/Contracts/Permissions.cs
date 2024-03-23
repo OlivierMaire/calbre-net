@@ -15,11 +15,14 @@ public class Permission
 public static class PermissionType
 {
     public const string ADMIN = "Admin";
+    public const string ADMIN_USER = "Admin.User";
+    public const string BOOK_VIEW = "Book.View";
+    public const string BOOK_BOOKMARK = "Book.Bookmark";
+    public const string CONFIGURATION_EDIT = "Configuration.Edit";
+    public const string CONFIGURATION_VIEWALL = "Configuration.ViewAll";
 }
 public static class PermissionStore
 {
-
-
     public static List<Permission> GetPermissions()
     {
         return new List<Permission>()
@@ -133,7 +136,59 @@ public static class PermissionStore
             {
                 Name = "RandomDetailView.Show",
                 Description = ""
+            },
+            // new()
+            // {
+            //     Name = "User.Add",
+            //     Description = "Add a User"
+            // },
+            // new()
+            // {
+            //     Name = "User.Edit",
+            //     Description = "Edit a User"
+            // },
+            // new()
+            // {
+            //     Name = "User.Delete",
+            //     Description = "Delete a User"
+            // },
+            new()
+            {
+                Name = PermissionType.ADMIN_USER,
+                Description = "Manage users (List/Add/Edit/Delete)"
+            },
+            new()
+            {
+                Name = "User.EditSelf",
+                Description = "Edit yourself"
+            },
+            new()
+            {
+                Name = "User.DeleteSelf",
+                Description = "Delete yourself"
+            },
+            new()
+            {
+                Name = PermissionType.BOOK_VIEW,
+                Description = "List, View Details, Read, Download Book"
+            },
+            new()
+            {
+                Name = PermissionType.BOOK_BOOKMARK,
+                Description = "Delete yourself"
+            },
+            new()
+            {
+                Name = PermissionType.CONFIGURATION_VIEWALL,
+                Description = "Get All Confirguration Settings"
+            },
+            new()
+            {
+                Name = PermissionType.CONFIGURATION_EDIT,
+                Description = "Edit Configuration"
             }
+
+
 
         };
     }

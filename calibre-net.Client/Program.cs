@@ -63,8 +63,8 @@ builder.Services.AddHttpClient("AuthenticationApi", client => client.BaseAddress
 
 // builder.Services.AddTransient<AuthenticationDelegatingHandler>();
 
-builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress))
- ;//.AddHttpMessageHandler<AuthenticationDelegatingHandler>();
+builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress));
+//  .AddHttpMessageHandler<AuthenticationDelegatingHandler>();
 
 // builder.Services.Configure<CalibreConfiguration>(options => builder.Configuration.GetSection("calibre").Bind(options));
 

@@ -16,6 +16,7 @@ public sealed class GetPageEndpoint(BookService bookService, ConfigurationServic
         Get("/{BookId:int}/{BookFormat}/page/{PageId:int}");
         Version(1);
         Group<Book>();
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task HandleAsync(GetPageRequest req, CancellationToken ct)

@@ -2,6 +2,7 @@ using calibre_net.Services;
 using calibre_net.Shared.Contracts;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Security.Claims;
 
 namespace calibre_net.Api.Endpoints;
 
@@ -9,7 +10,7 @@ public class User : Group
 {
     public User()
     {
-        Configure("user", ep => ep.Description(x => x.AllowAnonymous().WithGroupName("user")));
+        Configure("user", ep => ep.Description(x => x.WithGroupName("user")));
     }
 }
 
@@ -20,6 +21,7 @@ public sealed class GetMyselfEndpoint : EndpointWithoutRequest<string>
         Get("/me");
         Version(1);
         Group<User>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -37,6 +39,7 @@ public sealed class GetAllUsersEndpoint(UserService userService) : EndpointWitho
         Get("/all");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -54,6 +57,7 @@ public sealed class GetAllPermissionsEndpoint : EndpointWithoutRequest<List<Perm
         Get("/allPermissions");
         Version(1);
         Group<User>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -71,6 +75,7 @@ public sealed class GetUserEndpoint(UserService userService) : Endpoint<GetUserR
         Get("/{id}");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(GetUserRequest req, CancellationToken ct)
@@ -87,6 +92,7 @@ public sealed class UpdateUserEndpoint(UserService userService) : Endpoint<UserM
         Post("/update");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(UserModelExtended req, CancellationToken ct)
@@ -95,7 +101,7 @@ public sealed class UpdateUserEndpoint(UserService userService) : Endpoint<UserM
     }
 }
 
-public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserModelExtended, UserModelExtended>
+public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserModelExtended, Results<Ok<UserModelExtended>,BadRequest<string[]>>>
 {
     private readonly UserService service = userService;
     public override void Configure()
@@ -103,6 +109,7 @@ public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserMode
         Put("/add");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(UserModelExtended req, CancellationToken ct)
@@ -110,7 +117,7 @@ public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserMode
         try
         {
             var user = await service.AddUserAsync(req);
-            await SendOkAsync(user);
+            await SendResultAsync(TypedResults.Ok(user));
             return;
         }
         catch (ServiceException se)
@@ -128,9 +135,8 @@ public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserMode
 }
 
 
-public sealed class DeleteUserEndpoint(UserService userService) : EndpointWithoutRequest<UserModelExtended>
+public sealed class DeleteUserEndpoint(UserService userService) : Endpoint<DeleteUserRequest, bool>
 {
-    private string Id { get; set; } = string.Empty;
     private readonly UserService service = userService;
 
     public override void Configure()
@@ -138,12 +144,15 @@ public sealed class DeleteUserEndpoint(UserService userService) : EndpointWithou
         Delete("/{id}");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
-    public override async Task HandleAsync(CancellationToken ct)
+    public override async Task HandleAsync(DeleteUserRequest req, CancellationToken ct)
     {
+        var currentUserId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+
         /* TODO set current user */ 
-        await service.DeleteUser(Id, null);
-        await SendOkAsync();
+        await service.DeleteUser(req.Id, currentUserId);
+        await SendOkAsync(true);
     }
 }

@@ -4,6 +4,7 @@ using calibre_net.Services;
 using calibre_net.Shared.Contracts;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
+using VersOne.Epub.Schema;
 using static ATL.PictureInfo;
 namespace calibre_net.Api.Endpoints;
 
@@ -26,8 +27,8 @@ Results<Ok<GetMetadataResponse>, NotFound>>
         Get("/metadata/{Id:int}/{format}");
         Version(1);
         Group<Book>();
-        // ResponseCache(_7DaysInSeconds); //cache for 7 days
-
+        ResponseCache(_7DaysInSeconds); //cache for 7 days
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task<Results<Ok<GetMetadataResponse>, NotFound>> ExecuteAsync(DownloadBookRequest req, CancellationToken ct)
@@ -49,90 +50,114 @@ Results<Ok<GetMetadataResponse>, NotFound>>
 
         }
         // Epub Metadata
+        if (BOOK_FORMATS.Contains(req.Format.ToUpper()))
+        {
+            var meta = GetEpubMeta(req);
+            if (meta != null)
+                return TypedResults.Ok(new GetMetadataResponse(meta));
+
+        }
 
 
         return TypedResults.NotFound();
     }
 
-
-    private AudioPlayerBlazor.AudioMetadata? GetAudioMetadata(DownloadBookRequest req)
+    private EPubMetadata? GetEpubMeta(DownloadBookRequest req)
     {
-        var conf = configService.GetCalibreConfiguration();
 
-        // get book
-        var bookPath = bookService.GetBookFile(req.Id, req.Format);
-        if (!String.IsNullOrEmpty(bookPath))
+        // Get Calibre data  
+        var book = bookService.GetBook(req.Id);
+        if (book != null)
         {
-            var path = conf.Database?.Location ?? string.Empty;
-            path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
-            path += bookPath;
-            if (System.IO.File.Exists(path))
+            var meta = new Shared.Contracts.EPubMetadata
             {
-                Track audioTrack = new Track(path);
-                // validate picture
-                if (audioTrack.EmbeddedPictures.Count == 0
-                || !audioTrack.EmbeddedPictures.Any(p => p.PicType == PIC_TYPE.Generic || p.PicType == PIC_TYPE.Front))
-                {
-                    var coverPath = bookService.GetBookCover(req.Id);
-                    path = conf.Database?.Location ?? string.Empty;
-                    path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
-                    path += coverPath;
-
-                    if (System.IO.File.Exists(path))
-                    {
-                        var stream = System.IO.File.OpenRead(path);
-                        audioTrack.EmbeddedPictures.Add(PictureInfo.fromBinaryData(stream, (int)stream.Length,
-                         PIC_TYPE.Generic, MetaDataIOFactory.TagType.ANY, 0));
-                    }
-                }
-
-                var meta = audioTrack.ToAudioMetadata();
-                return meta;
-            }
-        }
-        return null;
-    }
-
-    private ComicMeta.Metadata.GenericMetadata? GetComicsMeta(DownloadBookRequest req)
-    {
-        var conf = configService.GetCalibreConfiguration();
-
-        // get book
-        var bookPath = bookService.GetBookFile(req.Id, req.Format);
-        if (!String.IsNullOrEmpty(bookPath))
-        {
-            var path = conf.Database?.Location ?? string.Empty;
-            path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
-            path += bookPath;
-            if (System.IO.File.Exists(path))
-            {
-                var comic = comicService.GetComicInfo(path);
-                if (comic != null)
-                {
-                    // Get Calibre data and add missing data
-                    var book = bookService.GetBook(req.Id);
-                    if (book != null)
-                    {
-                        // if (String.IsNullOrEmpty(comic.Title))
-                            comic.Title = book.Title; // always override
-                        if (String.IsNullOrEmpty(comic.Series))
-                            comic.Series = book.Series.Name;
-                        if (comic.Writers == null || comic.Writers.Length == 0)
-                            comic.Writers = book.Authors.Select(a => a.Name).ToArray();
-                        if (String.IsNullOrEmpty(comic.CommunityRating))
-                            comic.CommunityRating = (book.Rating.Rating / 2.0m).ToString();
-                        if (comic.Tags == null || comic.Tags.Length == 0)
-                            comic.Tags = book.Tags.Select(t => t.Name).ToArray();
-                        if (String.IsNullOrEmpty(comic.Summary))
-                            comic.Summary = book.Comments.Text;
-                    }
-                }
-                return comic;
-            }
+                Title = book.Title,
+                Authors = book.Authors.ToArray()
+            };
+            return meta;
         }
 
         return null;
     }
+
+private AudioPlayerBlazor.AudioMetadata? GetAudioMetadata(DownloadBookRequest req)
+{
+    var conf = configService.GetCalibreConfiguration();
+
+    // get book
+    var bookPath = bookService.GetBookFile(req.Id, req.Format);
+    if (!String.IsNullOrEmpty(bookPath))
+    {
+        var path = conf.Database?.Location ?? string.Empty;
+        path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
+        path += bookPath;
+        if (System.IO.File.Exists(path))
+        {
+            Track audioTrack = new Track(path);
+            // validate picture
+            if (audioTrack.EmbeddedPictures.Count == 0
+            || !audioTrack.EmbeddedPictures.Any(p => p.PicType == PIC_TYPE.Generic || p.PicType == PIC_TYPE.Front))
+            {
+                var coverPath = bookService.GetBookCover(req.Id);
+                path = conf.Database?.Location ?? string.Empty;
+                path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
+                path += coverPath;
+
+                if (System.IO.File.Exists(path))
+                {
+                    var stream = System.IO.File.OpenRead(path);
+                    audioTrack.EmbeddedPictures.Add(PictureInfo.fromBinaryData(stream, (int)stream.Length,
+                     PIC_TYPE.Generic, MetaDataIOFactory.TagType.ANY, 0));
+                }
+            }
+
+            var meta = audioTrack.ToAudioMetadata();
+            return meta;
+        }
+    }
+    return null;
+}
+
+private ComicMeta.Metadata.GenericMetadata? GetComicsMeta(DownloadBookRequest req)
+{
+    var conf = configService.GetCalibreConfiguration();
+
+    // get book
+    var bookPath = bookService.GetBookFile(req.Id, req.Format);
+    if (!String.IsNullOrEmpty(bookPath))
+    {
+        var path = conf.Database?.Location ?? string.Empty;
+        path = path.EndsWith(Path.DirectorySeparatorChar) ? path : path + Path.DirectorySeparatorChar;
+        path += bookPath;
+        if (System.IO.File.Exists(path))
+        {
+            var comic = comicService.GetComicInfo(path);
+            if (comic != null)
+            {
+                // Get Calibre data and add missing data
+                var book = bookService.GetBook(req.Id);
+                if (book != null)
+                {
+                    // if (String.IsNullOrEmpty(comic.Title))
+                    comic.Title = book.Title; // always override
+                    if (String.IsNullOrEmpty(comic.Series))
+                        comic.Series = book.Series.Name;
+                    if (comic.Writers == null || comic.Writers.Length == 0)
+                        comic.Writers = book.Authors.Select(a => a.Name).ToArray();
+                    if (String.IsNullOrEmpty(comic.CommunityRating))
+                        comic.CommunityRating = (book.Rating.Rating / 2.0m).ToString();
+                    if (comic.Tags == null || comic.Tags.Length == 0)
+                        comic.Tags = book.Tags.Select(t => t.Name).ToArray();
+                    if (String.IsNullOrEmpty(comic.Summary))
+                        comic.Summary = book.Comments.Text;
+                }
+            }
+            return comic;
+        }
+    }
+
+    return null;
+}
 
 
 

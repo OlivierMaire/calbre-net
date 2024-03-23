@@ -30,7 +30,9 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
             new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
             new Claim(ClaimTypes.Name, userInfo.Email),
             new Claim(ClaimTypes.Email, userInfo.Email),
-            new Claim("Permissions", string.Join(",",userInfo.Permissions)) ];
+            // new Claim("Permissions", string.Join(",",userInfo.Permissions)) ];
+            ..userInfo.Permissions.Select(p =>   new Claim("Permissions", p) ).ToArray()];
+      
 
         authenticationStateTask = Task.FromResult(
             new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims,

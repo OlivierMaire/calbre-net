@@ -1,15 +1,38 @@
 @page "/Admin/User/{id}"
 @page "/Admin/User"
+
+@using System.Security.Claims
+
 @inject UserClient UserClient
 @inject Microsoft.Extensions.Options.IOptions<SupportedCulturesOptions> SupportedCultures
 @inject ILogger<User> Logger
 @inject IStringLocalizer<calibre_net.Shared.Resources.Admin> L
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider _authenticationStateProvider
 
 @attribute [Authorize(Policy = "Admin")]
 @attribute [StreamRendering]
 
+<AuthorizeView >
+    Authorized personel only
+    </AuthorizeView>
 
+<AuthorizeView Policy="Admin" >
+    Authorized Admin personel only
+    </AuthorizeView>
+
+    <AuthorizeView Policy="Admintest" >
+    Authorized AdminTest personel only
+    </AuthorizeView>
+
+        <AuthorizeView Policy="ReadUnread.Show" >
+    Authorized  ReadUnread.Show personel only
+    </AuthorizeView>
+
+ 
+
+@if (!_loading && SelectedUser != null)
+{
 @if (this.IsNewUser)
 {
     <MudText Typo="Typo.h4">@L["Add new User"]</MudText>
@@ -17,13 +40,18 @@
 else
 {
     <MudText Typo="Typo.h4">@L["Edit User {userName}", SelectedUser?.Name ?? string.Empty]</MudText>
-    <MudText Typo="Typo.caption">@Id</MudText>
+    <MudText Typo="Typo.caption">@SelectedUser?.Id</MudText>
 }
 
-@if (!_loading && SelectedUser != null)
+@if (!string.IsNullOrEmpty(ErrorMessage))
 {
+<MudAlert Severity="Severity.Error">@((MarkupString)ErrorMessage)</MudAlert>
+}
+
+
     <EditForm Model="SelectedUser" method="post" OnValidSubmit="SubmitForm" FormName="SelectedUser">
         <DataAnnotationsValidator />
+        <input type="hidden" name="SelectedUser.Id" value="@SelectedUser.Id" />
         <MudTextField Label="Username" name="SelectedUser.Name" @bind-Value="@SelectedUser.Name" Variant="Variant.Text" />
         <MudTextField Label="Email" name="SelectedUser.Email" @bind-Value="@SelectedUser.Email" Variant="Variant.Text"
             InputType="InputType.Email" />
@@ -74,9 +102,26 @@ else
             }
         </div>
 
+
+ @if(!UserIsMyself)
+    {
+        <AuthorizeView Policy="@PermissionType.ADMIN_USER" Context="AuthContext" >
+
         <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3"
             ButtonType="ButtonType.Submit">Save
         </MudButton>
+        </AuthorizeView>
+}
+else
+{
+
+           <AuthorizeView Policy="User.EditSelf" Context="AuthContext" >
+
+        <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3"
+            ButtonType="ButtonType.Submit">Save
+        </MudButton>
+        </AuthorizeView>
+        }
 
 
         <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
@@ -92,13 +137,29 @@ else
     Disabled="true">Add
     Allowed/Denied Custom Column Values</MudButton>
 
-<EditForm Model="Id" method="post" OnValidSubmit="SubmitDeleteForm" FormName="DeleteUser">
+@if (!string.IsNullOrEmpty(Id))
+{
+    @if(!UserIsMyself)
+    {
+        <AuthorizeView Policy="@PermissionType.ADMIN_USER" >
+    <EditForm Model="Id" method="post" OnValidSubmit="SubmitDeleteForm" FormName="DeleteUser" Context="EditContext">
+            <MudButton StartIcon="@Icons.Material.Filled.PersonOff" Variant="Variant.Filled" Color="Color.Secondary"
+                ButtonType="ButtonType.Submit" Class="mt-3 ml-3">Delete User</MudButton>
+    </EditForm>
+        </AuthorizeView>
+}
+else
+{
 
-    <MudButton StartIcon="@Icons.Material.Filled.PersonOff" 
-    Variant="Variant.Filled" Color="Color.Secondary" ButtonType="ButtonType.Submit"
-        Class="mt-3 ml-3" >Delete User</MudButton>
+           <AuthorizeView Policy="User.DeleteSelf" >
+    <EditForm Model="Id" method="post" OnValidSubmit="SubmitDeleteForm" FormName="DeleteUser" Context="EditContext">
+            <MudButton StartIcon="@Icons.Material.Filled.PersonOff" Variant="Variant.Filled" Color="Color.Secondary"
+                ButtonType="ButtonType.Submit" Class="mt-3 ml-3">Delete My Account</MudButton>
+    </EditForm>
+        </AuthorizeView>
+        }
+}
 
-</EditForm>
 
 @code {
 
@@ -112,7 +173,11 @@ else
     private Func<CultureOption, string> convertFunc = ci =>
     ci == null ? string.Empty : ci.DisplayName;
 
-    private bool IsNewUser => string.IsNullOrEmpty(Id);
+    private bool IsNewUser => string.IsNullOrEmpty(SelectedUser?.Id) ;
+
+    private string ErrorMessage {get;set;}= string.Empty;
+
+    private bool UserIsMyself {get;set;} = false;
 
 
     ICollection<Permission> Permissions { get; set; } = null!;
@@ -127,11 +192,17 @@ else
         supportedCultures = SupportedCultures.Value.SupportedCultureOptions;
 
         Permissions = await UserClient.AllPermissionsAsync();
-        if (!IsNewUser)
+        if (!string.IsNullOrEmpty(Id))
             SelectedUser ??= await UserClient.UserGetAsync(Id.ToString());
         else
             SelectedUser ??= new UserModelExtended();
         SelectedUser.Permissions ??= [];
+
+        var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
+         var currentUserId = authState.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        UserIsMyself = SelectedUser.Id == currentUserId;
+
+
 
         _loading = false;
 
@@ -158,11 +229,21 @@ else
             {
                 Logger.LogInformation(ae.Message);
                 Logger.LogInformation(ae.Response);
+                if (ae is ApiException<ICollection<string>>)
+                    {
+
+               ErrorMessage = string.Join(",", ((ApiException<ICollection<string>>)ae).Result);
+                    }
+                @* Logger.LogInformation(ae.Result); *@
             }
+            @* catch (ApiException<string[]> ae)
+            {
+               ErrorMessage = string.Join(",", ae.Result);
+            } *@
         }
         else
         {
-            SelectedUser!.Id = Id;
+            @* SelectedUser!.Id = Id; *@
             SelectedUser = await UserClient.UpdateAsync(SelectedUser);
         }
 
