@@ -120,7 +120,7 @@ public sealed class DownloadBookEndpoint(BookService bookService, ConfigurationS
         Version(1);
         Group<Book>();
         ResponseCache(_7DaysInSeconds); //cache for 7 days
-        Policies("Book.Download");
+        Policies(PermissionType.BOOK_VIEW);
 
     }
 

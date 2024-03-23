@@ -16,15 +16,21 @@ public class GetMetadataResponse
     {
         this.ComicMetadata = ComicMetadata;
     }
+    public GetMetadataResponse(EPubMetadata ePubMetadata)
+    {
+        this.EpubMetadata = ePubMetadata;
+    }
+
 
     [JsonIgnore]
-    public object Metadata => ComicMetadata == null ? AudioMetadata! : ComicMetadata!;
+    public object Metadata => ComicMetadata == null ? AudioMetadata == null ? EpubMetadata! : AudioMetadata! : ComicMetadata!;
 
     public AudioMetadata? AudioMetadata { get; set; }
     public ComicMetadata? ComicMetadata { get; set; }
+    public EPubMetadata? EpubMetadata { get; set; }
 }
 
-
+#region Audio Metadata
 public record AudioMetadata
 {
     //
@@ -581,8 +587,9 @@ public record PictureInfoDto
 
 
 }
+#endregion
 
-
+#region Comics Metadata
 public record ComicMetadata()
 {
     public bool IsEmpty { get; set; } = true;
@@ -725,3 +732,12 @@ public enum AgeRating
     [EnumMember(Value = "X18+")]
     X18,
 }
+#endregion
+
+#region Epub Metadata
+    public class EPubMetadata{
+        public string Title {get;set;} = string.Empty;
+    public AuthorDto[] Authors { get; set; } = [];
+}
+
+#endregion

@@ -1,7 +1,9 @@
+@using calibre_net.Shared.Contracts
 @inject UserClient UserClient
 @attribute [StreamRendering]
 @* @rendermode InteractiveAuto *@
 @inject ISnackbar Snackbar
+
 
 <MudText Typo="Typo.h4">Users</MudText>
 
@@ -62,13 +64,13 @@
                 OnClick="@button.ButtonAction" Disabled="@button.ButtonDisabled" />
         </EditButtonContent>
     </MudTable>
-<AuthorizeView Policy="User.Edit">
+<AuthorizeView Policy="@PermissionType.ADMIN_USER">
     <MudButton StartIcon="@Icons.Material.Filled.Edit" Variant="Variant.Filled" Color="Color.Primary" Class="mt-3">Edit
         Users</MudButton>
 </AuthorizeView>
 }
 
-<AuthorizeView Policy="User.Add">
+<AuthorizeView Policy="@PermissionType.ADMIN_USER">
     <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"
         Class="mt-3 ml-3" Href="/Admin/User">Add a new User</MudButton>
 </AuthorizeView>

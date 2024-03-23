@@ -10,7 +10,7 @@ public class User : Group
 {
     public User()
     {
-        Configure("user", ep => ep.Description(x => x.AllowAnonymous().WithGroupName("user")));
+        Configure("user", ep => ep.Description(x => x.WithGroupName("user")));
     }
 }
 
@@ -21,6 +21,7 @@ public sealed class GetMyselfEndpoint : EndpointWithoutRequest<string>
         Get("/me");
         Version(1);
         Group<User>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -38,6 +39,7 @@ public sealed class GetAllUsersEndpoint(UserService userService) : EndpointWitho
         Get("/all");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -55,6 +57,7 @@ public sealed class GetAllPermissionsEndpoint : EndpointWithoutRequest<List<Perm
         Get("/allPermissions");
         Version(1);
         Group<User>();
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -72,6 +75,7 @@ public sealed class GetUserEndpoint(UserService userService) : Endpoint<GetUserR
         Get("/{id}");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(GetUserRequest req, CancellationToken ct)
@@ -88,6 +92,7 @@ public sealed class UpdateUserEndpoint(UserService userService) : Endpoint<UserM
         Post("/update");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(UserModelExtended req, CancellationToken ct)
@@ -104,6 +109,7 @@ public sealed class AddUserEndpoint(UserService userService) : Endpoint<UserMode
         Put("/add");
         Version(1);
         Group<User>();
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(UserModelExtended req, CancellationToken ct)
@@ -138,7 +144,7 @@ public sealed class DeleteUserEndpoint(UserService userService) : Endpoint<Delet
         Delete("/{id}");
         Version(1);
         Group<User>();
-        Permissions("DeleteUserPermission");
+        Policies(PermissionType.ADMIN_USER);
     }
 
     public override async Task HandleAsync(DeleteUserRequest req, CancellationToken ct)

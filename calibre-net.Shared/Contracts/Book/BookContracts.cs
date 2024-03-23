@@ -10,4 +10,5 @@ public record GetBookmarkResponse (int BookId, string BookFormat, string Positio
 
 public record GetPageRequest(int BookId, string BookFormat, int PageId);
 public record GetPageResponse(byte[] PageContent, string contentType);
+public record GetBookDataResponse(byte[] Data, string contentType);
 
