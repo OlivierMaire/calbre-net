@@ -20,10 +20,6 @@ Search
     }
 </p>
 
-<p>
-   AUTHOR:  @req.Author
-</p>
-
 
 @if (BookList == null)
 {
@@ -60,8 +56,13 @@ else
         @* calibre_net.Shared.Contacts.SearchRequest req = new(); *@
         var req = dict.ToObject<SearchRequest>();
 
-Console.WriteLine($"AuthorID: {req.Author}");
+Console.WriteLine($"Format: {req.Format}");
 
+        if (PageRoute == "top-rated")
+        {
+            req.RatingValue = 9;
+            req.RatingValueOperator = SqlOperator.GreaterOrEquals;
+        }
 
             
         BookList = await BookClient.SearchAsync(req);
@@ -78,7 +79,7 @@ Console.WriteLine($"AuthorID: {req.Author}");
         var dictionary = new Dictionary<string, object>();
         var pairs = input.Split('/');
 
-        for (int i = 0; i < pairs.Length; i += 2)
+        for (int i = 0; i + 1 < pairs.Length; i += 2)
         {
             string key = pairs[i];
             string value = pairs[i + 1];

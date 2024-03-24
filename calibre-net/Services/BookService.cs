@@ -21,11 +21,9 @@ public class BookService(CalibreDbDapperContext dbContext)
         // .AsSplitQuery()
         // .FromCache("books");
 
-        using (var ctx = dbContext.ConnectionCreate())
-        {
-
-            var books =
-   ctx.Query<Book, Author, Series, Rating, Book>($"""
+        using var ctx = dbContext.ConnectionCreate();
+        var dynamicParams = new DynamicParameters();
+        var sql = $"""
             SELECT b.id, b.title, b.sort, b.timestamp, b.pubdate, b.series_index, b.author_sort, b.isbn, b.lccn, b.path, b.flags, b.uuid, b.has_cover, b.last_modified, 
             a.id, a.name, a.sort, a.link, 
             s.id, s.name, s.sort, s.link, 
@@ -36,39 +34,114 @@ public class BookService(CalibreDbDapperContext dbContext)
             LEFT JOIN books_series_link bsl on bsl.book = b.id
             LEFT JOIN series s on s.Id = bsl.series
             LEFT JOIN books_ratings_link brl on brl.book = b.id
-            LEFT JOIN ratings r on r.Id = brl.rating
-            WHERE 
-            (@authorId IS NULL OR a.Id = @authorId )
-            AND (@seriesId IS NULL OR s.Id = @seriesId )
-            AND (@ratingId IS NULL OR r.Id = @ratingId )
-            """,
-            (book, author, serie, rating) =>
-   {
-       book.Authors.Add(author);
-       book.Series.Add(serie);
-       book.Rating.Add(rating);
-       return book;
-   },
-   param: new
-   {
-       authorId = req.Author,
-       seriesId = req.Series,
-       ratingId = req.Rating
-   },
-    splitOn: "Id,Id,Id,Id");
+            LEFT JOIN ratings r on r.Id = brl.rating 
+            """;
+        
+        string sqlJoin = string.Empty;
+        string sqlWhere = string.Empty;
 
-            books = books.GroupBy(b => b.Id)
-                .Select(g =>
-                {
-                    var groupedBook = g.First();
-                    groupedBook.Authors = g.Select(b => b.Authors.SingleOrDefault() ?? new Author()).ToList();
-                    groupedBook.Series = g.Select(b => b.Series.SingleOrDefault() ?? new Series()).ToList();
-                    groupedBook.Rating = g.Select(b => b.Rating.SingleOrDefault() ?? new Rating()).ToList();
-                    return groupedBook;
-                }).ToList();
-
-            return books.ProjectToDto().ToList();
+        if (req.Author.HasValue)
+        {
+            sqlWhere += " AND (a.Id = @authorId) ";
+            dynamicParams.Add("authorId", req.Author);
         }
+        if (req.Series.HasValue)
+        {
+            sqlWhere += " AND (s.Id = @seriesId) ";
+            dynamicParams.Add("seriesId", req.Series);
+        }
+        if (req.Rating.HasValue)
+        {
+            sqlWhere += " AND (r.Id = @ratingId) ";
+            dynamicParams.Add("ratingId", req.Rating);
+        }
+        if (req.RatingValue.HasValue)
+        {
+            sqlWhere += req.RatingValueOperator switch
+            {
+                SqlOperator.Equals => " AND (r.rating = @ratingValue) ",
+                SqlOperator.GreaterThan => " AND (r.rating > @ratingValue) ",
+                SqlOperator.LesserThan => " AND (r.rating < @ratingValue) ",
+                SqlOperator.GreaterOrEquals => " AND (r.rating >= @ratingValue) ",
+                SqlOperator.LesserOrEquals => " AND (r.rating <= @ratingValue) ",
+                _ => " AND (r.rating = @ratingValue) ",
+            };
+            dynamicParams.Add("ratingValue", req.RatingValue);
+        }
+        if (req.Tag.HasValue)
+        {
+            sqlJoin += """ 
+            JOIN books_tags_link btl on btl.book = b.id
+            JOIN tags t on t.Id = btl.tag
+            """;
+            sqlWhere += " AND (t.Id = @tagId) ";
+            dynamicParams.Add("tagId", req.Tag);
+        }
+        if (req.Publisher.HasValue)
+        {
+             sqlJoin += """ 
+            JOIN books_publishers_link bpl on bpl.book = b.id
+            JOIN publishers p on p.Id = bpl.publisher
+            """;
+            sqlWhere += " AND (p.Id = @publisherId) ";
+            dynamicParams.Add("publisherId", req.Publisher);
+        }
+        sql += sqlJoin;
+        if (!string.IsNullOrEmpty(sqlWhere))
+        {
+            sql += " WHERE 1 = 1 ";
+            sql += sqlWhere;
+        }
+        if (req.Language.HasValue)
+        {
+             sqlJoin += """ 
+            JOIN books_languages_link bll on bll.book = b.id
+            JOIN languages l on l.Id = bll.lang_code
+            """;
+            sqlWhere += " AND (l.Id = @languageId) ";
+            dynamicParams.Add("languageId", req.Language);
+        }        
+        if (!string.IsNullOrEmpty(req.Format))
+        {
+             sqlJoin += """ 
+            JOIN data d on d.book = b.id
+            """;
+            sqlWhere += " AND (d.Format = @formatValue) ";
+            dynamicParams.Add("formatValue", req.Format);
+        }
+
+        sql += sqlJoin;
+        if (!string.IsNullOrEmpty(sqlWhere))
+        {
+            sql += " WHERE 1 = 1 ";
+            sql += sqlWhere;
+        }
+
+        Console.WriteLine(sql);
+
+        var books =
+            ctx.Query<Book, Author, Series, Rating, Book>(sql,
+                        (book, author, serie, rating) =>
+            {
+                book.Authors.Add(author);
+                book.Series.Add(serie);
+                book.Rating.Add(rating);
+                return book;
+            },
+            param: dynamicParams,
+            splitOn: "Id,Id,Id,Id");
+
+        books = books.GroupBy(b => b.Id)
+            .Select(g =>
+            {
+                var groupedBook = g.First();
+                groupedBook.Authors = g.Select(b => b.Authors.SingleOrDefault() ?? new Author()).ToList();
+                groupedBook.Series = g.Select(b => b.Series.SingleOrDefault() ?? new Series()).ToList();
+                groupedBook.Rating = g.Select(b => b.Rating.SingleOrDefault() ?? new Rating()).ToList();
+                return groupedBook;
+            }).ToList();
+
+        return books.ProjectToDto().ToList();
 
     }
 

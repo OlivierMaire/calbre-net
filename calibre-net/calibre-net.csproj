@@ -23,6 +23,7 @@
     <PackageReference Include="Fido2" Version="4.0.0-beta.12" />
     <PackageReference Include="Fido2.AspNet" Version="4.0.0-beta.12" />
     <PackageReference Include="HeimGuard" Version="1.0.0" />
+    <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.3" />
     <!-- <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" /> -->

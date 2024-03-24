@@ -18,6 +18,12 @@ public static class ObjectExtensions
                 continue;
             Type propertyType = property.PropertyType;
 
+            if (propertyType == typeof(string))
+            {
+                property.SetValue(resultObject, SourceValue.ToString(), null);
+                continue;
+            }
+
             //Nullable properties have to be treated differently, since we 
             //  use their underlying property to set the value in the object
             if (propertyType.IsGenericType
