@@ -29,7 +29,7 @@
                                @if (!first) {
                                 <span> &amp; </span>
                             }
-                                <MudLink Typo="Typo.body2" Align="Align.Left" Href="@author.AuthorLink">@author.Name</MudLink>
+                                <MudLink Typo="Typo.body2" Align="Align.Left" Href="@author.SearchUrl">@author.Name</MudLink>
                              @if (first) {
                                 first = false;
                             }
@@ -50,7 +50,7 @@
                 @if (CalibreBook.Rating != null)
                 {
                     <div class="book-rating">
-                        <a href="@CalibreBook.Rating.RatingLink">
+                        <a href="@CalibreBook.Rating.SearchUrl">
                             <calibre_net.Client.Components.Shared.StarRatingDisplay
                                 Value="@(CalibreBook.Rating.Rating ?? 0)" />
                         </a>

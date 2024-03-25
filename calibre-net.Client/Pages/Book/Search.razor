@@ -14,9 +14,9 @@ Search
 </p>
 
 <p>
-    @foreach(var (k,v) in DICT)
+    @foreach (var (k, v) in DICT)
     {
-        <p>@k : @v</p>
+    <p>@k : @v</p>
     }
 </p>
 
@@ -28,14 +28,14 @@ Search
 else
 {
 
-<MudContainer Class="d-flex flex-row gap-2 flex-wrap flex-wrap-anim" MaxWidth="MaxWidth.False">
+    <MudContainer Class="d-flex flex-row gap-2 flex-wrap flex-wrap-anim" MaxWidth="MaxWidth.False">
         @foreach (var book in BookList)
         {
-            <BookThumb CalibreBook="@book"/>
+            <BookThumb CalibreBook="@book" />
         }
-</MudContainer>
+    </MudContainer>
 
-   
+
 }
 
 
@@ -43,8 +43,8 @@ else
     [Parameter]
     public string? PageRoute { get; set; }
 
-    public Dictionary<string,object> DICT = [];
-        public SearchRequest req = new();
+    public Dictionary<string, object> DICT = [];
+    public SearchRequest req = new();
 
     ICollection<BookDto> BookList { get; set; } = null!;
 
@@ -56,7 +56,19 @@ else
         @* calibre_net.Shared.Contacts.SearchRequest req = new(); *@
         var req = dict.ToObject<SearchRequest>();
 
-Console.WriteLine($"Format: {req.Format}");
+        if (dict.Keys.Any(k => k.StartsWith("cc_")))
+        {
+           req.CustomColumn = dict.Where(d => d.Key.StartsWith("cc_"))
+            .Select(d => 
+            {
+                var key = int.Parse(d.Key.Replace("cc_", ""));
+                int? value = null;
+                if (int.TryParse(d.Value.ToString(), out var parsedValue))
+                    value = parsedValue;
+               return KeyValuePair.Create(key, value);
+            })
+            .ToDictionary();
+        }
 
         if (PageRoute == "top-rated")
         {
@@ -64,7 +76,7 @@ Console.WriteLine($"Format: {req.Format}");
             req.RatingValueOperator = SqlOperator.GreaterOrEquals;
         }
 
-            
+
         BookList = await BookClient.SearchAsync(req);
         Console.WriteLine($"{BookList?.Count} books found");
 

@@ -12,3 +12,4 @@ public record GetPageRequest(int BookId, string BookFormat, int PageId);
 public record GetPageResponse(byte[] PageContent, string contentType);
 public record GetBookDataResponse(byte[] Data, string contentType);
 
+public record GetCustomColumnListResponse(List<CustomColumnDto> CustomColumns);

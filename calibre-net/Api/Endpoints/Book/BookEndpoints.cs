@@ -235,3 +235,22 @@ public sealed class SearchBooksEndpoint(BookService service) : Endpoint<SearchRe
         await SendOkAsync(service.GetBooks(req), ct);
     }
 }
+
+
+public sealed class GetCustomColumns(BookService bookService): EndpointWithoutRequest<GetCustomColumnListResponse>
+{
+    private readonly BookService _bookService = bookService;
+
+    public override void Configure()
+    {
+        Get("custom_columns");
+        Version(1);
+        Group<Book>();
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var cc = _bookService.GetCustomColumns();
+        await SendOkAsync(new GetCustomColumnListResponse(cc.ProjectToDto().ToList()), ct);
+    }
+}

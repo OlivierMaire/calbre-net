@@ -18,9 +18,11 @@ public partial class PublisherDto
     [JsonPropertyName("books")]
     public List<BookDto> Books {get;set;} = [];
 
+    [JsonPropertyName("bookCount")]
+    public int BookCount {get;set;} = 0;
     
     [JsonIgnore]
-    public string SearchUrl => $"/publisher/{Id}";
+    public string SearchUrl => $"/books/publisher/{Id}";
 
 }
 

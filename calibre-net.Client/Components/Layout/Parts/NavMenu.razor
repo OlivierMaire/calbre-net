@@ -1,40 +1,65 @@
 ﻿@inject NavigationManager NavigationManager
+@inject calibre_net.Client.ApiClients.BookClient BookClient
 
 <MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="books" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Book">Books</MudNavLink>
-    <MudNavLink Href="books/top-rated" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Star">Top Rated Books</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
-    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Weather</MudNavLink>
-	<MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Auth Required</MudNavLink>
+    <MudNavLink Href="/books" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Book">Books</MudNavLink>
+    <MudNavLink Href="/books/top-rated" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Star">Top Rated Books
+    </MudNavLink>
+    <MudNavLink Href="/books/tags" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Tag">Tags</MudNavLink>
+    <MudNavLink Href="/books/series" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LibraryBooks">Series
+    </MudNavLink>
+    <MudNavLink Href="/books/authors" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Authors</MudNavLink>
+    <MudNavLink Href="/books/publishers" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Tag">Publishers
+    </MudNavLink>
+    <MudNavLink Href="/books/languages" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Flag">Languages
+    </MudNavLink>
+    <MudNavLink Href="/books/ratings" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.StarOutline">Ratings
+    </MudNavLink>
+    <MudNavLink Href="/books/formats" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.GifBox">Formats</MudNavLink>
 
-	<AuthorizeView>
-		<Authorized>
-			@* <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">@context.User.Identity?.Name</MudNavLink> *@
-			@* <div class="nav-item px-3">
-                    <form action="Account/Logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-                        </button>
-                    </form>
-                </div> *@
-		</Authorized>
-		<NotAuthorized>
-			<MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Register</MudNavLink>
-			<MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Login</MudNavLink>
-		</NotAuthorized>
-	</AuthorizeView>
+    @foreach (var cc in CustomColumns)
+    {
+    <MudNavLink Href="@cc.CategoryUrl" Match="NavLinkMatch.All" >@cc.Name</MudNavLink>
+    }
+
+    <AuthorizeView>
+        <Authorized>
+            @* <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix"
+            Icon="@Icons.Material.Filled.List">@context.User.Identity?.Name</MudNavLink> *@
+            @* <div class="nav-item px-3">
+            <form action="Account/Logout" method="post">
+            <AntiforgeryToken />
+            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+            <button type="submit" class="nav-link">
+            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+            </button>
+            </form>
+            </div> *@
+        </Authorized>
+        <NotAuthorized>
+            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Register
+            </MudNavLink>
+            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Login
+            </MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
 
 </MudNavMenu>
 
 @code {
     private string? currentUrl;
 
-    protected override void OnInitialized()
+    private List<CustomColumnDto> CustomColumns { get; set; } = [];
+    protected override async Task OnInitializedAsync()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         @* NavigationManager.LocationChanged += OnLocationChanged; *@
+
+        var ccResponse = await BookClient.Custom_columnsAsync();
+        if (ccResponse != null)
+        {
+            CustomColumns = ccResponse.CustomColumns;
+        }
     }
-	}
+}

@@ -33,4 +33,7 @@ public partial class CustomColumnDto
     
     [JsonPropertyName("data")]
     public List<GenericCustomColumnDto> Data { get; set; } = [];
+
+    [JsonIgnore]
+    public string CategoryUrl => $"/books/cc_{Id}";
 }

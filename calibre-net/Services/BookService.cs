@@ -36,7 +36,7 @@ public class BookService(CalibreDbDapperContext dbContext)
             LEFT JOIN books_ratings_link brl on brl.book = b.id
             LEFT JOIN ratings r on r.Id = brl.rating 
             """;
-        
+
         string sqlJoin = string.Empty;
         string sqlWhere = string.Empty;
 
@@ -79,35 +79,42 @@ public class BookService(CalibreDbDapperContext dbContext)
         }
         if (req.Publisher.HasValue)
         {
-             sqlJoin += """ 
+            sqlJoin += """ 
             JOIN books_publishers_link bpl on bpl.book = b.id
             JOIN publishers p on p.Id = bpl.publisher
             """;
             sqlWhere += " AND (p.Id = @publisherId) ";
             dynamicParams.Add("publisherId", req.Publisher);
         }
-        sql += sqlJoin;
-        if (!string.IsNullOrEmpty(sqlWhere))
-        {
-            sql += " WHERE 1 = 1 ";
-            sql += sqlWhere;
-        }
         if (req.Language.HasValue)
         {
-             sqlJoin += """ 
+            sqlJoin += """ 
             JOIN books_languages_link bll on bll.book = b.id
             JOIN languages l on l.Id = bll.lang_code
             """;
             sqlWhere += " AND (l.Id = @languageId) ";
             dynamicParams.Add("languageId", req.Language);
-        }        
+        }
         if (!string.IsNullOrEmpty(req.Format))
         {
-             sqlJoin += """ 
+            sqlJoin += """ 
             JOIN data d on d.book = b.id
             """;
             sqlWhere += " AND (d.Format = @formatValue) ";
             dynamicParams.Add("formatValue", req.Format);
+        }
+
+        foreach (var cc in req.CustomColumn)
+        {
+            if (cc.Value.HasValue)
+            {
+                sqlJoin += $""" 
+                JOIN books_custom_column_{cc.Key}_link bll on bll.book = b.id
+                JOIN custom_column_{cc.Key} cc_{cc.Key} on cc_{cc.Key}.Id = bll.value
+                """;
+                sqlWhere += $" AND (cc_{cc.Key}.Id = @cc_{cc.Key}Id) ";
+                dynamicParams.Add($"cc_{cc.Key}Id", cc.Value);
+            }
         }
 
         sql += sqlJoin;
@@ -236,5 +243,127 @@ public class BookService(CalibreDbDapperContext dbContext)
             return path;
         }
 
+    }
+
+    public List<TagDto> GetAllTags()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var tags =
+            ctx.Query<TagDto>($"""
+            select t.Id, MAX(t.name) as name, MAX(t.link) as link, count() as bookCount from tags t
+            join books_tags_link btl on btl.tag = t.Id
+            group by t.Id
+            """);
+            return tags.ToList();
+        }
+    }
+
+
+    public List<SeriesDto> GetAllSeries()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var series =
+            ctx.Query<SeriesDto>($"""
+            select s.Id, MAX(s.name) as name, MAX(s.sort) as sort, MAX(s.link) as link, count() as bookCount from series s
+            join books_series_link bsl on bsl.series = s.Id
+            group by s.Id
+            """);
+            return series.ToList();
+        }
+    }
+
+    public List<AuthorDto> GetAllAuthors()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var authors =
+            ctx.Query<AuthorDto>($"""
+            select s.Id, MAX(s.name) as name, MAX(s.sort) as sort, MAX(s.link) as link, count() as bookCount from authors s
+            join books_authors_link bsl on bsl.author = s.Id
+            group by s.Id
+            """);
+            return authors.ToList();
+        }
+    }
+
+    public List<PublisherDto> GetAllPublishers()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var publishers =
+            ctx.Query<PublisherDto>($"""
+            select s.Id, MAX(s.name) as name, MAX(s.sort) as sort, MAX(s.link) as link, count() as bookCount from publishers s
+            join books_publishers_link bsl on bsl.publisher = s.Id
+            group by s.Id
+            """);
+            return publishers.ToList();
+        }
+    }
+    public List<LanguageDto> GetAllLanguages()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var languages =
+            ctx.Query<LanguageDto>($"""
+            select s.Id, MAX(s.lang_code) as langCode, MAX(s.link) as link, count() as bookCount from languages s
+            join books_languages_link bsl on bsl.lang_code = s.Id
+            group by s.Id
+            """);
+            return languages.ToList();
+        }
+    }
+    public List<RatingDto> GetAllRatings()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var ratings =
+            ctx.Query<RatingDto>($"""
+            select s.Id, MAX(s.rating) as rating, MAX(s.link) as link, count() as bookCount from ratings s
+            join books_ratings_link bsl on bsl.rating = s.Id
+            group by s.Id
+            """);
+            return ratings.ToList();
+        }
+    }
+
+    public List<FormatDto> GetAllFormats()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var formats =
+            ctx.Query<FormatDto>($"""
+            select d.format, count() as bookCount from data d
+            group by d.format
+            """);
+            return formats.ToList();
+        }
+    }
+
+    public List<CustomColumn> GetCustomColumns()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var cc =
+            ctx.Query<CustomColumn>($"""
+            select * from custom_columns
+            """);
+            return cc.ToList();
+        }
+    }
+
+    public List<GenericCustomColumnDto> GetAllCustomColumns(int columnId)
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var cc =
+            ctx.Query<GenericCustomColumnDto>($"""
+            select {columnId} as columnId, s.Id, MAX(s.value) as value, MAX(s.link) as link, count() as bookCount from custom_column_{columnId} s
+            join books_custom_column_{columnId}_link bsl on bsl.value = s.Id
+            group by s.Id
+            """);
+            return cc.ToList();
+        }
     }
 }

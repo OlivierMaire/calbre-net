@@ -1,27 +1,26 @@
 using System.Text.Json.Serialization;
 
 namespace calibre_net.Shared.Contracts;
-public partial class SeriesDto
+public partial class GenericCategoryCount
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
+ 
 
     [JsonPropertyName("name")]
-    public string Name { get; set; } = null!;
-
+    public string Name { get; set; } = string.Empty;
+    
     [JsonPropertyName("sort")]
     public string? Sort { get; set; }
 
-    [JsonPropertyName("link")]
-    public string Link { get; set; } = null!;
+    [JsonPropertyName("bookCount")]
+    public int BookCount {get;set;} = 0;
 
     // [JsonPropertyName("books")]
     // public List<BookDto> Books {get;set;} = [];
 
-    [JsonPropertyName("bookCount")]
-    public int BookCount {get;set;} = 0;
-    
-    [JsonIgnore]
-    public string SeriesLink => $"/books/series/{Id}";
+    [JsonPropertyName("searchUrl")]
+    public string SearchUrl {get;set;} = string.Empty;
 
 }
+

@@ -15,7 +15,10 @@ public partial class LanguageDto
     [JsonPropertyName("books")]
     public List<BookDto> Books {get;set;} = [];
 
+    [JsonPropertyName("bookCount")]
+    public int BookCount {get;set;} = 0;
+
     [JsonIgnore]
-    public string SearchUrl => $"/language/{Id}";
+    public string SearchUrl => $"/books/language/{Id}";
 
 }

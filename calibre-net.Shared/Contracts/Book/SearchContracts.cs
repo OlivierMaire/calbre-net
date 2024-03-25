@@ -12,6 +12,7 @@ public record SearchRequest{
     public int? Publisher { get; set; }
     public int? Language { get; set; }
     public string? Format { get; set; }
+    public Dictionary<int, int?> CustomColumn {get;set;} = [];
 }
 
 public enum SqlOperator
