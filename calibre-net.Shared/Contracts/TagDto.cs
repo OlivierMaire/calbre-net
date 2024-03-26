@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 
 namespace calibre_net.Shared.Contracts;
-public partial class TagDto
+public partial class TagDto: Searchable
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
@@ -20,7 +20,7 @@ public partial class TagDto
 
     [JsonIgnore]
     [JsonPropertyName("searchUrl")]
-    public string SearchUrl => $"/books/tag/{Id}"; 
+    public override string SearchUrl => $"tag/{Id}"; 
 
 }
 

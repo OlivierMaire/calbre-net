@@ -1,6 +1,7 @@
 using calibre_net.Client.Services;
 using calibre_net.Data.Calibre;
 using calibre_net.Shared.Contracts;
+using calibre_net.Shared;
 using Calibre_net.Data.Calibre;
 using Dapper;
 
@@ -12,7 +13,7 @@ public class BookService(CalibreDbDapperContext dbContext)
 {
     private readonly CalibreDbDapperContext dbContext = dbContext;
 
-    public List<BookDto> GetBooks(SearchRequest req)
+    public List<BookDto> GetBooks(GetSearchValuesRequest req)
     {
         // var books = calibreDb.Books
         // .Include(b => b.Authors)
@@ -40,81 +41,174 @@ public class BookService(CalibreDbDapperContext dbContext)
         string sqlJoin = string.Empty;
         string sqlWhere = string.Empty;
 
-        if (req.Author.HasValue)
+        if (req.Terms.HasKey("author"))
         {
-            sqlWhere += " AND (a.Id = @authorId) ";
-            dynamicParams.Add("authorId", req.Author);
-        }
-        if (req.Series.HasValue)
-        {
-            sqlWhere += " AND (s.Id = @seriesId) ";
-            dynamicParams.Add("seriesId", req.Series);
-        }
-        if (req.Rating.HasValue)
-        {
-            sqlWhere += " AND (r.Id = @ratingId) ";
-            dynamicParams.Add("ratingId", req.Rating);
-        }
-        if (req.RatingValue.HasValue)
-        {
-            sqlWhere += req.RatingValueOperator switch
+            var term = req.Terms.Get("author");
+            if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
             {
-                SqlOperator.Equals => " AND (r.rating = @ratingValue) ",
-                SqlOperator.GreaterThan => " AND (r.rating > @ratingValue) ",
-                SqlOperator.LesserThan => " AND (r.rating < @ratingValue) ",
-                SqlOperator.GreaterOrEquals => " AND (r.rating >= @ratingValue) ",
-                SqlOperator.LesserOrEquals => " AND (r.rating <= @ratingValue) ",
-                _ => " AND (r.rating = @ratingValue) ",
-            };
-            dynamicParams.Add("ratingValue", req.RatingValue);
+                // search by name
+
+                sqlWhere += " AND (a.name like @authorName) ";
+                dynamicParams.Add("authorName", $"%{term?.ValueName}%");
+            }
+            else
+            {
+                sqlWhere += " AND (a.Id = @authorId) ";
+                dynamicParams.Add("authorId", term?.Value);
+            }
         }
-        if (req.Tag.HasValue)
+        if (req.Terms.HasKey("series"))
         {
+            var term = req.Terms.Get("series");
+            if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
+            {
+                // search by name
+
+                sqlWhere += " AND (s.name like @seriesName) ";
+                dynamicParams.Add("seriesName", $"%{term?.ValueName}%");
+            }
+            else
+            {
+                sqlWhere += " AND (s.Id = @seriesId) ";
+                dynamicParams.Add("seriesId", term?.Value);
+            }
+        }
+        if (req.Terms.HasKey("rating"))
+        {
+            var term = req.Terms.Get("rating");
+            if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
+            {
+                if (term.IsNumeric && term.NumericSearchOperator.HasValue)
+                {
+                    sqlWhere += $" AND (r.rating {term.NumericSearchOperator?.ToEnumString()} @ratingName) ";
+                    dynamicParams.Add("ratingName", $"{term?.ValueName}");
+
+                }
+                else
+                {
+                    // search by name
+                    sqlWhere += " AND (r.rating like @ratingName) ";
+                    dynamicParams.Add("ratingName", $"%{term?.ValueName}%");
+                }
+            }
+            else
+            {
+                sqlWhere += " AND (r.Id = @ratingId) ";
+                dynamicParams.Add("ratingId", term?.Value);
+            }
+        }
+        if (req.Terms.HasKey("tag"))
+        {
+            var term = req.Terms.Get("tag");
+
             sqlJoin += """ 
             JOIN books_tags_link btl on btl.book = b.id
             JOIN tags t on t.Id = btl.tag
             """;
-            sqlWhere += " AND (t.Id = @tagId) ";
-            dynamicParams.Add("tagId", req.Tag);
+
+            if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
+            {
+                // search by name
+                sqlWhere += " AND (t.name like @tagName) ";
+                dynamicParams.Add("tagName", $"%{term?.ValueName}%");
+            }
+            else
+            {
+                sqlWhere += " AND (t.Id = @tagId) ";
+                dynamicParams.Add("tagId", term?.Value);
+            }
         }
-        if (req.Publisher.HasValue)
+        if (req.Terms.HasKey("publisher"))
         {
+            var term = req.Terms.Get("publisher");
+
             sqlJoin += """ 
             JOIN books_publishers_link bpl on bpl.book = b.id
             JOIN publishers p on p.Id = bpl.publisher
             """;
-            sqlWhere += " AND (p.Id = @publisherId) ";
-            dynamicParams.Add("publisherId", req.Publisher);
+
+            if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
+            {
+                // search by name
+                sqlWhere += " AND (p.name like @publisherName) ";
+                dynamicParams.Add("publisherName", $"%{term?.ValueName}%");
+            }
+            else
+            {
+                sqlWhere += " AND (p.Id = @publisherId) ";
+                dynamicParams.Add("publisherId", term?.Value);
+            }
         }
-        if (req.Language.HasValue)
+        if (req.Terms.HasKey("language"))
         {
+            var term = req.Terms.Get("language");
+
             sqlJoin += """ 
             JOIN books_languages_link bll on bll.book = b.id
             JOIN languages l on l.Id = bll.lang_code
             """;
-            sqlWhere += " AND (l.Id = @languageId) ";
-            dynamicParams.Add("languageId", req.Language);
+
+            if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
+            {
+                // search by name
+                sqlWhere += " AND (l.lang_code like @languageName) ";
+                dynamicParams.Add("languageName", $"%{term?.ValueName}%");
+            }
+            else
+            {
+                sqlWhere += " AND (l.Id = @languageId) ";
+                dynamicParams.Add("languageId", term?.Value);
+            }
         }
-        if (!string.IsNullOrEmpty(req.Format))
+        if (req.Terms.HasKey("format"))
         {
+            var term = req.Terms.Get("format");
             sqlJoin += """ 
             JOIN data d on d.book = b.id
             """;
             sqlWhere += " AND (d.Format = @formatValue) ";
-            dynamicParams.Add("formatValue", req.Format);
+            dynamicParams.Add("formatValue", term?.Value);
         }
-
-        foreach (var cc in req.CustomColumn)
+        if (req.Terms.HasKey("keyword"))
         {
-            if (cc.Value.HasValue)
+            var term = req.Terms.Get("keyword");
+            var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+
+            sqlJoin += " JOIN comments c on c.book = b.id ";
+            sqlWhere += """ 
+                        AND (
+                                (b.Title like @keyword) 
+                            OR  (c.text like @keyword)
+                            )
+                        """;
+            dynamicParams.Add("keyword", $"%{termValue}%");
+        }
+        if (req.Terms.Any(t => t.Key.StartsWith("cc_")))
+        {
+            var terms = req.Terms.Where(t => t.Key.StartsWith("cc_"));
+            foreach (var term in terms)
             {
+                var ccKey = term.Key[3..];
+
                 sqlJoin += $""" 
-                JOIN books_custom_column_{cc.Key}_link bll on bll.book = b.id
-                JOIN custom_column_{cc.Key} cc_{cc.Key} on cc_{cc.Key}.Id = bll.value
+                JOIN books_custom_column_{ccKey}_link bll on bll.book = b.id
+                JOIN custom_column_{ccKey} cc_{ccKey} on cc_{ccKey}.Id = bll.value
                 """;
-                sqlWhere += $" AND (cc_{cc.Key}.Id = @cc_{cc.Key}Id) ";
-                dynamicParams.Add($"cc_{cc.Key}Id", cc.Value);
+
+                if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
+                {
+                    
+                    sqlWhere += $" AND (cc_{ccKey}.Id like @cc_{ccKey}Id) ";
+                    dynamicParams.Add($"cc_{ccKey}Id", $"%{term?.ValueName}%");
+                }
+                else
+                {
+
+                    sqlWhere += $" AND (cc_{ccKey}.Id = @cc_{ccKey}Id) ";
+                    dynamicParams.Add($"cc_{ccKey}Id", term?.Value);
+                }
             }
+
         }
 
         sql += sqlJoin;

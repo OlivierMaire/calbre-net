@@ -1,0 +1,46 @@
+@using System.Text.RegularExpressions
+@inject NavigationManager NavigationManager
+@inject SearchService SearchService
+<div class="search-form">
+    <EditForm Model="Keyword" method="post" OnValidSubmit="SubmitForm" FormName="Keyword">
+        <MudTextField Label="Keyword" name="Keyword" @bind-Value="@Keyword" Variant="Variant.Outlined"
+            Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Margin="Margin.Dense"
+            Clearable="true" />
+    </EditForm>
+</div>
+@code {
+    [SupplyParameterFromForm]
+    private string? Keyword { get; set; }
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        Keyword ??= string.Empty;
+        if (NavigationManager.Uri.Contains("/books/")
+        && NavigationManager.Uri.Contains("/keyword/")
+        && string.IsNullOrEmpty(Keyword))
+        {
+            var match = Regex.Match(NavigationManager.Uri, @"^.*\/books\/.*keyword\/([^\/]*)\/?.*$");
+            if (match.Groups.Count == 2)
+            {
+                Keyword = System.Net.WebUtility.UrlDecode(match.Groups[1].Value);
+            }
+        }
+    }
+
+
+    public async Task SubmitForm()
+    {
+        if (!string.IsNullOrEmpty(Keyword))
+        {
+            var escapedKeyword = System.Net.WebUtility.UrlEncode(Keyword);
+            var keyword = new KeywordDto() { Keyword = escapedKeyword };
+
+            var searchUrl = SearchService.GetSearchUrl(keyword);
+
+            NavigationManager.NavigateTo(searchUrl);
+        }
+    }
+
+}

@@ -1,0 +1,7 @@
+.search-form {
+    ::deep {
+        .mud-input-label-outlined {
+            background-color: var(--mud-palette-appbar-background);
+        }
+    }
+}

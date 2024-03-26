@@ -8,12 +8,12 @@
     Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
 
 
-<div class="container text-center my-3">
+@* <div class="container text-center my-3">
     @foreach (var message in messages)
     {
         <div class="alert alert-sm alert-info">@message</div>
     }
-</div>
+</div> *@
 
 @code {
     private List<string> messages = new List<string>();

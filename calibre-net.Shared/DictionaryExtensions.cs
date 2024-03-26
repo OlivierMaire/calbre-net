@@ -1,10 +1,11 @@
 using System.ComponentModel;
 using System.Reflection;
+using calibre_net.Shared.Contracts;
 
 namespace calibre_net.Shared;
 public static class ObjectExtensions
 {
-    public static T ToObject<T>(this IDictionary<string, object> source)
+    public static T ToObject<T>(this IDictionary<string, string> source)
         where T : class, new()
     {
         var resultObject = new T();
@@ -54,5 +55,24 @@ public static class ObjectExtensions
             propInfo => propInfo.GetValue(source, null)
         );
 
+    }
+
+    public static List<SearchTerm> ToSearchTerms(this IDictionary<string, string> source)
+    {
+        List<SearchTerm> terms = [];
+        foreach (var (SourceKey, SourceValue) in source)
+        {
+            var term = new SearchTerm
+            {
+                Key = SourceKey,
+                // Value = SourceValue,
+            };
+            if (SourceValue.StartsWith("v:"))
+                term.ValueName = SourceValue[2..];
+            else
+                term.Value = SourceValue;
+            terms.Add(term);
+        }
+        return terms;
     }
 }

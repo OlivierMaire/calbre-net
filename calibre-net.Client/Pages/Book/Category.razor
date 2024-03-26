@@ -2,6 +2,7 @@
 @using calibre_net.Shared
 
 @inject CategoryClient CategoryClient
+@inject SearchService SearchService
 
 @page "/books/{categoryType}"
 @attribute [StreamRendering]
@@ -13,7 +14,7 @@ CAT @CategoryType
     <MudList Clickable="true" class="category-list">
         @foreach (var category in Categories)
         {
-            <a href="@category.SearchUrl">
+            <a href="@SearchService.GetSearchUrl(category)">
                     <MudBadge Content="@category.BookCount" Overlap="true" Origin="Origin.CenterRight" Color="Color.Primary"
                        >
                 <MudListItem Class="pr-10">

@@ -35,7 +35,7 @@ public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutReque
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        await SendOkAsync(service.GetBooks(new SearchRequest()), ct);
+        await SendOkAsync(service.GetBooks(new GetSearchValuesRequest([])), ct);
     }
 }
 
@@ -217,7 +217,7 @@ public sealed class GetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
 }
 
 
-public sealed class SearchBooksEndpoint(BookService service) : Endpoint<SearchRequest, List<BookDto>>
+public sealed class SearchBooksEndpoint(BookService service) : Endpoint<GetSearchValuesRequest, List<BookDto>>
 {
     private readonly BookService service = service;
 
@@ -230,7 +230,7 @@ public sealed class SearchBooksEndpoint(BookService service) : Endpoint<SearchRe
         Policies(PermissionType.BOOK_VIEW);
     }
 
-    public override async Task HandleAsync(SearchRequest req, CancellationToken ct)
+    public override async Task HandleAsync(GetSearchValuesRequest req, CancellationToken ct)
     {
         await SendOkAsync(service.GetBooks(req), ct);
     }

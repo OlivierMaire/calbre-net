@@ -1,40 +1,169 @@
-@page "/books"
-@inject ApiClients.BookClient BookClient
-@inject ApiClients.IdentityClient IdentityClient
+@using calibre_net.Shared.Contracts
+@using calibre_net.Shared
+@using calibre_net.Client.Components.Shared
 
-@attribute [StreamRendering]
+@inject ApiClients.BookClient BookClient
+@inject ApiClients.SearchClient SearchClient
+@inject NavigationManager NavigationManager
+
+@page "/books"
+@page "/books/top-rated"
+@page "/books/{*pageRoute}"
+@* @attribute [StreamRendering] *@
 @attribute [Authorize]
 
+@rendermode InteractiveAuto
+
 <PageTitle>Books</PageTitle>
-<MudText Typo="Typo.h3" GutterBottom="true">Books</MudText>
 
-@if (BookList == null)
-{
-    <MudProgressCircular Color="Color.Default" Indeterminate="true" />
-}
-else
-{
+<div class="search-page">
+    <div class="search-top">
+        <MudText Typo="Typo.h3" GutterBottom="true">Books</MudText>
 
-<MudContainer Class="d-flex flex-row gap-2 flex-wrap flex-wrap-anim" MaxWidth="MaxWidth.False">
-        @foreach (var book in BookList)
+        Search
+
+        <p>
+            PageRoute: @PageRoute
+        </p>
+
+        @* <p>
+        @foreach (var (k, v) in DICT)
         {
-            <BookThumb CalibreBook="@book"/>
+        <p>@k : @v</p>
         }
-</MudContainer>
+        </p> *@
 
-   
-}
+        <div class="search-tags">
+            @foreach (var term in SearchTerms)
+            {
+                @* <div>
+            @term.Key : *@
+                <MudChip Color="Color.Primary" Variant="Variant.Outlined" OnClose="() => RemoveSearchTerm(term)">
+                    @if (term.IsNumeric && term.NumericSearchOperator.HasValue)
+                    {
+                        @(term.NumericSearchOperator?.ToEnumString())
+                    }
 
+                    @if(term.Key == "rating" && !string.IsNullOrEmpty(term.ValueName))
+                    {
+                                       <calibre_net.Client.Components.Shared.StarRatingDisplay 
+                                       Value="@(int.Parse(term.ValueName))" />
+
+                    }
+else{
+                    @(string.IsNullOrEmpty(term.ValueName) ? term.Value : term.ValueName)
+                    }
+                </MudChip>
+                @* </div> *@
+            }
+        </div>
+
+        <div>
+            @foreach (var term in SearchTerms)
+            {
+                <p>@term.Key : @term.Value (@term.ValueName)</p>
+            }
+        </div>
+    </div>
+    <div class="search-results">
+
+        @if (BookList == null)
+        {
+            <MudProgressCircular Color="Color.Default" Indeterminate="true" />
+        }
+        else
+        {
+            <div class="infinite-wrap infinite-scroll-hide">
+                <InfiniteScrolling ItemsProvider="GetBooks">
+                    <ItemTemplate Context="book">
+                        <BookThumb @key="book.Id" CalibreBook="@book" />
+                    </ItemTemplate>
+                    <LoadingTemplate>
+                        <div class="book-thumb p-1 d-flex flex-column justify-center">
+                            <MudProgressCircular Color="Color.Primary" Indeterminate="true" />
+                        </div>
+                    </LoadingTemplate>
+                </InfiniteScrolling>
+            </div>
+        }
+    </div>
+</div>
 
 @code {
+    [Parameter]
+    public string? PageRoute { get; set; }
 
-    ICollection<BookDto> BookList { get; set; } = null!;
+    public SearchRequest SearchRequest { get; set; } = new();
+    public List<SearchTerm> SearchTerms { get; set; } = [];
 
-    protected override async Task OnInitializedAsync()
+    IEnumerable<BookDto> BookList { get; set; } = null!;
+
+    void RemoveSearchTerm(SearchTerm term)
     {
-        @* await IdentityClient.DownloadPersonalDataAsync(); *@
-        BookList = await BookClient.AllAsync();
-        Console.WriteLine($"{BookList?.Count} books found");
-        StateHasChanged();
+        SearchTerms.Remove(term);
+        var url = "/books/" + string.Join("/", SearchTerms.Select(d => $"{d.Key}/{d.Value}"));
+        NavigationManager.NavigateTo(url);
     }
+
+    async Task<IEnumerable<BookDto>> GetBooks(InfiniteScrollingItemsProviderRequest request)
+    {
+        @* await Task.Delay(1000); // Simulate async loading *@
+        return BookList.Skip(request.StartIndex).Take(30);//.Range(request.StartIndex, 50);
+    }
+    protected override async Task OnParametersSetAsync()
+    {
+        var dict = PageRoute.ParseStringToDictionary();
+        SearchTerms = dict.ToSearchTerms();
+        var response = await SearchClient.SearchValueAsync(new GetSearchValuesRequest(SearchTerms));
+        if (response != null)
+        {
+            SearchTerms = response.Terms;
+        }
+
+        @* SearchRequest = dict.ToObject<SearchRequest>(); *@
+
+        if (dict.Keys.Any(k => k.StartsWith("cc_")))
+        {
+            SearchRequest.CustomColumn = dict.Where(d => d.Key.StartsWith("cc_"))
+            .Select(d =>
+            {
+                var key = int.Parse(d.Key.Replace("cc_", ""));
+                int? value = null;
+                if (int.TryParse(d.Value.ToString(), out var parsedValue))
+                    value = parsedValue;
+                return KeyValuePair.Create(key, value);
+            })
+            .ToDictionary();
+        }
+
+        if (NavigationManager.Uri.EndsWith("/books/top-rated"))
+        {
+            SearchRequest.RatingValue = 9;
+            SearchRequest.RatingValueOperator = NumericOperator.GreaterOrEquals;
+
+            SearchTerms = new List<SearchTerm>{
+                new SearchTerm{
+                    Key = "rating",
+                    ValueName = "9",
+                    IsNumeric = true,
+                    NumericSearchOperator = NumericOperator.GreaterThan
+                }
+            };
+        }
+        SearchRequest.Terms = SearchTerms;
+
+        BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms));
+        Console.WriteLine($"{BookList.Count()} books found");
+
+        StateHasChanged();
+
+
+    }
+
+
+
+
+
+
+
 }

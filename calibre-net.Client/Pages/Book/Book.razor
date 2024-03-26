@@ -3,6 +3,7 @@
 
 @using System.Globalization
 @inject ApiClients.BookClient BookClient
+@inject SearchService SearchService
 @inject IStringLocalizer<calibre_net.Shared.Resources.Shared> L
 
 <PageTitle>@CalibreBook?.Title</PageTitle>
@@ -29,7 +30,7 @@
                                @if (!first) {
                                 <span> &amp; </span>
                             }
-                                <MudLink Typo="Typo.body2" Align="Align.Left" Href="@author.SearchUrl">@author.Name</MudLink>
+                                <MudLink Typo="Typo.body2" Align="Align.Left" Href="@SearchService.GetSearchUrl(author)">@author.Name</MudLink>
                              @if (first) {
                                 first = false;
                             }
@@ -42,7 +43,7 @@
                     <div class="book-series">
                        
                         <MudText Typo="Typo.caption" Class="pr-1"> Book @CalibreBook.SeriesIndex of </MudText>
-                        <MudLink Typo="Typo.caption" Align="Align.Left" Href="@CalibreBook.Series.SeriesLink">
+                        <MudLink Typo="Typo.caption" Align="Align.Left" Href="@SearchService.GetSearchUrl(CalibreBook.Series)">
                             @CalibreBook.Series.Name</MudLink>
                     </div>
                 }
@@ -50,7 +51,7 @@
                 @if (CalibreBook.Rating != null)
                 {
                     <div class="book-rating">
-                        <a href="@CalibreBook.Rating.SearchUrl">
+                        <a href="@SearchService.GetSearchUrl(CalibreBook.Rating)">
                             <calibre_net.Client.Components.Shared.StarRatingDisplay
                                 Value="@(CalibreBook.Rating.Rating ?? 0)" />
                         </a>
@@ -65,8 +66,8 @@
                         <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Translate"/>
                          @foreach (var lang in CalibreBook.Languages)
                         {
-                        <a href="@lang.SearchUrl">
-                        <MudChip Href="@lang.SearchUrl" Size="Size.Small"  Variant="Variant.Text" >@L[$"lang_{lang.LangCode}"]</MudChip>
+                        <a href="@SearchService.GetSearchUrl(lang)">
+                        <MudChip Href="@SearchService.GetSearchUrl(lang)" Size="Size.Small"  Variant="Variant.Text" >@L[$"lang_{lang.LangCode}"]</MudChip>
                         </a>
                          }
                     </div>
@@ -96,9 +97,9 @@
                          @foreach (var tag in CalibreBook.Tags)
                         { 
                         
-                            <a href="@tag.SearchUrl" >
+                            <a href="@SearchService.GetSearchUrl(tag)" >
                         <MudChip Color="Color.Info" Variant="Variant.Text" Size="Size.Small" 
-                        Href="@tag.SearchUrl" >@tag.Name</MudChip>
+                        Href="@SearchService.GetSearchUrl(tag)" >@tag.Name</MudChip>
                        </a>
  }
                     </div>
@@ -108,7 +109,7 @@
                 {
                     <div class="book-publisher">
                         <MudText Typo="Typo.body2">Publisher: 
-                            <MudLink Typo="Typo.body2" Href="CalibreBook.Publisher.SearchUrl"
+                            <MudLink Typo="Typo.body2" Href="@(SearchService.GetSearchUrl(CalibreBook.Publisher))"
                             Class="pl-1">@CalibreBook.Publisher.Name</MudLink>
                         </MudText>
                     </div>

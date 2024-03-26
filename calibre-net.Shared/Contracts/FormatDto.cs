@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 
 namespace calibre_net.Shared.Contracts;
-public partial class FormatDto
+public partial class FormatDto : Searchable
 {
 
     [JsonPropertyName("format")]
@@ -14,5 +14,5 @@ public partial class FormatDto
     public int BookCount {get;set;} = 0;
 
     [JsonIgnore]
-    public string SearchUrl => $"/books/format/{Format}";
+    public override string SearchUrl => $"format/{Format}";
 }
