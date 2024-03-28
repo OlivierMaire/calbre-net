@@ -12,7 +12,8 @@
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-
+    <link href="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.css" rel="stylesheet" />
+    
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="calibre-net.styles.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -26,6 +27,7 @@
     <script src="_framework/blazor.web.js"></script>
     <script src="/js/app.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
 </body>
 
 </html>
@@ -44,6 +46,6 @@
     }
 
     @* private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path.StartsWithSegments("/Account")
-    ? null
-    : InteractiveAuto; *@
+? null
+: InteractiveAuto; *@
 }

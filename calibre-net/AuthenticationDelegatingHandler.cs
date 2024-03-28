@@ -18,8 +18,9 @@ public class ServerAuthenticationDelegatingHandler(IHttpContextAccessor accessor
     {
         // get cookies from the current HttpContext request.
         var cookie = accessor.HttpContext?.Request.Headers.Cookie;
-        // add the cookies to the HttpClient request.
-        request.Headers.Add("Cookie", cookie.ToString());
+        if (cookie.HasValue)
+            // add the cookies to the HttpClient request.
+            request.Headers.Add("Cookie", cookie.ToString());
 
         // Send Request
         var response = await base.SendAsync(request, cancellationToken);

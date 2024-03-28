@@ -39,19 +39,20 @@
                 @* <div>
             @term.Key : *@
                 <MudChip Color="Color.Primary" Variant="Variant.Outlined" OnClose="() => RemoveSearchTerm(term)">
-                    @if (term.IsNumeric && term.NumericSearchOperator.HasValue)
+                    @if (term is NumericSearchTerm numTerm)
                     {
-                        @(term.NumericSearchOperator?.ToEnumString())
+                        @(numTerm.NumericSearchOperator.ToEnumString())
                     }
 
-                    @if(term.Key == "rating" && !string.IsNullOrEmpty(term.ValueName))
+                    @if (term is RatingSearchTerm ratingTerm)
                     {
-                                       <calibre_net.Client.Components.Shared.StarRatingDisplay 
-                                       Value="@(int.Parse(term.ValueName))" />
+                        <calibre_net.Client.Components.Shared.StarRatingDisplay 
+                        Value="@(ratingTerm.IntValue)" />
 
+                        @term.Value
                     }
-else{
-                    @(string.IsNullOrEmpty(term.ValueName) ? term.Value : term.ValueName)
+                    else{
+                        @(string.IsNullOrEmpty(term.Value) ? term.Value : term.Value)
                     }
                 </MudChip>
                 @* </div> *@
@@ -61,7 +62,7 @@ else{
         <div>
             @foreach (var term in SearchTerms)
             {
-                <p>@term.Key : @term.Value (@term.ValueName)</p>
+                <p>@term.Key : @term.Value (@term.Value)</p>
             }
         </div>
     </div>
@@ -93,7 +94,6 @@ else{
     [Parameter]
     public string? PageRoute { get; set; }
 
-    public SearchRequest SearchRequest { get; set; } = new();
     public List<SearchTerm> SearchTerms { get; set; } = [];
 
     IEnumerable<BookDto> BookList { get; set; } = null!;
@@ -120,43 +120,21 @@ else{
             SearchTerms = response.Terms;
         }
 
-        @* SearchRequest = dict.ToObject<SearchRequest>(); *@
-
-        if (dict.Keys.Any(k => k.StartsWith("cc_")))
-        {
-            SearchRequest.CustomColumn = dict.Where(d => d.Key.StartsWith("cc_"))
-            .Select(d =>
-            {
-                var key = int.Parse(d.Key.Replace("cc_", ""));
-                int? value = null;
-                if (int.TryParse(d.Value.ToString(), out var parsedValue))
-                    value = parsedValue;
-                return KeyValuePair.Create(key, value);
-            })
-            .ToDictionary();
-        }
-
         if (NavigationManager.Uri.EndsWith("/books/top-rated"))
         {
-            SearchRequest.RatingValue = 9;
-            SearchRequest.RatingValueOperator = NumericOperator.GreaterOrEquals;
-
             SearchTerms = new List<SearchTerm>{
-                new SearchTerm{
+                new RatingSearchTerm{
                     Key = "rating",
-                    ValueName = "9",
-                    IsNumeric = true,
+                    Value = (9 / 2.0m).ToString(System.Globalization.CultureInfo.InvariantCulture),
                     NumericSearchOperator = NumericOperator.GreaterThan
                 }
             };
         }
-        SearchRequest.Terms = SearchTerms;
 
         BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms));
         Console.WriteLine($"{BookList.Count()} books found");
 
         StateHasChanged();
-
 
     }
 

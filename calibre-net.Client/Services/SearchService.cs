@@ -1,12 +1,14 @@
+using calibre_net.Client.ApiClients;
 using calibre_net.Shared.Contracts;
 using Microsoft.AspNetCore.Components;
 
 namespace calibre_net.Client.Services;
 
 [ScopedRegistration]
-public class SearchService(NavigationManager navigationManager)
+public class SearchService(NavigationManager navigationManager, CategoryClient categoryClient)
 {
     private readonly NavigationManager _navigationManager = navigationManager;
+    private readonly CategoryClient _categoryClient = categoryClient;
 
     public string GetSearchUrl(ISearchable searchable)
     {
@@ -26,5 +28,24 @@ public class SearchService(NavigationManager navigationManager)
 
     }
 
-  
+    public async Task<List<KeyValuePair<string, string>>> GetLanguages()
+    {
+        var languages = await _categoryClient.LanguagesAsync();
+        if (languages != null)
+        {
+            return languages.Languages.Select(l => KeyValuePair.Create(l.Id.ToString(), l.LangCode)).ToList();
+        }
+        return [];
+    }
+
+    public async Task<List<KeyValuePair<string, string>>> GetFormats()
+    {
+        var formats = await _categoryClient.FormatsAsync();
+        if (formats != null)
+        {
+            return formats.Formats.Select(l => KeyValuePair.Create(l.Format, l.Format)).ToList();
+        }
+        return [];
+    }
+
 }

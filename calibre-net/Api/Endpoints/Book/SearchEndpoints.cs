@@ -37,9 +37,8 @@ public sealed class GetSearchValuesEndpoint(CalibreDbDapperContext dbContext) : 
     {
         foreach (var term in req.Terms)
         {
-            if (string.IsNullOrEmpty(term.Value))
-                continue;
-            if (!TableMapper.ContainsKey(term.Key))
+            if (term is not IdSearchTerm)
+            // if (string.IsNullOrEmpty(term.Value))
                 continue;
             if (!TableMapper.ContainsKey(term.Key))
                 continue;
@@ -48,11 +47,9 @@ public sealed class GetSearchValuesEndpoint(CalibreDbDapperContext dbContext) : 
             using (var ctx = _dbContext.ConnectionCreate())
             {
                 var name = ctx.QueryFirst<string>(tableQuery, new { id = term.Value });
-                term.ValueName = name;
+                ((IdSearchTerm)term).ValueDisplayName = name;
             }
         }
-
-
 
         await SendOkAsync(new GetSearchValuesResponse(req.Terms));
     }

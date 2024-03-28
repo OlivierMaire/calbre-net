@@ -188,3 +188,8 @@ main {
     text-decoration-color: var(--bs-link-hover-color-rgb) !important;
 
   }
+ 
+  .search-list-term-popover{
+    z-index: calc(var(--mud-zindex-appbar) + 4) !important;
+    max-width: max-content !important;
+}

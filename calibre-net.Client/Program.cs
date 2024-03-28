@@ -11,6 +11,7 @@ using calibre_net.Shared.Contracts;
 using EPubBlazor;
 using AudioPlayerBlazor;
 using ComicsBlazor;
+using MudExtensions.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 // builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -76,6 +77,7 @@ builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
 
 builder.Services.RegisterServices(builder.Configuration);
 
+builder.Services.AddMudExtensions();
 
 var host = builder.Build();
 

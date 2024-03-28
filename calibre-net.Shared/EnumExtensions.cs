@@ -1,4 +1,5 @@
 using System.Runtime.Serialization;
+using calibre_net.Shared.Contracts;
 
 namespace calibre_net.Shared;
 
@@ -11,6 +12,15 @@ public static class EnumExtensions
         var enumMemberAttribute = ((EnumMemberAttribute[])enumType.GetField(name).GetCustomAttributes(typeof(EnumMemberAttribute), true)).Single();
         return enumMemberAttribute.Value;
     }
+
+        public static string ToEnumOperatorString<T>(this T type) where T : System.Enum
+    {
+        var enumType = typeof(T);
+        var name = Enum.GetName(enumType, type);
+        var enumMemberAttribute = ((EnumOperatorAttribute[])enumType.GetField(name).GetCustomAttributes(typeof(EnumOperatorAttribute), true)).Single();
+        return enumMemberAttribute.Value;
+    }
+
 
     public static T ToEnum<T>(this string str)
     {
