@@ -94,6 +94,84 @@ public static class TermsExt
             ?.Value;
     }
 
-   
+    public static List<SearchTerm> ToSearchTerms(this IDictionary<string, string> source)
+    {
+        List<SearchTerm> terms = [];
+        foreach (var (SourceKey, SourceValue) in source)
+        {
+            SearchTerm term;
+            if (SourceValue.StartsWith("s:", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var value = SourceValue[2..];
+                term = new StringSearchTerm();
+                var possibleOperator = value.Split(":")[0];
+                if (GetValueFromEnumMember<StringOperator>(value.Split(":")[0], out var enumValue))
+                {
+                    (term as StringSearchTerm).StringSearchOperator = enumValue;
+                    value = value[(possibleOperator.Length + 1)..];
+                }
+                term.Value = value;
+            }
+            else if (SourceValue.StartsWith("n:", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var value = SourceValue[2..];
+                term = new NumericSearchTerm();
+                var possibleOperator = value.Split(":")[0];
+                if (GetValueFromEnumMember<NumericOperator>(value.Split(":")[0], out var enumValue))
+                {
+                    (term as NumericSearchTerm).NumericSearchOperator = enumValue;
+                    value = value[(possibleOperator.Length + 1)..];
+                }
+                term.Value = value;
+            }
+            else if (SourceValue.StartsWith("r:", StringComparison.InvariantCultureIgnoreCase))
+            {
+                var value = SourceValue[2..];
+                term = new RatingSearchTerm();
+                var possibleOperator = value.Split(":")[0];
+                if (GetValueFromEnumMember<NumericOperator>(value.Split(":")[0], out var enumValue))
+                {
+                    (term as RatingSearchTerm).NumericSearchOperator = enumValue;
+                    value = value[(possibleOperator.Length + 1)..];
+                }
+                term.Value = value;
+            }
+            else if (SourceValue.StartsWith("l:", StringComparison.InvariantCultureIgnoreCase))
+            {
+                term = new ListSearchTerm();
+                term.Value = SourceValue[2..];
+            }
+            else
+            {
+                term = new IdSearchTerm();
+                term.Value = SourceValue;
+            }
+            term.Key = SourceKey;
+            terms.Add(term);
+        }
+        return terms;
+    }
+
+    private static bool GetValueFromEnumMember<T>(string value, out T enumOutput)
+    {
+        var type = typeof(T);
+        if (type.GetTypeInfo().IsEnum)
+        {
+            foreach (var name in Enum.GetNames(type))
+            {
+                var attr = type.GetRuntimeField(name)
+                    .GetCustomAttribute<System.Runtime.Serialization.EnumMemberAttribute>(true);
+                if (attr != null && attr.Value == value)
+                {
+                    enumOutput = (T)Enum.Parse(type, name);
+                    return true;
+                }
+            }
+            enumOutput = default!;
+            return false;
+        }
+
+        throw new InvalidOperationException("Not Enum");
+    }
 
 }

@@ -2,6 +2,7 @@
 @inject NavigationManager NavigationManager
 @inject SearchService SearchService
 @inject ApiClients.BookClient BookClient
+@using calibre_net.Shared.Contracts
 
 @rendermode InteractiveAuto
 
@@ -14,7 +15,7 @@
 
     <MudToggleIconButton @bind-Toggled="@_isOpen" Class="adv-search-form "
         Icon="@Icons.Material.Filled.KeyboardArrowDown" Color="@Color.Default"
-        ToggledIcon="@Icons.Material.Filled.KeyboardArrowUp" >
+        ToggledIcon="@Icons.Material.Filled.KeyboardArrowUp">
     </MudToggleIconButton>
     <MudPopover Open="@_isOpen" Class="pa-4" RelativeWidth="false" AnchorOrigin="Origin.BottomLeft"
         TransformOrigin="Origin.TopLeft">
@@ -31,7 +32,8 @@
             {
                 <AdvancedSearchTerm @bind-Term="AdvForm.CustomColumns[i]" />
             }
-            <MudButton StartIcon="@Icons.Material.Filled.Search" Class="ml-auto mt-4 mb-1" Variant="Variant.Outlined" Color="Color.Primary" OnClick="Search">Search</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.Search" Class="ml-auto mt-4 mb-1" Variant="Variant.Outlined"
+                Color="Color.Primary" OnClick="Search">Search</MudButton>
         </div>
     </MudPopover>
 </div>
@@ -74,7 +76,7 @@
         }
 
         Keyword ??= string.Empty;
-        if (NavigationManager.Uri.Contains("/books/")
+        @* if (NavigationManager.Uri.Contains("/books/")
         && NavigationManager.Uri.Contains("/keyword/")
         && string.IsNullOrEmpty(Keyword))
         {
@@ -83,7 +85,43 @@
             {
                 Keyword = System.Net.WebUtility.UrlDecode(match.Groups[1].Value);
             }
+        } *@
+
+        if (NavigationManager.Uri.Contains("/books/"))
+        {
+            var pageRoute = NavigationManager.Uri.Substring(NavigationManager.Uri.IndexOf("/books/") + 7);
+            var searchTerms = pageRoute.ParseStringToDictionary().ToSearchTerms();
+            foreach (var st in searchTerms)
+            {
+                if (st.Key == AdvForm.Author.Key && st is StringSearchTerm author)
+                    AdvForm.Author = author;
+                if (st.Key == AdvForm.Format.Key && st is ListSearchTerm format)
+                    AdvForm.Format = format;
+                if (st.Key == AdvForm.Keyword.Key && st is StringSearchTerm keyword)
+                    AdvForm.Keyword = keyword;
+                if (st.Key == AdvForm.Language.Key && st is ListSearchTerm language)
+                    AdvForm.Language = language;
+                if (st.Key == AdvForm.Publisher.Key && st is StringSearchTerm publisher)
+                    AdvForm.Publisher = publisher;
+                if (st.Key == AdvForm.Rating.Key && st is RatingSearchTerm rating)
+                    AdvForm.Rating = rating;
+                if (st.Key == AdvForm.Series.Key && st is StringSearchTerm series)
+                    AdvForm.Series = series;
+                if (st.Key == AdvForm.Tag.Key && st is StringSearchTerm tag)
+                    AdvForm.Tag = tag;
+                if (st.Key.StartsWith("cc_"))
+                {
+                    for (int i = 0; i < AdvForm.CustomColumns.Count; i++)
+                    {
+                        if (st.Key == AdvForm.CustomColumns[i].Key && st is StringSearchTerm cc)
+                            AdvForm.CustomColumns[i] = cc;
+                    }
+
+                }
+            }
         }
+
+        Keyword = AdvForm.Keyword.Value;
     }
 
 
@@ -103,10 +141,11 @@
     public async Task Search()
     {
 
-        var KeywordSearch = new StringSearchTerm{
-            Key = "keyword",
-            Value = Keyword
-        };
+        var KeywordSearch = new StringSearchTerm
+            {
+                Key = "keyword",
+                Value = Keyword
+            };
 
         List<SearchTerm> list = new List<SearchTerm>{
 
@@ -120,7 +159,7 @@ AdvForm.Language,
 AdvForm.Format,
 };
 
-list = [KeywordSearch,..list,..AdvForm.CustomColumns];
+        list = [KeywordSearch, .. list, .. AdvForm.CustomColumns];
 
 
 

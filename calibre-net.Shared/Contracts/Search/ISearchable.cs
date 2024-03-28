@@ -29,7 +29,7 @@ public static class SearchableExtensions
             string value = pairs[i + 1];
 
             // You can convert the value to the appropriate type (e.g., int, double, etc.) if needed.
-            dictionary[key] = value;
+            dictionary[key] =System.Net.WebUtility.UrlDecode(value); 
         }
 
         return dictionary;
