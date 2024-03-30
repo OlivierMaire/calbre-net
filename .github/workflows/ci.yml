@@ -28,6 +28,7 @@ jobs:
         
       - name: Setup .NET wasm-tools
         run: sudo dotnet workload install wasm-tools
+        continue-on-error: true
 
       - name: Restore dependencies
         run: dotnet restore
