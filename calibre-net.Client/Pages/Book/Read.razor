@@ -40,6 +40,7 @@ Format.ToLower() == "pdf")
   private async Task<VersOne.Epub.EpubBook?> GetBookData()
   {
     var bookData = await BookClient.DownloadDataAsync(Id, Format);
+    if (bookData == null) return null;
     using MemoryStream ms = new(bookData.Data);
     var book = await VersOne.Epub.EpubReader.ReadBookAsync(ms);
     return book;

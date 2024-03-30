@@ -1,0 +1,168 @@
+@using System.Text.RegularExpressions
+@inject NavigationManager NavigationManager
+@inject SearchService SearchService
+@inject ApiClients.BookClient BookClient
+@using calibre_net.Shared.Contracts
+
+@rendermode InteractiveAuto
+
+<div class="search-form d-flex flex-row">
+    @* <EditForm Model="Keyword" method="post" OnValidSubmit="SubmitForm" FormName="Keyword"> *@
+    <MudTextField Label="Keyword" name="Keyword" @bind-Value="@Keyword" Variant="Variant.Outlined"
+        Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Margin="Margin.Dense" Clearable="true"
+        OnAdornmentClick="Search" />
+    @* </EditForm> *@
+
+    <MudToggleIconButton @bind-Toggled="@_isOpen" Class="adv-search-form "
+        Icon="@Icons.Material.Filled.KeyboardArrowDown" Color="@Color.Default"
+        ToggledIcon="@Icons.Material.Filled.KeyboardArrowUp">
+    </MudToggleIconButton>
+    <MudPopover Open="@_isOpen" Class="pa-4" RelativeWidth="false" AnchorOrigin="Origin.BottomLeft"
+        TransformOrigin="Origin.TopLeft">
+        <div class="d-flex flex-column">
+            <MudText>Advanced Search</MudText>
+            <AdvancedSearchTerm @bind-Term="AdvForm.Author" />
+            <AdvancedSearchTerm @bind-Term="AdvForm.Series" />
+            <AdvancedSearchTerm @bind-Term="AdvForm.Rating" />
+            <AdvancedSearchTerm @bind-Term="AdvForm.Tag" />
+            <AdvancedSearchTerm @bind-Term="AdvForm.Publisher" />
+            <AdvancedSearchTerm @bind-Term="AdvForm.Language" />
+            <AdvancedSearchTerm @bind-Term="AdvForm.Format" />
+            @for (int i = 0; i < AdvForm.CustomColumns.Count; i++)
+            {
+                <AdvancedSearchTerm @bind-Term="AdvForm.CustomColumns[i]" />
+            }
+            <MudButton StartIcon="@Icons.Material.Filled.Search" Class="ml-auto mt-4 mb-1" Variant="Variant.Outlined"
+                Color="Color.Primary" OnClick="Search">Search</MudButton>
+        </div>
+    </MudPopover>
+</div>
+
+
+@code {
+    [SupplyParameterFromForm]
+    private string? Keyword { get; set; }
+
+    private bool _isOpen { get; set; } = false;
+
+    private AdvancedSearchForm AdvForm { get; set; } = new();
+
+    public void ToggleOpen()
+    {
+        if (_isOpen)
+            _isOpen = false;
+        else
+            _isOpen = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AdvForm.Language.Values = await SearchService.GetLanguages();
+        AdvForm.Format.Values = await SearchService.GetFormats();
+
+        var ccResponse = await BookClient.Custom_columnsAsync();
+        if (ccResponse != null)
+        {
+            foreach (var cc in ccResponse.CustomColumns)
+            {
+                AdvForm.CustomColumns.Add(new CustomColumnSearchTerm()
+                    {
+                        Key = $"cc_{cc.Id}",
+                        KeyName = cc.Name,
+                        ColumnId = cc.Id,
+                    });
+
+            }
+        }
+
+        Keyword ??= string.Empty;
+        @* if (NavigationManager.Uri.Contains("/books/")
+&& NavigationManager.Uri.Contains("/keyword/")
+&& string.IsNullOrEmpty(Keyword))
+{
+var match = Regex.Match(NavigationManager.Uri, @"^.*\/books\/.*keyword\/([^\/]*)\/?.*$");
+if (match.Groups.Count == 2)
+{
+Keyword = System.Net.WebUtility.UrlDecode(match.Groups[1].Value);
+}
+} *@
+
+        if (NavigationManager.Uri.Contains("/books/"))
+        {
+            var pageRoute = NavigationManager.Uri.Substring(NavigationManager.Uri.IndexOf("/books/") + 7);
+            var searchTerms = pageRoute.ParseStringToDictionary().ToSearchTerms();
+            foreach (var st in searchTerms)
+            {
+                if (st.Key == AdvForm.Author.Key && st is StringSearchTerm author)
+                    AdvForm.Author = author;
+                if (st.Key == AdvForm.Format.Key && st is ListSearchTerm format)
+                    AdvForm.Format = format;
+                if (st.Key == AdvForm.Keyword.Key && st is StringSearchTerm keyword)
+                    AdvForm.Keyword = keyword;
+                if (st.Key == AdvForm.Language.Key && st is ListSearchTerm language)
+                    AdvForm.Language = language;
+                if (st.Key == AdvForm.Publisher.Key && st is StringSearchTerm publisher)
+                    AdvForm.Publisher = publisher;
+                if (st.Key == AdvForm.Rating.Key && st is RatingSearchTerm rating)
+                    AdvForm.Rating = rating;
+                if (st.Key == AdvForm.Series.Key && st is StringSearchTerm series)
+                    AdvForm.Series = series;
+                if (st.Key == AdvForm.Tag.Key && st is StringSearchTerm tag)
+                    AdvForm.Tag = tag;
+                if (st.Key.StartsWith("cc_"))
+                {
+                    for (int i = 0; i < AdvForm.CustomColumns.Count; i++)
+                    {
+                        if (st.Key == AdvForm.CustomColumns[i].Key && st is StringSearchTerm cc)
+                            AdvForm.CustomColumns[i] = cc;
+                    }
+
+                }
+            }
+        }
+
+        Keyword = AdvForm.Keyword.Value;
+    }
+
+
+    @* public async Task SubmitForm()
+{
+if (!string.IsNullOrEmpty(Keyword))
+{
+var escapedKeyword = System.Net.WebUtility.UrlEncode(Keyword);
+var keyword = new KeywordDto() { Keyword = escapedKeyword };
+
+var searchUrl = SearchService.GetSearchUrl(keyword);
+
+NavigationManager.NavigateTo(searchUrl);
+}
+} *@
+
+    public void Search()
+    {
+
+        var KeywordSearch = new StringSearchTerm
+            {
+                Key = SearchTermsConstants.KEYWORD_TAG,
+                Value = Keyword ?? string.Empty
+            };
+
+        List<SearchTerm> list = new List<SearchTerm>{
+            AdvForm.Author,
+            AdvForm.Series,
+            AdvForm.Rating,
+            AdvForm.Keyword,
+            AdvForm.Tag,
+            AdvForm.Publisher,
+            AdvForm.Language,
+            AdvForm.Format,
+            };
+
+        list = [KeywordSearch, .. list, .. AdvForm.CustomColumns];
+
+        var url = "/books/" + list.ToUrl();
+        NavigationManager.NavigateTo(url);
+        _isOpen = false;
+    }
+
+}

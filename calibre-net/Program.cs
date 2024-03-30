@@ -353,7 +353,7 @@ if (app.Environment.IsDevelopment())
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(calibre_net.Client.Pages.Counter).Assembly);
+    .AddAdditionalAssemblies(typeof(calibre_net.Client.Pages.Book.Books).Assembly);
 
 
 

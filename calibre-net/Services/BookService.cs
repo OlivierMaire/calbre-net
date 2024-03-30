@@ -1,8 +1,10 @@
 using calibre_net.Client.Services;
 using calibre_net.Data.Calibre;
 using calibre_net.Shared.Contracts;
+using calibre_net.Shared;
 using Calibre_net.Data.Calibre;
 using Dapper;
+using System.Globalization;
 
 namespace calibre_net.Services;
 
@@ -12,7 +14,7 @@ public class BookService(CalibreDbDapperContext dbContext)
 {
     private readonly CalibreDbDapperContext dbContext = dbContext;
 
-    public List<BookDto> GetBooks()
+    public List<BookDto> GetBooks(GetSearchValuesRequest req)
     {
         // var books = calibreDb.Books
         // .Include(b => b.Authors)
@@ -21,11 +23,9 @@ public class BookService(CalibreDbDapperContext dbContext)
         // .AsSplitQuery()
         // .FromCache("books");
 
-        using (var ctx = dbContext.ConnectionCreate())
-        {
-
-            var books =
-   ctx.Query<Book, Author, Series, Rating, Book>($"""
+        using var ctx = dbContext.ConnectionCreate();
+        var dynamicParams = new DynamicParameters();
+        var sql = $"""
             SELECT b.id, b.title, b.sort, b.timestamp, b.pubdate, b.series_index, b.author_sort, b.isbn, b.lccn, b.path, b.flags, b.uuid, b.has_cover, b.last_modified, 
             a.id, a.name, a.sort, a.link, 
             s.id, s.name, s.sort, s.link, 
@@ -36,27 +36,223 @@ public class BookService(CalibreDbDapperContext dbContext)
             LEFT JOIN books_series_link bsl on bsl.book = b.id
             LEFT JOIN series s on s.Id = bsl.series
             LEFT JOIN books_ratings_link brl on brl.book = b.id
-            LEFT JOIN ratings r on r.Id = brl.rating
-            """, (book, author, serie, rating) =>
-   {
-       book.Authors.Add(author);
-       book.Series.Add(serie);
-       book.Rating.Add(rating);
-       return book;
-   }, splitOn: "Id,Id,Id,Id");
+            LEFT JOIN ratings r on r.Id = brl.rating 
+            """;
 
-            books = books.GroupBy(b => b.Id)
-                .Select(g =>
-                {
-                    var groupedBook = g.First();
-                    groupedBook.Authors = g.Select(b => b.Authors.SingleOrDefault() ?? new Author()).ToList();
-                    groupedBook.Series = g.Select(b => b.Series.SingleOrDefault() ?? new Series()).ToList();
-                    groupedBook.Rating = g.Select(b => b.Rating.SingleOrDefault() ?? new Rating()).ToList();
-                    return groupedBook;
-                }).ToList();
+        string sqlJoin = string.Empty;
+        string sqlWhere = string.Empty;
 
-            return books.ProjectToDto().ToList();
+        if (req.Terms.HasKey(SearchTermsConstants.AUTHOR_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.AUTHOR_TAG);
+            if (term is StringSearchTerm stringTerm)
+            {
+                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                sqlWhere += $" AND (a.name {operators[0]} @authorName) ";
+                dynamicParams.Add("authorName", operators[1].Replace("VALUE", termValue));
+            }
+
+            if (term is IdSearchTerm)
+            {
+                sqlWhere += " AND (a.Id = @authorId) ";
+                dynamicParams.Add("authorId", term?.Value);
+            }
         }
+        if (req.Terms.HasKey(SearchTermsConstants.SERIES_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.SERIES_TAG);
+            if (term is StringSearchTerm stringTerm)
+            {
+                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                sqlWhere += $" AND (s.name {operators[0]} @seriesName) ";
+                dynamicParams.Add("seriesName", operators[1].Replace("VALUE", termValue));
+            }
+
+            if (term is IdSearchTerm)
+            {
+                sqlWhere += " AND (s.Id = @seriesId) ";
+                dynamicParams.Add("seriesId", term?.Value);
+            }
+        }
+        if (req.Terms.HasKey(SearchTermsConstants.RATING_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.RATING_TAG);
+            if (term is RatingSearchTerm ratingTerm)
+            {
+                if (decimal.TryParse(term?.Value, CultureInfo.InvariantCulture, out var numValue))
+                {
+                    numValue *= 2;
+                    sqlWhere += $" AND (r.rating {ratingTerm.NumericSearchOperator.ToEnumString()} @ratingName) ";
+                    dynamicParams.Add("ratingName", (int)numValue);
+                }
+            }
+            if (term is IdSearchTerm)
+            {
+                sqlWhere += " AND (r.Id = @ratingId) ";
+                dynamicParams.Add("ratingId", term?.Value);
+            }
+        }
+        if (req.Terms.HasKey(SearchTermsConstants.TAG_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.TAG_TAG);
+
+            sqlJoin += """ 
+            JOIN books_tags_link btl on btl.book = b.id
+            JOIN tags t on t.Id = btl.tag
+            """;
+
+            if (term is StringSearchTerm stringTerm)
+            {
+                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                sqlWhere += $" AND (t.name {operators[0]} @tagName) ";
+                dynamicParams.Add("tagName", operators[1].Replace("VALUE", termValue));
+            }
+            if (term is IdSearchTerm)
+            {
+                sqlWhere += " AND (t.Id = @tagId) ";
+                dynamicParams.Add("tagId", term?.Value);
+            }
+        }
+        if (req.Terms.HasKey(SearchTermsConstants.PUBLISHER_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.PUBLISHER_TAG);
+
+            sqlJoin += """ 
+             JOIN books_publishers_link bpl on bpl.book = b.id
+             JOIN publishers p on p.Id = bpl.publisher
+            """;
+
+            if (term is StringSearchTerm stringTerm)
+            {
+                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                sqlWhere += $" AND (p.name {operators[0]} @publisherName) ";
+                dynamicParams.Add("publisherName", operators[1].Replace("VALUE", termValue));
+            }
+            if (term is IdSearchTerm)
+            {
+                sqlWhere += " AND (p.Id = @publisherId) ";
+                dynamicParams.Add("publisherId", term?.Value);
+            }
+        }
+        if (req.Terms.HasKey(SearchTermsConstants.LANGUAGE_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.LANGUAGE_TAG);
+
+            sqlJoin += """ 
+             JOIN books_languages_link bll on bll.book = b.id
+             JOIN languages l on l.Id = bll.lang_code
+            """;
+
+            if (term is StringSearchTerm stringTerm)
+            {
+                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                sqlWhere += $" AND (l.lang_code {operators[0]} @languageName) ";
+                dynamicParams.Add("languageName", operators[1].Replace("VALUE", termValue));
+            }
+            if (term is ListSearchTerm || term is IdSearchTerm)
+            {
+                sqlWhere += " AND (l.Id = @languageId) ";
+                dynamicParams.Add("languageId", term?.Value);
+            }
+        }
+        if (req.Terms.HasKey(SearchTermsConstants.FORMAT_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.FORMAT_TAG);
+            sqlJoin += " JOIN data d on d.book = b.id ";
+            if (term is ListSearchTerm || term is IdSearchTerm)
+            {
+                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                sqlWhere += " AND (d.Format = @formatValue) ";
+                dynamicParams.Add("formatValue", termValue);
+            }
+        }
+        if (req.Terms.HasKey(SearchTermsConstants.KEYWORD_TAG))
+        {
+            var term = req.Terms.Get(SearchTermsConstants.KEYWORD_TAG);
+
+            sqlJoin += " JOIN comments c on c.book = b.id ";
+            if (term is StringSearchTerm stringTerm)
+            {
+                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                sqlWhere += $""" 
+                        AND (
+                                (b.Title {operators[0]} @keyword) 
+                            OR  (c.text {operators[0]} @keyword)
+                            )
+                        """;
+                dynamicParams.Add("keyword", operators[1].Replace("VALUE", termValue));
+            }
+        }
+        if (req.Terms.Any(t => t.Key.StartsWith("cc_")))
+        {
+            var terms = req.Terms.Where(t => t.Key.StartsWith("cc_"));
+            foreach (var term in terms)
+            {
+                var ccKey = term.Key[3..];
+
+                sqlJoin += $""" 
+                JOIN books_custom_column_{ccKey}_link bll on bll.book = b.id
+                JOIN custom_column_{ccKey} cc_{ccKey} on cc_{ccKey}.Id = bll.value
+                """;
+
+                if (term is StringSearchTerm stringTerm)
+                {
+                    var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                    var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+
+                    sqlWhere += $" AND (cc_{ccKey}.value {operators[0]} @cc_{ccKey}Name) ";
+                    dynamicParams.Add($"cc_{ccKey}Name", operators[1].Replace("VALUE", termValue));
+                }
+                if (term is IdSearchTerm)
+                {
+                    sqlWhere += $" AND (cc_{ccKey}.Id = @cc_{ccKey}Id) ";
+                    dynamicParams.Add($"cc_{ccKey}Id", term?.Value);
+                }
+            }
+
+        }
+
+        sql += sqlJoin;
+        if (!string.IsNullOrEmpty(sqlWhere))
+        {
+            sql += " WHERE 1 = 1 ";
+            sql += sqlWhere;
+        }
+
+        // Console.WriteLine(sql);
+        // foreach (var p in dynamicParams.ParameterNames)
+        //     Console.WriteLine($"{p}: {dynamicParams.Get<string>(p)}");
+
+
+        var books =
+            ctx.Query<Book, Author, Series, Rating, Book>(sql,
+                        (book, author, serie, rating) =>
+            {
+                book.Authors.Add(author);
+                book.Series.Add(serie);
+                book.Rating.Add(rating);
+                return book;
+            },
+            param: dynamicParams,
+            splitOn: "Id,Id,Id,Id");
+
+        books = books.GroupBy(b => b.Id)
+            .Select(g =>
+            {
+                var groupedBook = g.First();
+                groupedBook.Authors = g.Select(b => b.Authors.SingleOrDefault() ?? new Author()).ToList();
+                groupedBook.Series = g.Select(b => b.Series.SingleOrDefault() ?? new Series()).ToList();
+                groupedBook.Rating = g.Select(b => b.Rating.SingleOrDefault() ?? new Rating()).ToList();
+                return groupedBook;
+            }).ToList();
+
+        return books.ProjectToDto().ToList();
 
     }
 
@@ -115,7 +311,7 @@ public class BookService(CalibreDbDapperContext dbContext)
                 return book.ToDto();
             }
         }
- 
+
     }
 
     public string GetBookCover(int id)
@@ -151,5 +347,127 @@ public class BookService(CalibreDbDapperContext dbContext)
             return path;
         }
 
+    }
+
+    public List<TagDto> GetAllTags()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var tags =
+            ctx.Query<TagDto>($"""
+            select t.Id, MAX(t.name) as name, MAX(t.link) as link, count() as bookCount from tags t
+            join books_tags_link btl on btl.tag = t.Id
+            group by t.Id
+            """);
+            return tags.ToList();
+        }
+    }
+
+
+    public List<SeriesDto> GetAllSeries()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var series =
+            ctx.Query<SeriesDto>($"""
+            select s.Id, MAX(s.name) as name, MAX(s.sort) as sort, MAX(s.link) as link, count() as bookCount from series s
+            join books_series_link bsl on bsl.series = s.Id
+            group by s.Id
+            """);
+            return series.ToList();
+        }
+    }
+
+    public List<AuthorDto> GetAllAuthors()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var authors =
+            ctx.Query<AuthorDto>($"""
+            select s.Id, MAX(s.name) as name, MAX(s.sort) as sort, MAX(s.link) as link, count() as bookCount from authors s
+            join books_authors_link bsl on bsl.author = s.Id
+            group by s.Id
+            """);
+            return authors.ToList();
+        }
+    }
+
+    public List<PublisherDto> GetAllPublishers()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var publishers =
+            ctx.Query<PublisherDto>($"""
+            select s.Id, MAX(s.name) as name, MAX(s.sort) as sort, MAX(s.link) as link, count() as bookCount from publishers s
+            join books_publishers_link bsl on bsl.publisher = s.Id
+            group by s.Id
+            """);
+            return publishers.ToList();
+        }
+    }
+    public List<LanguageDto> GetAllLanguages()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var languages =
+            ctx.Query<LanguageDto>($"""
+            select s.Id, MAX(s.lang_code) as langCode, MAX(s.link) as link, count() as bookCount from languages s
+            join books_languages_link bsl on bsl.lang_code = s.Id
+            group by s.Id
+            """);
+            return languages.ToList();
+        }
+    }
+    public List<RatingDto> GetAllRatings()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var ratings =
+            ctx.Query<RatingDto>($"""
+            select s.Id, MAX(s.rating) as rating, MAX(s.link) as link, count() as bookCount from ratings s
+            join books_ratings_link bsl on bsl.rating = s.Id
+            group by s.Id
+            """);
+            return ratings.ToList();
+        }
+    }
+
+    public List<FormatDto> GetAllFormats()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var formats =
+            ctx.Query<FormatDto>($"""
+            select d.format, count() as bookCount from data d
+            group by d.format
+            """);
+            return formats.ToList();
+        }
+    }
+
+    public List<CustomColumn> GetCustomColumns()
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var cc =
+            ctx.Query<CustomColumn>($"""
+            select * from custom_columns
+            """);
+            return cc.ToList();
+        }
+    }
+
+    public List<GenericCustomColumnDto> GetAllCustomColumns(int columnId)
+    {
+        using (var ctx = dbContext.ConnectionCreate())
+        {
+            var cc =
+            ctx.Query<GenericCustomColumnDto>($"""
+            select {columnId} as columnId, s.Id, MAX(s.value) as value, MAX(s.link) as link, count() as bookCount from custom_column_{columnId} s
+            join books_custom_column_{columnId}_link bsl on bsl.value = s.Id
+            group by s.Id
+            """);
+            return cc.ToList();
+        }
     }
 }

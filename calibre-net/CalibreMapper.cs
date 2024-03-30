@@ -31,7 +31,7 @@ public static class BookDtoMapper
     public static AuthorDto MapAuthor(Author author)
        => author.ToDtoWithoutBooks();
     public static SeriesDto MapSeriesList(ICollection<Series> series)
-       => series.Count > 0 ? series.First().ToDtoWithoutBooks() : new SeriesDto();
+       => series.Count > 0 ? series.First().ToDto() : new SeriesDto();
     public static RatingDto MapRatingsList(ICollection<Rating> ratings)
        => ratings.Count > 0 ? ratings.First().ToDtoWithoutBooks() : new RatingDto();
     public static LanguageDto MapLanguage(Language language)
@@ -39,7 +39,7 @@ public static class BookDtoMapper
     public static IdentifierDto MapIdentifier(Identifier identifier)
        => identifier.ToDtoWithoutBooks();
     public static TagDto MapIdentifier(Tag tag)
-       => tag.ToDtoWithoutBooks();
+       => tag.ToDto();
     public static PublisherDto MapPublishersList(ICollection<Publisher> publishers)
     => publishers.Count > 0 ? publishers.First().ToDtoWithoutBooks() : new PublisherDto();
     public static CustomColumnDto MapCustomColumn(CustomColumn customColumn)
@@ -74,8 +74,8 @@ public static partial class SeriesMapper
     public static partial IQueryable<SeriesDto> ProjectToDto(this IQueryable<Series> query);
     public static partial IEnumerable<SeriesDto> ProjectToDto(this IEnumerable<Series> query);
     public static partial SeriesDto ToDto(this Series book);
-    [MapperIgnoreTarget(nameof(SeriesDto.Books))]
-    public static partial SeriesDto ToDtoWithoutBooks(this Series book);
+    // [MapperIgnoreTarget(nameof(SeriesDto.Books))]
+    // public static partial SeriesDto ToDtoWithoutBooks(this Series book);
 }
 
 public static class SeriesBookDtoMapper
@@ -144,8 +144,8 @@ public static partial class TagMapper
     public static partial IQueryable<TagDto> ProjectToDto(this IQueryable<Tag> query);
     public static partial IEnumerable<TagDto> ProjectToDto(this IEnumerable<Tag> query);
     public static partial TagDto ToDto(this Tag book);
-    [MapperIgnoreTarget(nameof(TagDto.Books))]
-    public static partial TagDto ToDtoWithoutBooks(this Tag book);
+    // [MapperIgnoreTarget(nameof(TagDto.Books))]
+    // public static partial TagDto ToDtoWithoutBooks(this Tag book);
 }
 
 public static class TagBookDtoMapper
@@ -201,3 +201,5 @@ public static partial class DataMapper
     public static partial IEnumerable<DataDto> ProjectToDto(this IEnumerable<Datum> query);
     public static partial DataDto ToDto(this Datum entity);
 }
+
+

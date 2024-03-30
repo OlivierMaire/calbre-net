@@ -35,7 +35,7 @@ public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutReque
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        await SendOkAsync(service.GetBooks(), ct);
+        await SendOkAsync(service.GetBooks(new GetSearchValuesRequest([])), ct);
     }
 }
 
@@ -213,5 +213,44 @@ public sealed class GetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
             await SendOkAsync(new GetBookmarkResponse((int)bookmark.BookId, bookmark.Format, bookmark.Position));
         else
             await SendOkAsync(new GetBookmarkResponse((int)req.BookId, req.BookFormat, ""));
+    }
+}
+
+
+public sealed class SearchBooksEndpoint(BookService service) : Endpoint<GetSearchValuesRequest, List<BookDto>>
+{
+    private readonly BookService service = service;
+
+    public override void Configure()
+    {
+        Post("/search");
+        Version(1);
+        Group<Book>();
+        ResponseCache(60); //cache for 60 seconds
+        Policies(PermissionType.BOOK_VIEW);
+    }
+
+    public override async Task HandleAsync(GetSearchValuesRequest req, CancellationToken ct)
+    {
+        await SendOkAsync(service.GetBooks(req), ct);
+    }
+}
+
+
+public sealed class GetCustomColumns(BookService bookService): EndpointWithoutRequest<GetCustomColumnListResponse>
+{
+    private readonly BookService _bookService = bookService;
+
+    public override void Configure()
+    {
+        Get("custom_columns");
+        Version(1);
+        Group<Book>();
+    }
+
+    public override async Task HandleAsync(CancellationToken ct)
+    {
+        var cc = _bookService.GetCustomColumns();
+        await SendOkAsync(new GetCustomColumnListResponse(cc.ProjectToDto().ToList()), ct);
     }
 }

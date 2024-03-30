@@ -1,3 +1,4 @@
+@inject SearchService SearchService
 <div class="book-thumb p-1 d-flex flex-column">
     @* <MudPaper Elevation="0"> *@
     <MudLink Href="@CalibreBook.BookLink">
@@ -20,15 +21,9 @@
                 @foreach (var author in CalibreBook.Authors)
                 {
                     <li>
-                        <MudLink Typo="Typo.body2" Align="Align.Left" Href="@author.AuthorLink">@author.Name</MudLink>
+                        <MudLink Typo="Typo.body2" Align="Align.Left" Href="@SearchService.GetSearchUrl(author)">@author.Name</MudLink>
                     </li>
                 }
-                @* @if (CalibreBook.Authors.Count > 2)
-                {
-                <li>
-                <MudLink Typo="Typo.body2" Align="Align.Left" Href="@CalibreBook.BookLink">...</MudLink>
-                </li>
-                } *@
             </ul>
         </div>
         <div class="flex-grow-1"></div>
@@ -36,7 +31,7 @@
         @if (CalibreBook.Series != null && !String.IsNullOrEmpty(CalibreBook.Series.Name))
         {
             <div class="book-series d-flex flex-row ">
-                <MudLink Typo="Typo.caption" Align="Align.Left" Href="@CalibreBook.Series.SeriesLink">
+                <MudLink Typo="Typo.caption" Align="Align.Left" Href="@SearchService.GetSearchUrl(CalibreBook.Series)">
                     @CalibreBook.Series.Name</MudLink>
                 <MudText Typo="Typo.caption" Class="pl-1">(@CalibreBook.SeriesIndex)</MudText>
             </div>
@@ -46,12 +41,9 @@
         @if (CalibreBook.Rating != null)
         {
             <div class="book-rating">
-                <a href="/rating/@CalibreBook.Rating.Id">
+                <a href="@SearchService.GetSearchUrl(CalibreBook.Rating)">
                     <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(CalibreBook.Rating.Rating ?? 0)" />
-
-
                 </a>
-
             </div>
         }
 

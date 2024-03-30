@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 
 namespace calibre_net.Shared.Contracts;
-public partial class LanguageDto
+public partial class LanguageDto: Searchable
 {
     [JsonPropertyName("id")]
     public int Id { get; set; }
@@ -15,7 +15,10 @@ public partial class LanguageDto
     [JsonPropertyName("books")]
     public List<BookDto> Books {get;set;} = [];
 
+    [JsonPropertyName("bookCount")]
+    public int BookCount {get;set;} = 0;
+
     [JsonIgnore]
-    public string SearchUrl => $"/language/{Id}";
+    public override string SearchUrl => $"language/{Id}";
 
 }

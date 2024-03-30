@@ -1,8 +1,11 @@
 using System.Text.Json.Serialization;
 
 namespace calibre_net.Shared.Contracts;
-public partial class GenericCustomColumnDto
+public partial class GenericCustomColumnDto: Searchable
 {
+    [JsonPropertyName("columnId")]
+    public int ColumnId { get; set; }
+
     [JsonPropertyName("id")]
     public int Id { get; set; }
 
@@ -13,4 +16,9 @@ public partial class GenericCustomColumnDto
     public string Link { get; set; } = null!;
 
     
+    [JsonPropertyName("bookCount")]
+    public int BookCount {get;set;} = 0;
+
+    [JsonIgnore]
+    public override string SearchUrl => $"cc_{ColumnId}/{Id}";
 }

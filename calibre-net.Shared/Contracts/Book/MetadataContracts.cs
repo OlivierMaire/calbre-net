@@ -329,7 +329,6 @@ public record AudioMetadata
     //     picture data) is valued NB2 : Also allows to value embedded pictures inside chapters
     public IList<PictureInfoDto> EmbeddedPictures { get; set; } = [];
 
-}
 
 public record FormatDto
 {
@@ -585,6 +584,8 @@ public record PictureInfoDto
     //     Get the MIME-type associated with the picture
     public string MimeType { get; set; } = string.Empty;
 
+
+}
 
 }
 #endregion
