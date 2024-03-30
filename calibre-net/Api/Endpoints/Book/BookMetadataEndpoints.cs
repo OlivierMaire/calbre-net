@@ -59,7 +59,7 @@ Results<Ok<GetMetadataResponse>, NotFound>>
         }
 
 
-        return TypedResults.NotFound();
+        return await Task.FromResult(TypedResults.NotFound());
     }
 
     private EPubMetadata? GetEpubMeta(DownloadBookRequest req)

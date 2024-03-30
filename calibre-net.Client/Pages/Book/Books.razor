@@ -20,25 +20,15 @@
     <div class="search-top">
         <MudText Typo="Typo.h3" GutterBottom="true">Books</MudText>
 
-        Search
-
-        <p>
-            PageRoute: @PageRoute
-        </p>
-
-        @* <p>
-        @foreach (var (k, v) in DICT)
-        {
-        <p>@k : @v</p>
-        }
-        </p> *@
-
         <div class="search-tags">
             @foreach (var term in SearchTerms)
-            {
-                @* <div>
-            @term.Key : *@
-                <MudChip Color="Color.Primary" Variant="Variant.Outlined" OnClose="() => RemoveSearchTerm(term)">
+            { 
+                var icon = term.GetIcon();
+                <MudChip Color="Color.Primary"
+                    Icon="@icon"
+                 Variant="Variant.Outlined" OnClose="() => RemoveSearchTerm(term)">
+                  
+                  
                     @if (term is NumericSearchTerm numTerm)
                     {
                         @(numTerm.NumericSearchOperator.ToEnumString())
@@ -105,10 +95,10 @@
         NavigationManager.NavigateTo(url);
     }
 
-    async Task<IEnumerable<BookDto>> GetBooks(InfiniteScrollingItemsProviderRequest request)
+    private async Task<IEnumerable<BookDto>> GetBooks(InfiniteScrollingItemsProviderRequest request)
     {
         @* await Task.Delay(1000); // Simulate async loading *@
-        return BookList.Skip(request.StartIndex).Take(30);//.Range(request.StartIndex, 50);
+        return await Task.FromResult( BookList.Skip(request.StartIndex).Take(30) );
     }
     protected override async Task OnParametersSetAsync()
     {

@@ -17,7 +17,7 @@ public sealed class GetSearchValuesEndpoint(CalibreDbDapperContext dbContext) : 
 {
     private readonly CalibreDbDapperContext _dbContext = dbContext;
     public static readonly Dictionary<string, string> TableMapper = new Dictionary<string, string>{
-        {"author", "select name from authors where id = @id"},
+        {SearchTermsConstants.AUTHOR_TAG, "select name from authors where id = @id"},
         {"series", "select name from series where id = @id"},
         {"rating", "select rating as name from ratings where id = @id"},
         {"tag", "select name from tags where id = @id"},

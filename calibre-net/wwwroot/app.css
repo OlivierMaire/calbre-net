@@ -183,3 +183,23 @@ a:hover {
   max-width: -moz-max-content !important;
   max-width: max-content !important;
 }
+
+.mud-icon-size-medium {
+  line-height: 1.5rem;
+  vertical-align: middle;
+}
+.mud-icon-size-medium[class^=icon-cn-]:before, .mud-icon-size-medium[class*=" icon-cn-"]:before {
+  width: inherit;
+  height: inherit;
+  margin: 0;
+}
+
+.mud-icon-size-small {
+  line-height: 1.25rem;
+  vertical-align: middle;
+}
+.mud-icon-size-small[class^=icon-cn-]:before, .mud-icon-size-small[class*=" icon-cn-"]:before {
+  width: inherit;
+  height: inherit;
+  margin: 0;
+}

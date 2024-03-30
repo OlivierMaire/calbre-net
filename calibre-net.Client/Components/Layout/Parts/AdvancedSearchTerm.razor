@@ -3,19 +3,19 @@
 @using calibre_net.Shared.Contracts
 @using MudExtensions
 
-<div class="d-flex flex-row align-items-baseline gap-1">
-    @if (Term is CustomColumnSearchTerm ccTerm)
-    {
-        <MudText Class="flex-grow-1">@ccTerm.KeyName</MudText>
-    }
-    else
-    {
-        <MudText Class="flex-grow-1">@Term.Key</MudText>
-    }
+<div class="d-flex flex-row align-items-baseline gap-1 adv-form-term">
+    <MudText Class="flex-grow-1">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <MudIcon Icon="@Icon" Class="mr-1" />
+        }
+        @KeyName
+    </MudText>
+
     <div style="max-width: 100px;">
         @if (Term is StringSearchTerm stringTerm)
         {
-            <MudSelect PopoverClass="search-list-term-popover" Dense="true" DisableUnderLine="true"
+            <MudSelect Class="m-0" PopoverClass="search-list-term-popover" Dense="true" DisableUnderLine="true"
                 @bind-Value="@(stringTerm.StringSearchOperator)" T="StringOperator" AnchorOrigin="Origin.TopLeft">
                 @foreach (var so in StringOperators)
                 {
@@ -72,8 +72,17 @@
     private List<KeyValuePair<string, StringOperator>> StringOperators { get; set; } = [];
     private List<KeyValuePair<string, NumericOperator>> NumericOperators { get; set; } = [];
 
+    private string Icon { get; set; } = string.Empty;
+    private string KeyName { get; set; } = string.Empty;
+
     protected override void OnInitialized()
     {
+        Icon = Term.GetIcon();
+        KeyName = Term.Key;
+        if (Term is CustomColumnSearchTerm ccTerm)
+            KeyName = ccTerm.KeyName;
+
+
         StringOperators = Enum.GetNames(typeof(StringOperator))
         .Select(e => KeyValuePair.Create(e, (StringOperator)Enum.Parse(typeof(StringOperator), e))).ToList();
 

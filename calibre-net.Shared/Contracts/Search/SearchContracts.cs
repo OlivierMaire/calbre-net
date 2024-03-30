@@ -8,35 +8,35 @@ public class AdvancedSearchForm
 {
     public StringSearchTerm Author = new()
     {
-        Key = "author"
+        Key = SearchTermsConstants.AUTHOR_TAG
     };
     public StringSearchTerm Series = new()
     {
-        Key = "series"
+        Key = SearchTermsConstants.SERIES_TAG
     };
     public RatingSearchTerm Rating = new()
     {
-        Key = "rating"
+        Key = SearchTermsConstants.RATING_TAG
     };
     public StringSearchTerm Keyword = new()
     {
-        Key = "keyword"
+        Key = SearchTermsConstants.KEYWORD_TAG
     };
     public StringSearchTerm Tag = new()
     {
-        Key = "tag"
+        Key = SearchTermsConstants.TAG_TAG
     };
     public StringSearchTerm Publisher = new()
     {
-        Key = "publisher"
+        Key = SearchTermsConstants.PUBLISHER_TAG
     };
     public ListSearchTerm Language = new()
     {
-        Key = "language"
+        Key = SearchTermsConstants.LANGUAGE_TAG
     };
     public ListSearchTerm Format = new()
     {
-        Key = "format"
+        Key = SearchTermsConstants.FORMAT_TAG
     };
     public List<SearchTerm> CustomColumns { get; set; } = [];
 
@@ -105,9 +105,9 @@ public static class TermsExt
                 var value = SourceValue[2..];
                 term = new StringSearchTerm();
                 var possibleOperator = value.Split(":")[0];
-                if (GetValueFromEnumMember<StringOperator>(value.Split(":")[0], out var enumValue))
+                if (GetValueFromEnumMember<StringOperator>(value.Split(":")[0], out var enumValue) )
                 {
-                    (term as StringSearchTerm).StringSearchOperator = enumValue;
+                    if (term is StringSearchTerm t ) t.StringSearchOperator = enumValue;
                     value = value[(possibleOperator.Length + 1)..];
                 }
                 term.Value = value;
@@ -119,7 +119,7 @@ public static class TermsExt
                 var possibleOperator = value.Split(":")[0];
                 if (GetValueFromEnumMember<NumericOperator>(value.Split(":")[0], out var enumValue))
                 {
-                    (term as NumericSearchTerm).NumericSearchOperator = enumValue;
+                    if (term is NumericSearchTerm t) t.NumericSearchOperator = enumValue;
                     value = value[(possibleOperator.Length + 1)..];
                 }
                 term.Value = value;
@@ -131,20 +131,24 @@ public static class TermsExt
                 var possibleOperator = value.Split(":")[0];
                 if (GetValueFromEnumMember<NumericOperator>(value.Split(":")[0], out var enumValue))
                 {
-                    (term as RatingSearchTerm).NumericSearchOperator = enumValue;
+                    if (term is RatingSearchTerm t) t.NumericSearchOperator = enumValue;
                     value = value[(possibleOperator.Length + 1)..];
                 }
                 term.Value = value;
             }
             else if (SourceValue.StartsWith("l:", StringComparison.InvariantCultureIgnoreCase))
             {
-                term = new ListSearchTerm();
-                term.Value = SourceValue[2..];
+                term = new ListSearchTerm
+                {
+                    Value = SourceValue[2..]
+                };
             }
             else
             {
-                term = new IdSearchTerm();
-                term.Value = SourceValue;
+                term = new IdSearchTerm
+                {
+                    Value = SourceValue
+                };
             }
             term.Key = SourceKey;
             terms.Add(term);
@@ -159,8 +163,8 @@ public static class TermsExt
         {
             foreach (var name in Enum.GetNames(type))
             {
-                var attr = type.GetRuntimeField(name)
-                    .GetCustomAttribute<System.Runtime.Serialization.EnumMemberAttribute>(true);
+                var attr = type.GetRuntimeField(name)?
+                    .GetCustomAttribute<EnumMemberAttribute>(true);
                 if (attr != null && attr.Value == value)
                 {
                     enumOutput = (T)Enum.Parse(type, name);

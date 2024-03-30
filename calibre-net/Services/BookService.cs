@@ -42,9 +42,9 @@ public class BookService(CalibreDbDapperContext dbContext)
         string sqlJoin = string.Empty;
         string sqlWhere = string.Empty;
 
-        if (req.Terms.HasKey("author"))
+        if (req.Terms.HasKey(SearchTermsConstants.AUTHOR_TAG))
         {
-            var term = req.Terms.Get("author");
+            var term = req.Terms.Get(SearchTermsConstants.AUTHOR_TAG);
             if (term is StringSearchTerm stringTerm)
             {
                 var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
@@ -59,9 +59,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("authorId", term?.Value);
             }
         }
-        if (req.Terms.HasKey("series"))
+        if (req.Terms.HasKey(SearchTermsConstants.SERIES_TAG))
         {
-            var term = req.Terms.Get("series");
+            var term = req.Terms.Get(SearchTermsConstants.SERIES_TAG);
             if (term is StringSearchTerm stringTerm)
             {
                 var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
@@ -76,9 +76,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("seriesId", term?.Value);
             }
         }
-        if (req.Terms.HasKey("rating"))
+        if (req.Terms.HasKey(SearchTermsConstants.RATING_TAG))
         {
-            var term = req.Terms.Get("rating");
+            var term = req.Terms.Get(SearchTermsConstants.RATING_TAG);
             if (term is RatingSearchTerm ratingTerm)
             {
                 if (decimal.TryParse(term?.Value, CultureInfo.InvariantCulture, out var numValue))
@@ -94,9 +94,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("ratingId", term?.Value);
             }
         }
-        if (req.Terms.HasKey("tag"))
+        if (req.Terms.HasKey(SearchTermsConstants.TAG_TAG))
         {
-            var term = req.Terms.Get("tag");
+            var term = req.Terms.Get(SearchTermsConstants.TAG_TAG);
 
             sqlJoin += """ 
             JOIN books_tags_link btl on btl.book = b.id
@@ -116,9 +116,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("tagId", term?.Value);
             }
         }
-        if (req.Terms.HasKey("publisher"))
+        if (req.Terms.HasKey(SearchTermsConstants.PUBLISHER_TAG))
         {
-            var term = req.Terms.Get("publisher");
+            var term = req.Terms.Get(SearchTermsConstants.PUBLISHER_TAG);
 
             sqlJoin += """ 
              JOIN books_publishers_link bpl on bpl.book = b.id
@@ -138,9 +138,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("publisherId", term?.Value);
             }
         }
-        if (req.Terms.HasKey("language"))
+        if (req.Terms.HasKey(SearchTermsConstants.LANGUAGE_TAG))
         {
-            var term = req.Terms.Get("language");
+            var term = req.Terms.Get(SearchTermsConstants.LANGUAGE_TAG);
 
             sqlJoin += """ 
              JOIN books_languages_link bll on bll.book = b.id
@@ -160,9 +160,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("languageId", term?.Value);
             }
         }
-        if (req.Terms.HasKey("format"))
+        if (req.Terms.HasKey(SearchTermsConstants.FORMAT_TAG))
         {
-            var term = req.Terms.Get("format");
+            var term = req.Terms.Get(SearchTermsConstants.FORMAT_TAG);
             sqlJoin += " JOIN data d on d.book = b.id ";
             if (term is ListSearchTerm || term is IdSearchTerm)
             {
@@ -171,9 +171,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("formatValue", termValue);
             }
         }
-        if (req.Terms.HasKey("keyword"))
+        if (req.Terms.HasKey(SearchTermsConstants.KEYWORD_TAG))
         {
-            var term = req.Terms.Get("keyword");
+            var term = req.Terms.Get(SearchTermsConstants.KEYWORD_TAG);
 
             sqlJoin += " JOIN comments c on c.book = b.id ";
             if (term is StringSearchTerm stringTerm)
@@ -214,18 +214,6 @@ public class BookService(CalibreDbDapperContext dbContext)
                     sqlWhere += $" AND (cc_{ccKey}.Id = @cc_{ccKey}Id) ";
                     dynamicParams.Add($"cc_{ccKey}Id", term?.Value);
                 }
-                // if (string.IsNullOrEmpty(term?.Value) && !string.IsNullOrEmpty(term?.ValueName))
-                // {
-
-                //     sqlWhere += $" AND (cc_{ccKey}.Id like @cc_{ccKey}Id) ";
-                //     dynamicParams.Add($"cc_{ccKey}Id", $"%{term?.ValueName}%");
-                // }
-                // else
-                // {
-
-                //     sqlWhere += $" AND (cc_{ccKey}.Id = @cc_{ccKey}Id) ";
-                //     dynamicParams.Add($"cc_{ccKey}Id", term?.Value);
-                // }
             }
 
         }
@@ -237,9 +225,9 @@ public class BookService(CalibreDbDapperContext dbContext)
             sql += sqlWhere;
         }
 
-        Console.WriteLine(sql);
-        foreach (var p in dynamicParams.ParameterNames)
-            Console.WriteLine($"{p}: {dynamicParams.Get<string>(p)}");
+        // Console.WriteLine(sql);
+        // foreach (var p in dynamicParams.ParameterNames)
+        //     Console.WriteLine($"{p}: {dynamicParams.Get<string>(p)}");
 
 
         var books =

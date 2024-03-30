@@ -16,7 +16,7 @@ public abstract class Searchable : ISearchable
 public static class SearchableExtensions
 {
    
-    public static Dictionary<string, string> ParseStringToDictionary(this string input)
+    public static Dictionary<string, string> ParseStringToDictionary(this string? input)
     {
         if (string.IsNullOrEmpty(input))
             return [];

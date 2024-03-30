@@ -6,17 +6,17 @@
     <MudNavLink Href="/books" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Book">Books</MudNavLink>
     <MudNavLink Href="/books/top-rated" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Star">Top Rated Books
     </MudNavLink>
-    <MudNavLink Href="/books/tags" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Tag">Tags</MudNavLink>
-    <MudNavLink Href="/books/series" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.LibraryBooks">Series
+    <MudNavLink Href="/books/tags" Match="NavLinkMatch.All" Icon="@SearchTermsConstants.TAG_ICON">Tags</MudNavLink>
+    <MudNavLink Href="/books/series" Match="NavLinkMatch.All" Icon="@SearchTermsConstants.SERIES_ICON">Series
     </MudNavLink>
-    <MudNavLink Href="/books/authors" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Authors</MudNavLink>
-    <MudNavLink Href="/books/publishers" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Tag">Publishers
+    <MudNavLink Href="/books/authors" Match="NavLinkMatch.All" Icon="@SearchTermsConstants.AUTHOR_ICON" >Authors</MudNavLink>
+    <MudNavLink Href="/books/publishers" Match="NavLinkMatch.All" Icon="@SearchTermsConstants.PUBLISHER_ICON">Publishers
     </MudNavLink>
-    <MudNavLink Href="/books/languages" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Flag">Languages
+    <MudNavLink Href="/books/languages" Match="NavLinkMatch.All" Icon="@SearchTermsConstants.LANGUAGE_ICON">Languages
     </MudNavLink>
-    <MudNavLink Href="/books/ratings" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.StarOutline">Ratings
+    <MudNavLink Href="/books/ratings" Match="NavLinkMatch.All" Icon="@SearchTermsConstants.RATING_ICON">Ratings
     </MudNavLink>
-    <MudNavLink Href="/books/formats" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.GifBox">Formats</MudNavLink>
+    <MudNavLink Href="/books/formats" Match="NavLinkMatch.All" Icon="@SearchTermsConstants.FORMAT_ICON">Formats</MudNavLink>
 
     @foreach (var cc in CustomColumns)
     {
@@ -50,6 +50,8 @@
 @code {
     private string? currentUrl;
 
+
+    
     private List<CustomColumnDto> CustomColumns { get; set; } = [];
     protected override async Task OnInitializedAsync()
     {
@@ -62,4 +64,7 @@
             CustomColumns = ccResponse.CustomColumns;
         }
     }
+
+
+ 
 }

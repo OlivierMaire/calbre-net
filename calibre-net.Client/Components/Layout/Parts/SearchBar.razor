@@ -77,15 +77,15 @@
 
         Keyword ??= string.Empty;
         @* if (NavigationManager.Uri.Contains("/books/")
-        && NavigationManager.Uri.Contains("/keyword/")
-        && string.IsNullOrEmpty(Keyword))
-        {
-            var match = Regex.Match(NavigationManager.Uri, @"^.*\/books\/.*keyword\/([^\/]*)\/?.*$");
-            if (match.Groups.Count == 2)
-            {
-                Keyword = System.Net.WebUtility.UrlDecode(match.Groups[1].Value);
-            }
-        } *@
+&& NavigationManager.Uri.Contains("/keyword/")
+&& string.IsNullOrEmpty(Keyword))
+{
+var match = Regex.Match(NavigationManager.Uri, @"^.*\/books\/.*keyword\/([^\/]*)\/?.*$");
+if (match.Groups.Count == 2)
+{
+Keyword = System.Net.WebUtility.UrlDecode(match.Groups[1].Value);
+}
+} *@
 
         if (NavigationManager.Uri.Contains("/books/"))
         {
@@ -125,48 +125,44 @@
     }
 
 
-    public async Task SubmitForm()
-    {
-        if (!string.IsNullOrEmpty(Keyword))
-        {
-            var escapedKeyword = System.Net.WebUtility.UrlEncode(Keyword);
-            var keyword = new KeywordDto() { Keyword = escapedKeyword };
+    @* public async Task SubmitForm()
+{
+if (!string.IsNullOrEmpty(Keyword))
+{
+var escapedKeyword = System.Net.WebUtility.UrlEncode(Keyword);
+var keyword = new KeywordDto() { Keyword = escapedKeyword };
 
-            var searchUrl = SearchService.GetSearchUrl(keyword);
+var searchUrl = SearchService.GetSearchUrl(keyword);
 
-            NavigationManager.NavigateTo(searchUrl);
-        }
-    }
+NavigationManager.NavigateTo(searchUrl);
+}
+} *@
 
-    public async Task Search()
+    public void Search()
     {
 
         var KeywordSearch = new StringSearchTerm
             {
-                Key = "keyword",
-                Value = Keyword
+                Key = SearchTermsConstants.KEYWORD_TAG,
+                Value = Keyword ?? string.Empty
             };
 
         List<SearchTerm> list = new List<SearchTerm>{
-
-AdvForm.Author,
-AdvForm.Series,
-AdvForm.Rating,
-AdvForm.Keyword,
-AdvForm.Tag,
-AdvForm.Publisher,
-AdvForm.Language,
-AdvForm.Format,
-};
+            AdvForm.Author,
+            AdvForm.Series,
+            AdvForm.Rating,
+            AdvForm.Keyword,
+            AdvForm.Tag,
+            AdvForm.Publisher,
+            AdvForm.Language,
+            AdvForm.Format,
+            };
 
         list = [KeywordSearch, .. list, .. AdvForm.CustomColumns];
-
-
 
         var url = "/books/" + list.ToUrl();
         NavigationManager.NavigateTo(url);
         _isOpen = false;
-
     }
 
 }
