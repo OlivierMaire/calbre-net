@@ -20,7 +20,7 @@ Format.ToLower() == "pdf")
   @if (Metadata != null)
   {
     <ComicsBlazor.ComicsBlazorView Url="@Url" Name="Comics Reader" Metadata="@Metadata" GetPage="GetComicPage"
-      SaveBookmark="SaveBookmark" @rendermode="new InteractiveAutoRenderMode(prerender: false)" />
+      SaveBookmark="SaveBookmark" @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />
   }
   else
   {
@@ -67,7 +67,7 @@ Format.ToLower() == "pdf")
 
     if (page != null)
     {
-      Console.WriteLine($"Got a page {page.contentType} {page.PageContent.Length}b");
+      @* Console.WriteLine($"Got a page {page.contentType} {page.PageContent.Length}b"); *@
       return new ComicsBlazor.PageData(page.PageContent, page.contentType);
       }
 

@@ -64,7 +64,7 @@ public partial class BookClient : BaseApiClient
                     if (status_ == 200)
                     {
 
-                        headers_.TryGetValue("content-type", out var contentType);
+                        headers_.TryGetValue("Content-Type", out var contentType);
 
                         using var stream = response_.Content != null ? (await response_.Content.ReadAsStreamAsync(cancellationToken)) : null;
 
@@ -170,7 +170,7 @@ public partial class BookClient : BaseApiClient
                     var status_ = (int)response_.StatusCode;
                     if (status_ == 200)
                     {
-                        headers_.TryGetValue("content-type", out var contentType);
+                        headers_.TryGetValue("Content-Type", out var contentType);
 
                         using var stream = response_.Content != null ? (await response_.Content.ReadAsStreamAsync(cancellationToken)) : null;
 
