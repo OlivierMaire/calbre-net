@@ -39,6 +39,7 @@ public sealed class GetPageEndpoint(BookService bookService, ConfigurationServic
                     if (stream != null)
                     {
                         await SendStreamAsync(stream, contentType: contentType ?? "image/jpg",
+                        fileName: $"{req.BookId}_{req.PageId}.jpg",
                         cancellation: ct);
 
                         // await stream.DisposeAsync();
