@@ -1,4 +1,6 @@
+using System.Drawing;
 using calibre_net.Shared.Contracts;
+using MudBlazor;
 
 namespace calibre_net.Client.ApiClients;
 public partial class BookClient : BaseApiClient
@@ -65,6 +67,16 @@ public partial class BookClient : BaseApiClient
                     {
 
                         headers_.TryGetValue("Content-Type", out var contentType);
+                        headers_.TryGetValue("X-FileInfo-Width", out var FileInfo_Width);
+                        headers_.TryGetValue("X-FileInfo-Height", out var FileInfo_Height);
+                        headers_.TryGetValue("X-FileInfo-LeftColor", out var FileInfo_LeftColor);
+                        headers_.TryGetValue("X-FileInfo-RightColor", out var FileInfo_RightColor);
+
+                        System.Drawing.Size? size = null;
+                        if (int.TryParse(FileInfo_Width?.FirstOrDefault(), out var FileInfo_WidthInt) &&
+                        int.TryParse(FileInfo_Height?.FirstOrDefault(), out var FileInfo_HeightInt))
+                            size = new System.Drawing.Size(FileInfo_WidthInt, FileInfo_HeightInt);
+
 
                         using var stream = response_.Content != null ? (await response_.Content.ReadAsStreamAsync(cancellationToken)) : null;
 
@@ -81,7 +93,8 @@ public partial class BookClient : BaseApiClient
                             stream.CopyTo(ms);
 
                             var bytes = ms.ToArray();
-                            return new GetPageResponse(bytes, contentType?.FirstOrDefault() ?? string.Empty);
+                            return new GetPageResponse(bytes, contentType?.FirstOrDefault() ?? string.Empty, size,
+                            FileInfo_LeftColor?.FirstOrDefault(), FileInfo_RightColor?.FirstOrDefault());
                         }
                     }
                     else

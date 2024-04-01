@@ -65,14 +65,15 @@ Format.ToLower() == "pdf")
   {
     var page = await BookClient.PageDataAsync(Id, Format, pageNmber);
 
+
     if (page != null)
-    {
-      @* Console.WriteLine($"Got a page {page.contentType} {page.PageContent.Length}b"); *@
-      return new ComicsBlazor.PageData(page.PageContent, page.contentType);
+    { 
+      return new ComicsBlazor.PageData(page.PageContent, page.ContentType, page.Size, page.LeftColor, page.RightColor );
       }
 
     return null;
   }
+
 
   private async void SaveBookmark(string position)
   {
