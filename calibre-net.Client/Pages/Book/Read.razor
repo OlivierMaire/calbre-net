@@ -20,7 +20,7 @@ Format.ToLower() == "pdf")
   @if (Metadata != null)
   {
     <ComicsBlazor.ComicsBlazorView Url="@Url" Name="Comics Reader" Metadata="@Metadata" GetPage="GetComicPage"
-      SaveBookmark="SaveBookmark" @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />
+      SaveBookmark="SaveBookmark" @rendermode="new InteractiveAutoRenderMode(prerender: false)" />
   }
   else
   {
