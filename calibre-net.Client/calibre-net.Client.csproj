@@ -9,9 +9,6 @@
     <RootNamespace>calibre-net.Client</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
-
-    <WasmBuildNative>true</WasmBuildNative>
-
   </PropertyGroup>
 
 <PropertyGroup>
