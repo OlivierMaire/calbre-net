@@ -53,11 +53,11 @@ public partial class BookClient : BaseApiClient
                 {
                     var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
                     foreach (var item_ in response_.Headers)
-                        headers_[item_.Key] = item_.Value;
+                        headers_[item_.Key.ToLowerInvariant()] = item_.Value;
                     if (response_.Content != null && response_.Content.Headers != null)
                     {
                         foreach (var item_ in response_.Content.Headers)
-                            headers_[item_.Key] = item_.Value;
+                            headers_[item_.Key.ToLowerInvariant()] = item_.Value;
                     }
 
                     ProcessResponse(client_, response_);
@@ -66,11 +66,11 @@ public partial class BookClient : BaseApiClient
                     if (status_ == 200)
                     {
 
-                        headers_.TryGetValue("Content-Type", out var contentType);
-                        headers_.TryGetValue("X-FileInfo-Width", out var FileInfo_Width);
-                        headers_.TryGetValue("X-FileInfo-Height", out var FileInfo_Height);
-                        headers_.TryGetValue("X-FileInfo-LeftColor", out var FileInfo_LeftColor);
-                        headers_.TryGetValue("X-FileInfo-RightColor", out var FileInfo_RightColor);
+                        headers_.TryGetValue("content-type", out var contentType);
+                        headers_.TryGetValue("x-fileinfo-width", out var FileInfo_Width);
+                        headers_.TryGetValue("x-fileinfo-height", out var FileInfo_Height);
+                        headers_.TryGetValue("x-fileinfo-leftcolor", out var FileInfo_LeftColor);
+                        headers_.TryGetValue("x-fileinfo-rightcolor", out var FileInfo_RightColor);
 
                         System.Drawing.Size? size = null;
                         if (int.TryParse(FileInfo_Width?.FirstOrDefault(), out var FileInfo_WidthInt) &&
@@ -171,11 +171,11 @@ public partial class BookClient : BaseApiClient
                 {
                     var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
                     foreach (var item_ in response_.Headers)
-                        headers_[item_.Key] = item_.Value;
+                        headers_[item_.Key.ToLowerInvariant()] = item_.Value;
                     if (response_.Content != null && response_.Content.Headers != null)
                     {
                         foreach (var item_ in response_.Content.Headers)
-                            headers_[item_.Key] = item_.Value;
+                            headers_[item_.Key.ToLowerInvariant()] = item_.Value;
                     }
 
                     ProcessResponse(client_, response_);
@@ -183,7 +183,7 @@ public partial class BookClient : BaseApiClient
                     var status_ = (int)response_.StatusCode;
                     if (status_ == 200)
                     {
-                        headers_.TryGetValue("Content-Type", out var contentType);
+                        headers_.TryGetValue("content-type", out var contentType);
 
                         using var stream = response_.Content != null ? (await response_.Content.ReadAsStreamAsync(cancellationToken)) : null;
 
