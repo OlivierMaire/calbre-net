@@ -10,7 +10,7 @@
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
 
-    <!-- <WasmBuildNative>true</WasmBuildNative> -->
+    <WasmBuildNative>true</WasmBuildNative>
 
   </PropertyGroup>
 
