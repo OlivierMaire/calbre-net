@@ -35,7 +35,7 @@ public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutReque
 
     public override async Task HandleAsync(CancellationToken ct)
     {
-        await SendOkAsync(service.GetBooks(new GetSearchValuesRequest([])), ct);
+        await SendOkAsync(service.GetBooks(new GetSearchValuesRequest([], [])), ct);
     }
 }
 

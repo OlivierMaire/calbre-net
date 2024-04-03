@@ -22,13 +22,12 @@
 
         <div class="search-tags">
             @foreach (var term in SearchTerms)
-            { 
+            {
                 var icon = term.GetIcon();
-                <MudChip Color="Color.Primary"
-                    Icon="@icon"
-                 Variant="Variant.Outlined" OnClose="() => RemoveSearchTerm(term)">
-                  
-                  
+                <MudChip Color="Color.Primary" Icon="@icon" Variant="Variant.Outlined"
+                    OnClose="() => RemoveSearchTerm(term)">
+
+
                     @if (term is NumericSearchTerm numTerm)
                     {
                         @(numTerm.NumericSearchOperator.ToEnumString())
@@ -36,17 +35,21 @@
 
                     @if (term is RatingSearchTerm ratingTerm)
                     {
-                        <calibre_net.Client.Components.Shared.StarRatingDisplay 
-                        Value="@(ratingTerm.IntValue)" />
+                        <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(ratingTerm.IntValue)" />
 
                         @term.Value
                     }
-                    else{
+                    else
+                    {
                         @(string.IsNullOrEmpty(term.Value) ? term.Value : term.Value)
                     }
                 </MudChip>
                 @* </div> *@
             }
+        </div>
+
+        <div>
+            <BookOrder OrderChanged="OrderChanged" Orders="@Orders" />
         </div>
 
         <div>
@@ -65,7 +68,7 @@
         else
         {
             <div class="infinite-wrap infinite-scroll-hide">
-                <InfiniteScrolling ItemsProvider="GetBooks">
+                <InfiniteScrolling @ref="Infinite" ItemsProvider="GetBooks">
                     <ItemTemplate Context="book">
                         <BookThumb @key="book.Id" CalibreBook="@book" />
                     </ItemTemplate>
@@ -88,6 +91,11 @@
 
     IEnumerable<BookDto> BookList { get; set; } = null!;
 
+    InfiniteScrolling<BookDto> Infinite { get; set; } = null!;
+
+    private List<SearchOrderModel> Orders { get; set; } = [];
+
+
     void RemoveSearchTerm(SearchTerm term)
     {
         SearchTerms.Remove(term);
@@ -98,13 +106,96 @@
     private async Task<IEnumerable<BookDto>> GetBooks(InfiniteScrollingItemsProviderRequest request)
     {
         @* await Task.Delay(1000); // Simulate async loading *@
-        return await Task.FromResult( BookList.Skip(request.StartIndex).Take(30) );
+        return await Task.FromResult(BookList.Skip(request.StartIndex).Take(30));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Orders = new() {
+new() {
+Key = SearchTermsConstants.BOOK_TAG,
+PropertyName = nameof(BookDto.LastModified),
+Icon = Icons.Material.Outlined.DateRange
+},
+new() {
+Key = SearchTermsConstants.BOOK_TAG,
+PropertyName = nameof(BookDto.Title),
+Icon = Icons.Material.Outlined.ShortText
+},
+new() {
+Key = SearchTermsConstants.AUTHOR_TAG,
+PropertyName = nameof(BookDto.AuthorSort),
+Icon = SearchTermsConstants.AUTHOR_ICON
+},
+new() {
+Key = SearchTermsConstants.BOOK_TAG,
+PropertyName = nameof(BookDto.Pubdate),
+Icon = Icons.Material.Outlined.DateRange,
+Position = 2
+},
+new() {
+Key = SearchTermsConstants.SERIES_TAG,
+PropertyName = nameof(BookDto.Series),
+Icon = SearchTermsConstants.SERIES_ICON,
+Position = 1
+
+},
+new() {
+Key = SearchTermsConstants.RATING_TAG,
+PropertyName = nameof(BookDto.Rating),
+Icon = SearchTermsConstants.RATING_ICON,
+},
+
+new() {
+Key = SearchTermsConstants.PUBLISHER_TAG,
+PropertyName = nameof(BookDto.Publisher),
+Icon = SearchTermsConstants.PUBLISHER_ICON,
+ServerSide = true
+
+},
+new() {
+Key = SearchTermsConstants.LANGUAGE_TAG,
+PropertyName = nameof(BookDto.Languages),
+Icon = SearchTermsConstants.LANGUAGE_ICON,
+ServerSide = true
+},
+new() {
+Key = SearchTermsConstants.FORMAT_TAG,
+PropertyName = nameof(BookDto.Data),
+Icon = SearchTermsConstants.FORMAT_ICON,
+ServerSide = true
+},
+
+
+
+
+
+};
+
+        var ccResponse = await BookClient.Custom_columnsAsync();
+        if (ccResponse != null)
+        {
+            foreach (var cc in ccResponse.CustomColumns)
+            {
+                Orders.Add(
+                new()
+                    {
+                        Key = $"cc_{cc.Id}",
+                        PropertyName = cc.Name,
+                        Icon = Icons.Material.Outlined.FilterNone,
+                        ServerSide = true
+                    });
+
+
+            }
+        }
+
     }
     protected override async Task OnParametersSetAsync()
     {
         var dict = PageRoute.ParseStringToDictionary();
         SearchTerms = dict.ToSearchTerms();
-        var response = await SearchClient.SearchValueAsync(new GetSearchValuesRequest(SearchTerms));
+        var response = await SearchClient.SearchValueAsync(new GetSearchValuesRequest(SearchTerms, []));
         if (response != null)
         {
             SearchTerms = response.Terms;
@@ -113,19 +204,58 @@
         if (NavigationManager.Uri.EndsWith("/books/top-rated"))
         {
             SearchTerms = new List<SearchTerm>{
-                new RatingSearchTerm{
-                    Key = "rating",
-                    Value = (9 / 2.0m).ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    NumericSearchOperator = NumericOperator.GreaterThan
-                }
+            new RatingSearchTerm{
+            Key = "rating",
+            Value = (9 / 2.0m).ToString(System.Globalization.CultureInfo.InvariantCulture),
+            NumericSearchOperator = NumericOperator.GreaterThan
+            }
             };
         }
 
-        BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms));
+
+        var orders = Orders.Where(o => o.Position > 0).OrderBy(o => o.Position)
+        .Select(o => o as SearchOrder).ToList();
+        BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms, orders));
         Console.WriteLine($"{BookList.Count()} books found");
 
         StateHasChanged();
 
+    }
+
+    private async void OrderChanged(List<SearchOrder> orders)
+    {
+        Console.WriteLine("Order Changed");
+
+        @* if (orders.Any(o => o.ServerSide)) *@
+        {
+            Console.WriteLine("Server Side Search");
+
+            BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms, orders));
+            await Infinite.RefreshDataAsync();
+
+        }
+        @* else
+{
+
+Type bookType = typeof(BookDto);
+
+IOrderedEnumerable<BookDto>? books = null;
+foreach (var o in orders)
+{
+books = books == null ?
+o.Ascending ? BookList.OrderBy(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null))
+: BookList.OrderByDescending(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null))
+:
+o.Ascending ? books.ThenBy(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null))
+: books.ThenByDescending(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null));
+}
+
+if (books != null)
+{
+BookList = books.AsEnumerable();
+await Infinite.RefreshDataAsync();
+}
+} *@
     }
 
 

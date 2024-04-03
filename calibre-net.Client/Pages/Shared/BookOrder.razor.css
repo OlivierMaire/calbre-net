@@ -1,0 +1,9 @@
+::deep .sort-badge .right {
+  left: -10px;
+}
+::deep .sort-badge .mud-badge-top {
+  top: 10px;
+}
+::deep .sort-badge .mud-badge-bottom {
+  top: -10px;
+}
