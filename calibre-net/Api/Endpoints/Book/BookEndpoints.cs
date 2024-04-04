@@ -20,24 +20,24 @@ public class Book : Group
     }
 }
 
-public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutRequest<List<BookDto>>
-{
-    private readonly BookService service = service;
+// public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutRequest<List<BookDto>>
+// {
+//     private readonly BookService service = service;
 
-    public override void Configure()
-    {
-        Get("/all");
-        Version(1);
-        Group<Book>();
-        ResponseCache(60); //cache for 60 seconds
-        Policies(PermissionType.BOOK_VIEW);
-    }
+//     public override void Configure()
+//     {
+//         Get("/all");
+//         Version(1);
+//         Group<Book>();
+//         ResponseCache(60); //cache for 60 seconds
+//         Policies(PermissionType.BOOK_VIEW);
+//     }
 
-    public override async Task HandleAsync(CancellationToken ct)
-    {
-        await SendOkAsync(service.GetBooks(new GetSearchValuesRequest([], [])), ct);
-    }
-}
+//     public override async Task HandleAsync(CancellationToken ct)
+//     {
+//         await SendOkAsync(service.GetBooks(new GetSearchValuesRequest([], [])), ct);
+//     }
+// }
 
 public sealed class GetBookEndpoint(BookService service) : Endpoint<GetBookRequest, BookDto>
 {
@@ -226,18 +226,22 @@ public sealed class SearchBooksEndpoint(BookService service) : Endpoint<GetSearc
         Post("/search");
         Version(1);
         Group<Book>();
-        ResponseCache(60); //cache for 60 seconds
         Policies(PermissionType.BOOK_VIEW);
+        // ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);//, varyByHeader: "x-request-hash");
+        Options(x => x.CacheOutput(p => p.AddPolicy(typeof(MyCustomPolicy))
+        .SetVaryByHeader("x-request-hash")
+        .Expire(TimeSpan.FromDays(1)) ));
     }
 
     public override async Task HandleAsync(GetSearchValuesRequest req, CancellationToken ct)
     {
+        this.HttpContext.Response.Headers.Append("cache", "force-cache");
         await SendOkAsync(service.GetBooks(req), ct);
     }
 }
 
 
-public sealed class GetCustomColumns(BookService bookService): EndpointWithoutRequest<GetCustomColumnListResponse>
+public sealed class GetCustomColumns(BookService bookService) : EndpointWithoutRequest<GetCustomColumnListResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -246,6 +250,7 @@ public sealed class GetCustomColumns(BookService bookService): EndpointWithoutRe
         Get("custom_columns");
         Version(1);
         Group<Book>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

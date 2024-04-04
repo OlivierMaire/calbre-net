@@ -1,4 +1,7 @@
 namespace calibre_net.Client.ApiClients;
+
+using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using calibre_net.Client.Services;
 
 // [SingletonRegistration]
@@ -17,9 +20,57 @@ public class BaseApiClient
     }
 
 
-        static protected void UpdateJsonSerializerSettings(System.Text.Json.JsonSerializerOptions settings){
-            settings.PropertyNameCaseInsensitive = true;
+    static protected void UpdateJsonSerializerSettings(System.Text.Json.JsonSerializerOptions settings)
+    {
+        settings.PropertyNameCaseInsensitive = true;
+    }
+
+    public static Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, System.Text.StringBuilder urlBuilder, CancellationToken ct)
+    {
+        // return PrepareRequestAsync(client, request, urlBuilder.ToString(), ct);
+        return Task.CompletedTask;
+    }
+    public static async Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, string url, CancellationToken ct)
+    {
+        Console.WriteLine("prepare request");
+        if (request.Method == HttpMethod.Post || request.Method == HttpMethod.Put)
+        {
+            if (request.Content is ByteArrayContent bytes)
+            {
+                using (var sha256hash = SHA256.Create())
+                {
+                    byte[] data = await bytes.ReadAsByteArrayAsync(ct);
+
+                    byte[] payloadBytes = sha256hash.ComputeHash(data);
+                    var digest = Convert.ToBase64String(payloadBytes);
+                    digest = "SHA-256=" + digest;
+                    request.Headers.Add("x-request-hash", digest);
+                }
+            }
         }
+    }
+
+    public static async Task ProcessResponseAsync(HttpClient client, HttpResponseMessage response, CancellationToken ct)
+    {
+        
+
+            if (response.Content is ByteArrayContent bytes)
+            {
+                using (var sha256hash = SHA256.Create())
+                {
+                    byte[] data = await bytes.ReadAsByteArrayAsync(ct);
+
+                    byte[] payloadBytes = sha256hash.ComputeHash(data);
+                    var digest = Convert.ToBase64String(payloadBytes);
+                    digest = "SHA-256=" + digest;
+                    // response.Headers.Add("x-request-hash", digest);
+                    // response.Headers.Add("etag", digest);
+                }
+            }
+    }
+
+
+
 
 }
 

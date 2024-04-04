@@ -3,14 +3,15 @@
 @inject SearchService SearchService
 @inject ApiClients.BookClient BookClient
 @using calibre_net.Shared.Contracts
+@implements IDisposable
 
 @rendermode InteractiveAuto
 
 <div class="search-form d-flex flex-row">
     @* <EditForm Model="Keyword" method="post" OnValidSubmit="SubmitForm" FormName="Keyword"> *@
-    <MudTextField Label="Keyword" name="Keyword" @bind-Value="@Keyword" Variant="Variant.Outlined"
+    <MudTextField Label="Keyword" name="Keyword" @bind-Value="Keyword" Variant="Variant.Outlined"
         Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Margin="Margin.Dense" Clearable="true"
-        OnAdornmentClick="Search" />
+        OnAdornmentClick="Search" OnKeyDown="HandleKeyDown" Immediate="true" />
     @* </EditForm> *@
 
     <MudToggleIconButton @bind-Toggled="@_isOpen" Class="adv-search-form "
@@ -40,7 +41,7 @@
 
 
 @code {
-    [SupplyParameterFromForm]
+    @* [SupplyParameterFromForm] *@
     private string? Keyword { get; set; }
 
     private bool _isOpen { get; set; } = false;
@@ -57,6 +58,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        NavigationManager.LocationChanged += LocationChanged;
+
         AdvForm.Language.Values = await SearchService.GetLanguages();
         AdvForm.Format.Values = await SearchService.GetFormats();
 
@@ -76,19 +79,64 @@
         }
 
         Keyword ??= string.Empty;
-        @* if (NavigationManager.Uri.Contains("/books/")
-&& NavigationManager.Uri.Contains("/keyword/")
-&& string.IsNullOrEmpty(Keyword))
+
+        LocationChanged(null, null);
+    }
+
+
+    @* public async Task SubmitForm()
 {
-var match = Regex.Match(NavigationManager.Uri, @"^.*\/books\/.*keyword\/([^\/]*)\/?.*$");
-if (match.Groups.Count == 2)
+if (!string.IsNullOrEmpty(Keyword))
 {
-Keyword = System.Net.WebUtility.UrlDecode(match.Groups[1].Value);
+var escapedKeyword = System.Net.WebUtility.UrlEncode(Keyword);
+var keyword = new KeywordDto() { Keyword = escapedKeyword };
+
+var searchUrl = SearchService.GetSearchUrl(keyword);
+
+NavigationManager.NavigateTo(searchUrl);
 }
 } *@
 
+    public void Search()
+    {
+
+        var KeywordSearch = new StringSearchTerm
+            {
+                Key = SearchTermsConstants.KEYWORD_TAG,
+                Value = Keyword ?? string.Empty
+            };
+
+        List<SearchTerm> list = new List<SearchTerm>{
+AdvForm.Author,
+AdvForm.Series,
+AdvForm.Rating,
+AdvForm.Keyword,
+AdvForm.Tag,
+AdvForm.Publisher,
+AdvForm.Language,
+AdvForm.Format,
+};
+
+        list = [KeywordSearch, .. list, .. AdvForm.CustomColumns];
+
+        var url = "/books/" + list.ToUrl();
+        NavigationManager.NavigateTo(url);
+        _isOpen = false;
+    }
+
+
+    protected void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            Search();
+    }
+
+    protected void LocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        Console.WriteLine("Location Changed");
         if (NavigationManager.Uri.Contains("/books/"))
         {
+            AdvForm = new();
             var pageRoute = NavigationManager.Uri.Substring(NavigationManager.Uri.IndexOf("/books/") + 7);
             var searchTerms = pageRoute.ParseStringToDictionary().ToSearchTerms();
             foreach (var st in searchTerms)
@@ -122,47 +170,13 @@ Keyword = System.Net.WebUtility.UrlDecode(match.Groups[1].Value);
         }
 
         Keyword = AdvForm.Keyword.Value;
+
+        StateHasChanged();
     }
 
-
-    @* public async Task SubmitForm()
-{
-if (!string.IsNullOrEmpty(Keyword))
-{
-var escapedKeyword = System.Net.WebUtility.UrlEncode(Keyword);
-var keyword = new KeywordDto() { Keyword = escapedKeyword };
-
-var searchUrl = SearchService.GetSearchUrl(keyword);
-
-NavigationManager.NavigateTo(searchUrl);
-}
-} *@
-
-    public void Search()
+    void IDisposable.Dispose()
     {
-
-        var KeywordSearch = new StringSearchTerm
-            {
-                Key = SearchTermsConstants.KEYWORD_TAG,
-                Value = Keyword ?? string.Empty
-            };
-
-        List<SearchTerm> list = new List<SearchTerm>{
-            AdvForm.Author,
-            AdvForm.Series,
-            AdvForm.Rating,
-            AdvForm.Keyword,
-            AdvForm.Tag,
-            AdvForm.Publisher,
-            AdvForm.Language,
-            AdvForm.Format,
-            };
-
-        list = [KeywordSearch, .. list, .. AdvForm.CustomColumns];
-
-        var url = "/books/" + list.ToUrl();
-        NavigationManager.NavigateTo(url);
-        _isOpen = false;
+        // Unsubscribe from the event when our component is disposed
+        NavigationManager.LocationChanged -= LocationChanged;
     }
-
 }

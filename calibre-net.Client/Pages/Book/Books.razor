@@ -5,6 +5,7 @@
 @inject ApiClients.BookClient BookClient
 @inject ApiClients.SearchClient SearchClient
 @inject NavigationManager NavigationManager
+@inject PersistentComponentState ApplicationState
 
 @page "/books"
 @page "/books/top-rated"
@@ -27,7 +28,6 @@
                 <MudChip Color="Color.Primary" Icon="@icon" Variant="Variant.Outlined"
                     OnClose="() => RemoveSearchTerm(term)">
 
-
                     @if (term is NumericSearchTerm numTerm)
                     {
                         @(numTerm.NumericSearchOperator.ToEnumString())
@@ -36,27 +36,21 @@
                     @if (term is RatingSearchTerm ratingTerm)
                     {
                         <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(ratingTerm.IntValue)" />
-
-                        @term.Value
+                    }
+                    else if (term is IdSearchTerm idTerm)
+                    {
+                        @(string.IsNullOrEmpty(idTerm.ValueDisplayName) ? idTerm.Value : idTerm.ValueDisplayName)
                     }
                     else
                     {
-                        @(string.IsNullOrEmpty(term.Value) ? term.Value : term.Value)
+                        @(term.Value)
                     }
                 </MudChip>
                 @* </div> *@
             }
         </div>
-
         <div>
             <BookOrder OrderChanged="OrderChanged" Orders="@Orders" />
-        </div>
-
-        <div>
-            @foreach (var term in SearchTerms)
-            {
-                <p>@term.Key : @term.Value (@term.Value)</p>
-            }
         </div>
     </div>
     <div class="search-results">
@@ -96,10 +90,13 @@
     private List<SearchOrderModel> Orders { get; set; } = [];
 
 
+    private PersistingComponentStateSubscription persistingSubscription;
+
+
     void RemoveSearchTerm(SearchTerm term)
     {
         SearchTerms.Remove(term);
-        var url = "/books/" + string.Join("/", SearchTerms.Select(d => $"{d.Key}/{d.Value}"));
+        var url = "/books/" + SearchTerms.ToUrl();
         NavigationManager.NavigateTo(url);
     }
 
@@ -111,7 +108,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Orders = new() {
+        if (!ApplicationState.TryTakeFromJson<List<SearchOrderModel>>(
+        nameof(Orders), out var restoredOrders))
+        {
+            // first access (prerender)
+            Orders = new() {
 new() {
 Key = SearchTermsConstants.BOOK_TAG,
 PropertyName = nameof(BookDto.LastModified),
@@ -165,58 +166,102 @@ PropertyName = nameof(BookDto.Data),
 Icon = SearchTermsConstants.FORMAT_ICON,
 ServerSide = true
 },
-
-
-
-
-
 };
 
-        var ccResponse = await BookClient.Custom_columnsAsync();
-        if (ccResponse != null)
-        {
-            foreach (var cc in ccResponse.CustomColumns)
+            var ccResponse = await BookClient.Custom_columnsAsync();
+            if (ccResponse != null)
             {
-                Orders.Add(
-                new()
-                    {
-                        Key = $"cc_{cc.Id}",
-                        PropertyName = cc.Name,
-                        Icon = Icons.Material.Outlined.FilterNone,
-                        ServerSide = true
-                    });
+                foreach (var cc in ccResponse.CustomColumns)
+                {
+                    Orders.Add(
+                    new()
+                        {
+                            Key = $"cc_{cc.Id}",
+                            PropertyName = cc.Name,
+                            Icon = Icons.Material.Outlined.FilterNone,
+                            ServerSide = true
+                        });
 
 
+                }
             }
         }
+        else
+        {
+            // after prerender
+            Orders = restoredOrders!;
+        }
 
+
+        persistingSubscription =
+        ApplicationState.RegisterOnPersisting(PersistData);
+
+
+
+    }
+
+    private Task PersistData()
+    {
+        ApplicationState.PersistAsJson(nameof(SearchTerms), SearchTerms);
+        ApplicationState.PersistAsJson(nameof(BookList), BookList);
+        ApplicationState.PersistAsJson(nameof(Orders), Orders);
+
+        return Task.CompletedTask;
     }
     protected override async Task OnParametersSetAsync()
     {
-        var dict = PageRoute.ParseStringToDictionary();
-        SearchTerms = dict.ToSearchTerms();
-        var response = await SearchClient.SearchValueAsync(new GetSearchValuesRequest(SearchTerms, []));
-        if (response != null)
-        {
-            SearchTerms = response.Terms;
-        }
 
-        if (NavigationManager.Uri.EndsWith("/books/top-rated"))
+
+        if (!ApplicationState.TryTakeFromJson<List<SearchTerm>>(
+        nameof(SearchTerms), out var restoredSearchTerms))
         {
-            SearchTerms = new List<SearchTerm>{
-            new RatingSearchTerm{
-            Key = "rating",
-            Value = (9 / 2.0m).ToString(System.Globalization.CultureInfo.InvariantCulture),
-            NumericSearchOperator = NumericOperator.GreaterThan
+            // first access (prerender)
+            var dict = PageRoute.ParseStringToDictionary();
+            SearchTerms = dict.ToSearchTerms();
+            var response = await SearchClient.SearchValueAsync(new GetSearchValuesRequest(SearchTerms, []));
+            if (response != null)
+            {
+                SearchTerms = response.Terms;
             }
-            };
+
+            if (NavigationManager.Uri.EndsWith("/books/top-rated"))
+            {
+                SearchTerms = new List<SearchTerm>{
+new RatingSearchTerm{
+Key = "rating",
+Value = (9 / 2.0m).ToString(System.Globalization.CultureInfo.InvariantCulture),
+NumericSearchOperator = NumericOperator.GreaterThan
+}
+};
+            }
+        }
+        else
+        {
+            // after prerender
+            SearchTerms = restoredSearchTerms!;
         }
 
 
-        var orders = Orders.Where(o => o.Position > 0).OrderBy(o => o.Position)
-        .Select(o => o as SearchOrder).ToList();
-        BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms, orders));
-        Console.WriteLine($"{BookList.Count()} books found");
+
+
+        if (!ApplicationState.TryTakeFromJson<IEnumerable<BookDto>>(
+        nameof(BookList), out var restoredBookList))
+        {
+            // first access (prerender)
+            var orders = Orders.Where(o => o.Position > 0).OrderBy(o => o.Position)
+            .Select(o => o as SearchOrder).ToList();
+            BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms, orders));
+            Console.WriteLine($"{BookList.Count()} books found");
+        }
+        else
+        {
+            // after prerender
+            BookList = restoredBookList!;
+            Console.WriteLine($"{BookList.Count()} books restored!");
+        }
+
+
+
 
         StateHasChanged();
 
