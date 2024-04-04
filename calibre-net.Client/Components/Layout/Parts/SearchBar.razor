@@ -133,7 +133,6 @@ AdvForm.Format,
 
     protected void LocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        Console.WriteLine("Location Changed");
         if (NavigationManager.Uri.Contains("/books/"))
         {
             AdvForm = new();
