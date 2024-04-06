@@ -11,7 +11,7 @@ public class Category : Group
     }
 }
 
-public sealed class GetTagsEndpoint(BookService bookService): EndpointWithoutRequest<GetTagsResponse>
+public sealed class GetTagsEndpoint(BookService bookService) : EndpointWithoutRequest<GetTagsResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -20,6 +20,7 @@ public sealed class GetTagsEndpoint(BookService bookService): EndpointWithoutReq
         Get("tags");
         Version(1);
         Group<Category>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -29,7 +30,7 @@ public sealed class GetTagsEndpoint(BookService bookService): EndpointWithoutReq
     }
 }
 
-public sealed class GetSeriesEndpoint(BookService bookService): EndpointWithoutRequest<GetSeriesResponse>
+public sealed class GetSeriesEndpoint(BookService bookService) : EndpointWithoutRequest<GetSeriesResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -38,6 +39,7 @@ public sealed class GetSeriesEndpoint(BookService bookService): EndpointWithoutR
         Get("series");
         Version(1);
         Group<Category>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -48,7 +50,7 @@ public sealed class GetSeriesEndpoint(BookService bookService): EndpointWithoutR
 }
 
 
-public sealed class GetAuthorsEndpoint(BookService bookService): EndpointWithoutRequest<GetAuthorsResponse>
+public sealed class GetAuthorsEndpoint(BookService bookService) : EndpointWithoutRequest<GetAuthorsResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -57,6 +59,7 @@ public sealed class GetAuthorsEndpoint(BookService bookService): EndpointWithout
         Get("authors");
         Version(1);
         Group<Category>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -66,7 +69,7 @@ public sealed class GetAuthorsEndpoint(BookService bookService): EndpointWithout
     }
 }
 
-public sealed class GetPublishersEndpoint(BookService bookService): EndpointWithoutRequest<GetPublishersResponse>
+public sealed class GetPublishersEndpoint(BookService bookService) : EndpointWithoutRequest<GetPublishersResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -75,6 +78,7 @@ public sealed class GetPublishersEndpoint(BookService bookService): EndpointWith
         Get("publishers");
         Version(1);
         Group<Category>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -85,7 +89,7 @@ public sealed class GetPublishersEndpoint(BookService bookService): EndpointWith
 }
 
 
-public sealed class GetLanguagesEndpoint(BookService bookService): EndpointWithoutRequest<GetLanguagesResponse>
+public sealed class GetLanguagesEndpoint(BookService bookService) : EndpointWithoutRequest<GetLanguagesResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -94,6 +98,7 @@ public sealed class GetLanguagesEndpoint(BookService bookService): EndpointWitho
         Get("languages");
         Version(1);
         Group<Category>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -104,7 +109,7 @@ public sealed class GetLanguagesEndpoint(BookService bookService): EndpointWitho
 }
 
 
-public sealed class GetCustomColumnEndpoint(BookService bookService): Endpoint<GetCustomColumnsRequest,GetCustomColumnsResponse>
+public sealed class GetCustomColumnEndpoint(BookService bookService) : Endpoint<GetCustomColumnsRequest, GetCustomColumnsResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -113,6 +118,10 @@ public sealed class GetCustomColumnEndpoint(BookService bookService): Endpoint<G
         Get("custom_column");
         Version(1);
         Group<Category>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds, varyByQueryKeys: ["columnId"]);
+        // Options(x => x.CacheOutput(p => p.AddPolicy(typeof(MyCustomPolicy))
+        // .SetVaryByHeader("x-request-hash")
+        // .Expire(TimeSpan.FromDays(1))));
     }
 
     public override async Task HandleAsync(GetCustomColumnsRequest req, CancellationToken ct)
@@ -123,7 +132,7 @@ public sealed class GetCustomColumnEndpoint(BookService bookService): Endpoint<G
 }
 
 
-public sealed class GetRatingsEndpoint(BookService bookService): EndpointWithoutRequest<GetRatingsResponse>
+public sealed class GetRatingsEndpoint(BookService bookService) : EndpointWithoutRequest<GetRatingsResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -142,7 +151,7 @@ public sealed class GetRatingsEndpoint(BookService bookService): EndpointWithout
 }
 
 
-public sealed class GetFormatsEndpoint(BookService bookService): EndpointWithoutRequest<GetFormatsResponse>
+public sealed class GetFormatsEndpoint(BookService bookService) : EndpointWithoutRequest<GetFormatsResponse>
 {
     private readonly BookService _bookService = bookService;
 
@@ -151,6 +160,7 @@ public sealed class GetFormatsEndpoint(BookService bookService): EndpointWithout
         Get("formats");
         Version(1);
         Group<Category>();
+        ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

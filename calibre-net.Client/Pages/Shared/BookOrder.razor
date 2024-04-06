@@ -1,0 +1,59 @@
+@inject BookClient BookClient
+
+<div>
+
+    @foreach (var o in Orders)
+    {
+        <MudBadge Visible="@(o.Position > 0 || NoPosition)"
+            Icon="@(o.Ascending ? Icons.Material.Filled.ArrowDownward : Icons.Material.Filled.ArrowUpward)" Overlap="true"
+            Origin="Origin.BottomRight" Class="my-4 sort-badge" Bordered="true" Color="Color.Secondary">
+            <MudBadge Content="@o.Position" Overlap="true" Visible="@(o.Position > 0)" Bordered="true" Color="Color.Primary">
+                <MudIconButton Icon="@o.Icon" 
+                Title="@o.PropertyName"
+                OnClick="() => ButtonClicked(o)">@o.Key @o.PropertyName</MudIconButton>
+            </MudBadge>
+        </MudBadge>
+    }
+
+</div>
+
+
+@code {
+    [Parameter] public List<SearchOrderModel> Orders { get; set; } = [];
+
+    [Parameter] public Action<List<SearchOrder>>? OrderChanged { get; set; }
+    [Parameter] public bool NoPosition  { get; set; } = false;
+
+   
+
+    private async void ButtonClicked(SearchOrderModel model)
+    {
+        Console.WriteLine($"{model.Key} clicked");
+
+        var maxPosition = Orders.Max(o => o.Position);
+        if (model.Position == 0 && !NoPosition)
+            model.Position = maxPosition + 1;
+        else if (model.Ascending)
+            model.Ascending = false;
+        else
+        {
+            if (model.Position < maxPosition && !NoPosition)
+            {
+                var pos = model.Position;
+                // recalculate others
+                var orders = Orders.Where(o => o.Position > model.Position).OrderBy(o => o.Position);
+                foreach (var o in orders)
+                {
+                    o.Position = pos;
+                    pos++;
+                }
+            }
+            model.Position = 0;
+            model.Ascending = true;
+
+        }
+        OrderChanged?.Invoke(Orders.Where(o => o.Position > 0 || NoPosition).OrderBy(o => o.Position)
+        .Select(o => o as SearchOrder).ToList());
+    }
+
+}

@@ -5,11 +5,18 @@
 @inject SearchService SearchService
 
 @page "/books/{categoryType}"
-@attribute [StreamRendering]
+@* @attribute [StreamRendering] *@
+@attribute [Authorize]
+@rendermode InteractiveAuto
 
 
-CAT @CategoryType
+<PageTitle>@CategoryType</PageTitle>
+        <MudText Typo="Typo.h3" GutterBottom="true">@CategoryType</MudText>
 
+        <div class="d-flex flex-row gap-2 align-items-center">
+            <BookOrder OrderChanged="OrderChanged" Orders="@Orders" NoPosition="true"/>
+            <CategoryFilter AvailableLetters="CategoryLetters" SelectionChanged="SelectionChanged"/>
+        </div>
 <div class="category-results">
     <MudList Clickable="true" class="category-list">
         @foreach (var category in Categories)
@@ -36,10 +43,35 @@ CAT @CategoryType
 
 @code
 {
-    [Parameter]
-    public string CategoryType { get; set; } = string.Empty;
+    [Parameter] public string CategoryType { get; set; } = string.Empty;
 
-    public List<GenericCategoryCount> Categories { get; set; } = [];
+    private List<GenericCategoryCount> AllCategories { get; set; } = [];
+    private List<GenericCategoryCount> Categories { get; set; } = [];
+    private List<SearchOrderModel> Orders { get; set; } = [];
+
+    private IEnumerable<char> CategoryLetters => AllCategories.Select(c => (string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).FirstOrDefault()).Distinct().OrderBy(x => x);
+        private char? SelectedLetter {get;set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+            Orders = new() {
+                new() {
+                Key = "Category",
+                PropertyName = "Name",
+                Icon = Icons.Material.Outlined.Reorder,
+                Ascending = true
+                
+                },
+            };
+
+
+
+          
+          
+      
+
+
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -55,6 +87,7 @@ CAT @CategoryType
             _ => CategoryType.StartsWith("cc_") ? await HandleCustomColumns() : [],
         };
 
+        AllCategories = Categories;
         Categories = Categories.OrderBy(c => string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).ToList();
     }
     
@@ -73,6 +106,30 @@ CAT @CategoryType
            return [];
            
         }
+
+    private void OrderChanged(List<SearchOrder> orders)
+    {
+        Console.WriteLine("Order Changed");
+  
+        var order = orders.Single(o => o.Key ==  "Category");
+        Orders.Single(o => o.Key ==  "Category").Ascending = order.Ascending;
+        if (order.Ascending)
+            Categories = Categories.OrderBy(c => string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).ToList();
+        else
+            Categories = Categories.OrderByDescending(c => string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).ToList();
+       StateHasChanged();
+    }
+
+    private void SelectionChanged(char? letter)
+    {
+SelectedLetter = letter;
+if (letter == null)
+    Categories = AllCategories;
+    else
+        Categories = AllCategories.Where(c => c.Sort?.StartsWith(letter.Value) ?? false).ToList();
+
+    OrderChanged(Orders.Select(o => o as SearchOrder).ToList());
+    }
 
 
 

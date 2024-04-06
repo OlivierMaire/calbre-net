@@ -14,6 +14,18 @@ public class BookService(CalibreDbDapperContext dbContext)
 {
     private readonly CalibreDbDapperContext dbContext = dbContext;
 
+    private static readonly Dictionary<string, string> OrderTables = new(){
+        {$"{SearchTermsConstants.BOOK_TAG}_LastModified", "b.timestamp"},
+        {$"{SearchTermsConstants.BOOK_TAG}_Title", "b.title"},
+        {$"{SearchTermsConstants.BOOK_TAG}_Pubdate", "b.pubdate"},
+        {$"{SearchTermsConstants.AUTHOR_TAG}_AuthorSort", "a.sort"},
+        {$"{SearchTermsConstants.SERIES_TAG}_Series", "s.sort"},
+        {$"{SearchTermsConstants.RATING_TAG}_Rating", "r.rating"},
+        {$"{SearchTermsConstants.PUBLISHER_TAG}_Publisher", "p.name"},
+        {$"{SearchTermsConstants.LANGUAGE_TAG}_Languages", "l.lang_code"},
+        {$"{SearchTermsConstants.FORMAT_TAG}_Data", "d.format"},
+    };
+
     public List<BookDto> GetBooks(GetSearchValuesRequest req)
     {
         // var books = calibreDb.Books
@@ -116,59 +128,72 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("tagId", term?.Value);
             }
         }
-        if (req.Terms.HasKey(SearchTermsConstants.PUBLISHER_TAG))
+        if (req.Terms.HasKey(SearchTermsConstants.PUBLISHER_TAG)
+        || req.Orders.HasKey(SearchTermsConstants.PUBLISHER_TAG))
         {
-            var term = req.Terms.Get(SearchTermsConstants.PUBLISHER_TAG);
 
             sqlJoin += """ 
              JOIN books_publishers_link bpl on bpl.book = b.id
              JOIN publishers p on p.Id = bpl.publisher
             """;
+            if (req.Terms.HasKey(SearchTermsConstants.PUBLISHER_TAG))
+            {
+                var term = req.Terms.Get(SearchTermsConstants.PUBLISHER_TAG);
 
-            if (term is StringSearchTerm stringTerm)
-            {
-                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
-                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
-                sqlWhere += $" AND (p.name {operators[0]} @publisherName) ";
-                dynamicParams.Add("publisherName", operators[1].Replace("VALUE", termValue));
-            }
-            if (term is IdSearchTerm)
-            {
-                sqlWhere += " AND (p.Id = @publisherId) ";
-                dynamicParams.Add("publisherId", term?.Value);
+                if (term is StringSearchTerm stringTerm)
+                {
+                    var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                    var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                    sqlWhere += $" AND (p.name {operators[0]} @publisherName) ";
+                    dynamicParams.Add("publisherName", operators[1].Replace("VALUE", termValue));
+                }
+                else if (term is IdSearchTerm)
+                {
+                    sqlWhere += " AND (p.Id = @publisherId) ";
+                    dynamicParams.Add("publisherId", term?.Value);
+                }
             }
         }
-        if (req.Terms.HasKey(SearchTermsConstants.LANGUAGE_TAG))
+        if (req.Terms.HasKey(SearchTermsConstants.LANGUAGE_TAG)
+        || req.Orders.HasKey(SearchTermsConstants.LANGUAGE_TAG))
         {
-            var term = req.Terms.Get(SearchTermsConstants.LANGUAGE_TAG);
 
             sqlJoin += """ 
              JOIN books_languages_link bll on bll.book = b.id
              JOIN languages l on l.Id = bll.lang_code
             """;
 
-            if (term is StringSearchTerm stringTerm)
+            if (req.Terms.HasKey(SearchTermsConstants.PUBLISHER_TAG))
             {
-                var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
-                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
-                sqlWhere += $" AND (l.lang_code {operators[0]} @languageName) ";
-                dynamicParams.Add("languageName", operators[1].Replace("VALUE", termValue));
-            }
-            if (term is ListSearchTerm || term is IdSearchTerm)
-            {
-                sqlWhere += " AND (l.Id = @languageId) ";
-                dynamicParams.Add("languageId", term?.Value);
+                var term = req.Terms.Get(SearchTermsConstants.LANGUAGE_TAG);
+
+                if (term is StringSearchTerm stringTerm)
+                {
+                    var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                    var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                    sqlWhere += $" AND (l.lang_code {operators[0]} @languageName) ";
+                    dynamicParams.Add("languageName", operators[1].Replace("VALUE", termValue));
+                }
+                if (term is ListSearchTerm || term is IdSearchTerm)
+                {
+                    sqlWhere += " AND (l.Id = @languageId) ";
+                    dynamicParams.Add("languageId", term?.Value);
+                }
             }
         }
-        if (req.Terms.HasKey(SearchTermsConstants.FORMAT_TAG))
+        if (req.Terms.HasKey(SearchTermsConstants.FORMAT_TAG)
+        || req.Orders.HasKey(SearchTermsConstants.FORMAT_TAG))
         {
-            var term = req.Terms.Get(SearchTermsConstants.FORMAT_TAG);
             sqlJoin += " JOIN data d on d.book = b.id ";
-            if (term is ListSearchTerm || term is IdSearchTerm)
+            if (req.Terms.HasKey(SearchTermsConstants.FORMAT_TAG))
             {
-                var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
-                sqlWhere += " AND (d.Format = @formatValue) ";
-                dynamicParams.Add("formatValue", termValue);
+                var term = req.Terms.Get(SearchTermsConstants.FORMAT_TAG);
+                if (term is ListSearchTerm || term is IdSearchTerm)
+                {
+                    var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                    sqlWhere += " AND (d.Format = @formatValue) ";
+                    dynamicParams.Add("formatValue", termValue);
+                }
             }
         }
         if (req.Terms.HasKey(SearchTermsConstants.KEYWORD_TAG))
@@ -189,30 +214,38 @@ public class BookService(CalibreDbDapperContext dbContext)
                 dynamicParams.Add("keyword", operators[1].Replace("VALUE", termValue));
             }
         }
-        if (req.Terms.Any(t => t.Key.StartsWith("cc_")))
+        if (req.Terms.Any(t => t.Key.StartsWith("cc_")) ||
+            req.Orders.Any(t => t.Key.StartsWith("cc_")))
         {
-            var terms = req.Terms.Where(t => t.Key.StartsWith("cc_"));
-            foreach (var term in terms)
+            var terms = req.Terms.Where(t => t.Key.StartsWith("cc_")).Select(t => t.Key);
+            var orders = req.Orders.Where(t => t.Key.StartsWith("cc_")).Select(t => t.Key);
+            IEnumerable<string> list = [.. terms, .. orders];
+            foreach (var termKey in list)
             {
-                var ccKey = term.Key[3..];
+                var ccKey = termKey[3..];
 
                 sqlJoin += $""" 
-                JOIN books_custom_column_{ccKey}_link bll on bll.book = b.id
-                JOIN custom_column_{ccKey} cc_{ccKey} on cc_{ccKey}.Id = bll.value
+                JOIN books_custom_column_{ccKey}_link bccl_{ccKey} on bccl_{ccKey}.book = b.id
+                JOIN custom_column_{ccKey} cc_{ccKey} on cc_{ccKey}.Id = bccl_{ccKey}.value
                 """;
 
-                if (term is StringSearchTerm stringTerm)
+                if (req.Terms.HasKey(termKey))
                 {
-                    var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
-                    var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+                    var term = req.Terms.Single(t => t.Key == termKey);
 
-                    sqlWhere += $" AND (cc_{ccKey}.value {operators[0]} @cc_{ccKey}Name) ";
-                    dynamicParams.Add($"cc_{ccKey}Name", operators[1].Replace("VALUE", termValue));
-                }
-                if (term is IdSearchTerm)
-                {
-                    sqlWhere += $" AND (cc_{ccKey}.Id = @cc_{ccKey}Id) ";
-                    dynamicParams.Add($"cc_{ccKey}Id", term?.Value);
+                    if (term is StringSearchTerm stringTerm)
+                    {
+                        var operators = stringTerm.StringSearchOperator.ToEnumOperatorString().Split(",");
+                        var termValue = System.Net.WebUtility.UrlDecode(term?.Value);
+
+                        sqlWhere += $" AND (cc_{ccKey}.value {operators[0]} @cc_{ccKey}Name) ";
+                        dynamicParams.Add($"cc_{ccKey}Name", operators[1].Replace("VALUE", termValue));
+                    }
+                    if (term is IdSearchTerm)
+                    {
+                        sqlWhere += $" AND (cc_{ccKey}.Id = @cc_{ccKey}Id) ";
+                        dynamicParams.Add($"cc_{ccKey}Id", term?.Value);
+                    }
                 }
             }
 
@@ -225,7 +258,32 @@ public class BookService(CalibreDbDapperContext dbContext)
             sql += sqlWhere;
         }
 
-        // Console.WriteLine(sql);
+        if (req.Orders.Count > 0)
+        {
+            string sqlOrder = " ORDER BY ";
+            bool first = true;
+            foreach (var o in req.Orders)
+            {
+                if (!first)
+                    sqlOrder += ", ";
+                if (o.Key.StartsWith("cc_"))
+                {
+                    var ccKey = o.Key[3..];
+                    sqlOrder += $" cc_{ccKey}.value {(o.Ascending ? "asc" : "desc")} ";
+
+                }
+                else
+                {
+
+                    var key = $"{o.Key}_{o.PropertyName}";
+                    sqlOrder += $" {OrderTables[key]} {(o.Ascending ? "asc" : "desc")} ";
+                }
+                first = false;
+            }
+            sql += sqlOrder;
+        }
+
+        Console.WriteLine(sql);
         // foreach (var p in dynamicParams.ParameterNames)
         //     Console.WriteLine($"{p}: {dynamicParams.Get<string>(p)}");
 

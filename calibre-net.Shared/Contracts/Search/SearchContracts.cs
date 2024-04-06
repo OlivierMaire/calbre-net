@@ -46,7 +46,7 @@ public class AdvancedSearchForm
 
 
 
-public record GetSearchValuesRequest(List<SearchTerm> Terms);
+public record GetSearchValuesRequest(List<SearchTerm> Terms, List<SearchOrder> Orders);
 public record GetSearchValuesResponse(List<SearchTerm> Terms);
 
 
@@ -55,6 +55,11 @@ public static class TermsExt
     public static bool HasKey(this List<SearchTerm> terms, string key)
     {
         return terms.Any(t => t.Key == key);
+    }
+
+    public static bool HasKey(this List<SearchOrder> orders, string key)
+    {
+        return orders.Any(t => t.Key == key);
     }
 
     public static ISearchTerm? Get(this List<SearchTerm> terms, string key)

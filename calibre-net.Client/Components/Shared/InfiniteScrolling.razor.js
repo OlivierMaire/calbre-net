@@ -24,6 +24,7 @@ export function initialize(lastIndicator, instance) {
             observer.unobserve(lastIndicator);
             observer.observe(lastIndicator);
         },
+        scrollTop: () => scrollTop(options.root)
     };
 }
 function findClosestScrollContainer(element) {
@@ -49,4 +50,7 @@ function isValidTableElement(element) {
 function setMaxHeight(element) {
     let height = element.offsetTop;
     element.style.maxHeight = `calc(100svh - ${height}px - 48px)`;
+}
+function scrollTop(element) {
+    element.scrollTop = 0;
 }

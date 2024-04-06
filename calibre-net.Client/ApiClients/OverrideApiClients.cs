@@ -40,12 +40,12 @@ public partial class BookClient : BaseApiClient
                 urlBuilder_.Append("/page/");
                 urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(pageId, System.Globalization.CultureInfo.InvariantCulture)));
 
-                PrepareRequest(client_, request_, urlBuilder_);
+                // PrepareRequest(client_, request_, urlBuilder_);
 
                 var url_ = urlBuilder_.ToString();
                 request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                PrepareRequest(client_, request_, url_);
+                // PrepareRequest(client_, request_, url_);
 
                 var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                 var disposeResponse_ = true;
@@ -60,7 +60,7 @@ public partial class BookClient : BaseApiClient
                             headers_[item_.Key.ToLowerInvariant()] = item_.Value;
                     }
 
-                    ProcessResponse(client_, response_);
+                    // ProcessResponse(client_, response_);
 
                     var status_ = (int)response_.StatusCode;
                     if (status_ == 200)
@@ -158,12 +158,12 @@ public partial class BookClient : BaseApiClient
                 urlBuilder_.Append('/');
                 urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(format, System.Globalization.CultureInfo.InvariantCulture)));
 
-                PrepareRequest(client_, request_, urlBuilder_);
+                // PrepareRequest(client_, request_, urlBuilder_);
 
                 var url_ = urlBuilder_.ToString();
                 request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                PrepareRequest(client_, request_, url_);
+                // PrepareRequest(client_, request_, url_);
 
                 var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                 var disposeResponse_ = true;
@@ -178,7 +178,7 @@ public partial class BookClient : BaseApiClient
                             headers_[item_.Key.ToLowerInvariant()] = item_.Value;
                     }
 
-                    ProcessResponse(client_, response_);
+                    // ProcessResponse(client_, response_);
 
                     var status_ = (int)response_.StatusCode;
                     if (status_ == 200)

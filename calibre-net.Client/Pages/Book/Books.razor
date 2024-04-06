@@ -5,6 +5,7 @@
 @inject ApiClients.BookClient BookClient
 @inject ApiClients.SearchClient SearchClient
 @inject NavigationManager NavigationManager
+@inject PersistentComponentState ApplicationState
 
 @page "/books"
 @page "/books/top-rated"
@@ -22,13 +23,11 @@
 
         <div class="search-tags">
             @foreach (var term in SearchTerms)
-            { 
+            {
                 var icon = term.GetIcon();
-                <MudChip Color="Color.Primary"
-                    Icon="@icon"
-                 Variant="Variant.Outlined" OnClose="() => RemoveSearchTerm(term)">
-                  
-                  
+                <MudChip Color="Color.Primary" Icon="@icon" Variant="Variant.Outlined"
+                    OnClose="() => RemoveSearchTerm(term)">
+
                     @if (term is NumericSearchTerm numTerm)
                     {
                         @(numTerm.NumericSearchOperator.ToEnumString())
@@ -36,24 +35,22 @@
 
                     @if (term is RatingSearchTerm ratingTerm)
                     {
-                        <calibre_net.Client.Components.Shared.StarRatingDisplay 
-                        Value="@(ratingTerm.IntValue)" />
-
-                        @term.Value
+                        <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(ratingTerm.IntValue)" />
                     }
-                    else{
-                        @(string.IsNullOrEmpty(term.Value) ? term.Value : term.Value)
+                    else if (term is IdSearchTerm idTerm)
+                    {
+                        @(string.IsNullOrEmpty(idTerm.ValueDisplayName) ? idTerm.Value : idTerm.ValueDisplayName)
+                    }
+                    else
+                    {
+                        @(term.Value)
                     }
                 </MudChip>
                 @* </div> *@
             }
         </div>
-
         <div>
-            @foreach (var term in SearchTerms)
-            {
-                <p>@term.Key : @term.Value (@term.Value)</p>
-            }
+            <BookOrder OrderChanged="OrderChanged" Orders="@Orders" />
         </div>
     </div>
     <div class="search-results">
@@ -65,7 +62,7 @@
         else
         {
             <div class="infinite-wrap infinite-scroll-hide">
-                <InfiniteScrolling ItemsProvider="GetBooks">
+                <InfiniteScrolling @ref="Infinite" ItemsProvider="GetBooks">
                     <ItemTemplate Context="book">
                         <BookThumb @key="book.Id" CalibreBook="@book" />
                     </ItemTemplate>
@@ -88,44 +85,222 @@
 
     IEnumerable<BookDto> BookList { get; set; } = null!;
 
+    InfiniteScrolling<BookDto> Infinite { get; set; } = null!;
+
+    private List<SearchOrderModel> Orders { get; set; } = [];
+
+
+    private PersistingComponentStateSubscription persistingSubscription;
+
+
     void RemoveSearchTerm(SearchTerm term)
     {
         SearchTerms.Remove(term);
-        var url = "/books/" + string.Join("/", SearchTerms.Select(d => $"{d.Key}/{d.Value}"));
+        var url = "/books/" + SearchTerms.ToUrl();
         NavigationManager.NavigateTo(url);
     }
 
     private async Task<IEnumerable<BookDto>> GetBooks(InfiniteScrollingItemsProviderRequest request)
     {
         @* await Task.Delay(1000); // Simulate async loading *@
-        return await Task.FromResult( BookList.Skip(request.StartIndex).Take(30) );
+        return await Task.FromResult(BookList.Skip(request.StartIndex).Take(30));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!ApplicationState.TryTakeFromJson<List<SearchOrderModel>>(
+        nameof(Orders), out var restoredOrders))
+        {
+            // first access (prerender)
+            Orders = new() {
+new() {
+Key = SearchTermsConstants.BOOK_TAG,
+PropertyName = nameof(BookDto.LastModified),
+Icon = Icons.Material.Outlined.DateRange
+},
+new() {
+Key = SearchTermsConstants.BOOK_TAG,
+PropertyName = nameof(BookDto.Title),
+Icon = Icons.Material.Outlined.ShortText
+},
+new() {
+Key = SearchTermsConstants.AUTHOR_TAG,
+PropertyName = nameof(BookDto.AuthorSort),
+Icon = SearchTermsConstants.AUTHOR_ICON
+},
+new() {
+Key = SearchTermsConstants.BOOK_TAG,
+PropertyName = nameof(BookDto.Pubdate),
+Icon = Icons.Material.Outlined.DateRange,
+Position = 2
+},
+new() {
+Key = SearchTermsConstants.SERIES_TAG,
+PropertyName = nameof(BookDto.Series),
+Icon = SearchTermsConstants.SERIES_ICON,
+Position = 1
+
+},
+new() {
+Key = SearchTermsConstants.RATING_TAG,
+PropertyName = nameof(BookDto.Rating),
+Icon = SearchTermsConstants.RATING_ICON,
+},
+
+new() {
+Key = SearchTermsConstants.PUBLISHER_TAG,
+PropertyName = nameof(BookDto.Publisher),
+Icon = SearchTermsConstants.PUBLISHER_ICON,
+ServerSide = true
+
+},
+new() {
+Key = SearchTermsConstants.LANGUAGE_TAG,
+PropertyName = nameof(BookDto.Languages),
+Icon = SearchTermsConstants.LANGUAGE_ICON,
+ServerSide = true
+},
+new() {
+Key = SearchTermsConstants.FORMAT_TAG,
+PropertyName = nameof(BookDto.Data),
+Icon = SearchTermsConstants.FORMAT_ICON,
+ServerSide = true
+},
+};
+
+            var ccResponse = await BookClient.Custom_columnsAsync();
+            if (ccResponse != null)
+            {
+                foreach (var cc in ccResponse.CustomColumns)
+                {
+                    Orders.Add(
+                    new()
+                        {
+                            Key = $"cc_{cc.Id}",
+                            PropertyName = cc.Name,
+                            Icon = Icons.Material.Outlined.FilterNone,
+                            ServerSide = true
+                        });
+
+
+                }
+            }
+        }
+        else
+        {
+            // after prerender
+            Orders = restoredOrders!;
+        }
+
+
+        persistingSubscription =
+        ApplicationState.RegisterOnPersisting(PersistData);
+
+
+
+    }
+
+    private Task PersistData()
+    {
+        ApplicationState.PersistAsJson(nameof(SearchTerms), SearchTerms);
+        ApplicationState.PersistAsJson(nameof(BookList), BookList);
+        ApplicationState.PersistAsJson(nameof(Orders), Orders);
+
+        return Task.CompletedTask;
     }
     protected override async Task OnParametersSetAsync()
     {
-        var dict = PageRoute.ParseStringToDictionary();
-        SearchTerms = dict.ToSearchTerms();
-        var response = await SearchClient.SearchValueAsync(new GetSearchValuesRequest(SearchTerms));
-        if (response != null)
+
+
+        if (!ApplicationState.TryTakeFromJson<List<SearchTerm>>(
+        nameof(SearchTerms), out var restoredSearchTerms))
         {
-            SearchTerms = response.Terms;
+            // first access (prerender)
+            var dict = PageRoute.ParseStringToDictionary();
+            SearchTerms = dict.ToSearchTerms();
+            var response = await SearchClient.SearchValueAsync(new GetSearchValuesRequest(SearchTerms, []));
+            if (response != null)
+            {
+                SearchTerms = response.Terms;
+            }
+
+            if (NavigationManager.Uri.EndsWith("/books/top-rated"))
+            {
+                SearchTerms = new List<SearchTerm>{
+new RatingSearchTerm{
+Key = "rating",
+Value = (9 / 2.0m).ToString(System.Globalization.CultureInfo.InvariantCulture),
+NumericSearchOperator = NumericOperator.GreaterThan
+}
+};
+            }
+        }
+        else
+        {
+            // after prerender
+            SearchTerms = restoredSearchTerms!;
         }
 
-        if (NavigationManager.Uri.EndsWith("/books/top-rated"))
+
+
+
+        if (!ApplicationState.TryTakeFromJson<IEnumerable<BookDto>>(
+        nameof(BookList), out var restoredBookList))
         {
-            SearchTerms = new List<SearchTerm>{
-                new RatingSearchTerm{
-                    Key = "rating",
-                    Value = (9 / 2.0m).ToString(System.Globalization.CultureInfo.InvariantCulture),
-                    NumericSearchOperator = NumericOperator.GreaterThan
-                }
-            };
+            // first access (prerender)
+            var orders = Orders.Where(o => o.Position > 0).OrderBy(o => o.Position)
+            .Select(o => o as SearchOrder).ToList();
+            BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms, orders));
+            Console.WriteLine($"{BookList.Count()} books found");
+        }
+        else
+        {
+            // after prerender
+            BookList = restoredBookList!;
+            Console.WriteLine($"{BookList.Count()} books restored!");
         }
 
-        BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms));
-        Console.WriteLine($"{BookList.Count()} books found");
+
+
 
         StateHasChanged();
 
+    }
+
+    private async void OrderChanged(List<SearchOrder> orders)
+    {
+        Console.WriteLine("Order Changed");
+
+        @* if (orders.Any(o => o.ServerSide)) *@
+        {
+            Console.WriteLine("Server Side Search");
+
+            BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(SearchTerms, orders));
+            await Infinite.RefreshDataAsync();
+
+        }
+        @* else
+{
+
+Type bookType = typeof(BookDto);
+
+IOrderedEnumerable<BookDto>? books = null;
+foreach (var o in orders)
+{
+books = books == null ?
+o.Ascending ? BookList.OrderBy(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null))
+: BookList.OrderByDescending(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null))
+:
+o.Ascending ? books.ThenBy(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null))
+: books.ThenByDescending(x => bookType.GetProperty(o.PropertyName)?.GetValue(x, null));
+}
+
+if (books != null)
+{
+BookList = books.AsEnumerable();
+await Infinite.RefreshDataAsync();
+}
+} *@
     }
 
 

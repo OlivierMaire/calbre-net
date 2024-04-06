@@ -127,18 +127,19 @@ public sealed class EnumOperatorAttribute : Attribute
 
 public static class SearchTermsConstants
 {
+    public const string BOOK_TAG = "book";
     public const string AUTHOR_TAG = "author";
     public const string AUTHOR_ICON = "icon-cn-feather_1";
     public const string SERIES_TAG = "series";
-    public const string SERIES_ICON = MudBlazor.Icons.Material.Filled.LibraryBooks;
+    public const string SERIES_ICON = MudBlazor.Icons.Material.Outlined.LibraryBooks;
     public const string TAG_TAG = "tag";
-    public const string TAG_ICON = MudBlazor.Icons.Material.Filled.Tag;
+    public const string TAG_ICON = MudBlazor.Icons.Material.Outlined.Tag;
     public const string PUBLISHER_TAG = "publisher";
     public const string PUBLISHER_ICON = "icon-cn-print-press";
     public const string LANGUAGE_TAG = "language";
-    public const string LANGUAGE_ICON = MudBlazor.Icons.Material.Filled.Flag;
+    public const string LANGUAGE_ICON = MudBlazor.Icons.Material.Outlined.Flag;
     public const string RATING_TAG = "rating";
-    public const string RATING_ICON = MudBlazor.Icons.Material.Filled.StarOutline;
+    public const string RATING_ICON = MudBlazor.Icons.Material.Outlined.StarOutline;
     public const string FORMAT_TAG = "format";
     public const string FORMAT_ICON = MudBlazor.Icons.Custom.FileFormats.FileDocument;
 
@@ -160,4 +161,18 @@ public static class SearchTermsConstants
         return icon;
     }
 
+}
+
+
+public class SearchOrder{
+    public string Key { get; set; } = string.Empty;
+    public string PropertyName { get; set; } = string.Empty;
+    public bool Ascending {get;set;} = true; 
+
+    public bool ServerSide {get;set;} = false;
+}
+
+public class SearchOrderModel : SearchOrder{
+    public string Icon { get; set; } = string.Empty;
+    public int Position {get;set;} = 0; 
 }

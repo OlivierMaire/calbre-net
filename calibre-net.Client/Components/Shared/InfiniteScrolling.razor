@@ -108,6 +108,8 @@
 
         _items = new List<T>();
         _enumerationCompleted = false;
+        if (_instance != null)
+            await _instance.InvokeVoidAsync("scrollTop");
         await LoadMoreItems();
     }
 

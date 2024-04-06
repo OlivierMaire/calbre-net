@@ -271,6 +271,11 @@ builder.Services.AddHttpClient("AuthenticationApi", client => client.BaseAddress
 builder.Services.AddScoped<ServerAuthenticationDelegatingHandler>();
 builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress))
     .AddHttpMessageHandler<ServerAuthenticationDelegatingHandler>();
+
+builder.Services.AddOutputCache(options => {
+    options.AddPolicy ("custompolicy", MyCustomPolicy.Instance);
+    // options.AddPolicy ("custompolicy", p => p.AddPolicy<MyCustomPolicy>().Exp);
+});
  
 builder.WebHost.ConfigureKestrel(o =>
 {
@@ -334,6 +339,7 @@ app.UseAuthentication() //add this
 
 app.UseAntiforgery(); // should be after UseAuthentication
 
+app.UseOutputCache();
 
 app.UseResponseCaching()
 // .UseAntiforgeryFE()
@@ -354,6 +360,8 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(calibre_net.Client.Pages.Book.Books).Assembly);
+
+
 
 
 
