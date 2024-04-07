@@ -251,6 +251,7 @@ public sealed class GetCustomColumns(BookService bookService) : EndpointWithoutR
         Version(1);
         Group<Book>();
         ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task HandleAsync(CancellationToken ct)

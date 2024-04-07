@@ -99,6 +99,8 @@ public sealed class GetLanguagesEndpoint(BookService bookService) : EndpointWith
         Version(1);
         Group<Category>();
         ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);
+        Policies(PermissionType.BOOK_VIEW);
+
     }
 
     public override async Task HandleAsync(CancellationToken ct)
@@ -122,6 +124,7 @@ public sealed class GetCustomColumnEndpoint(BookService bookService) : Endpoint<
         // Options(x => x.CacheOutput(p => p.AddPolicy(typeof(MyCustomPolicy))
         // .SetVaryByHeader("x-request-hash")
         // .Expire(TimeSpan.FromDays(1))));
+        Policies(PermissionType.BOOK_VIEW);
     }
 
     public override async Task HandleAsync(GetCustomColumnsRequest req, CancellationToken ct)

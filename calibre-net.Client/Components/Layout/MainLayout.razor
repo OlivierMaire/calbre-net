@@ -1,6 +1,9 @@
 ﻿@inherits LayoutComponentBase
 @layout MudMainLayout
+@using Microsoft.AspNetCore.Authorization
 
+@* // force authorization on all pages *@
+@attribute [Authorize]
 
 <div>
     <MudLayout>
