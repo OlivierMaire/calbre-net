@@ -72,7 +72,7 @@ public partial class BookDto
 
 
     [JsonPropertyName("comments")]
-    public CommentDto Comments {get;set;} = null!;
+    public CommentDto Comments {get;set;} = new();
 
     
     [JsonPropertyName("data")]
