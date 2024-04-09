@@ -82,7 +82,7 @@
 
     protected override void OnInitialized()
     {
-        Icon = Term.GetIcon();
+                Icon = Term.GetIcon();
         KeyName = Term.Key;
         if (Term is CustomColumnSearchTerm ccTerm)
             KeyName = ccTerm.KeyName;

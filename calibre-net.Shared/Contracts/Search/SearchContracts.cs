@@ -40,6 +40,23 @@ public class AdvancedSearchForm
     };
     public List<SearchTerm> CustomColumns { get; set; } = [];
 
+    public void Clear()
+    {
+        this.Author.Value = string.Empty;
+        this.Series.Value = string.Empty;
+        this.Rating.Value = string.Empty;
+        this.Rating.IntValue = 0;
+        this.Keyword.Value = string.Empty;
+        this.Tag.Value = string.Empty;
+        this.Publisher.Value = string.Empty;
+        this.Language.Value = string.Empty;
+        this.Format.Value = string.Empty;
+        foreach (var cc in this.CustomColumns)
+        {
+            cc.Value = string.Empty;
+        }
+    }
+
 }
 
 

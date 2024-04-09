@@ -135,7 +135,7 @@ AdvForm.Format,
     {
         if (NavigationManager.Uri.Contains("/books/"))
         {
-            AdvForm = new();
+            AdvForm.Clear();
             var pageRoute = NavigationManager.Uri.Substring(NavigationManager.Uri.IndexOf("/books/") + 7);
             var searchTerms = pageRoute.ParseStringToDictionary().ToSearchTerms();
             foreach (var st in searchTerms)

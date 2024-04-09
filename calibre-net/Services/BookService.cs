@@ -220,13 +220,13 @@ public class BookService(CalibreDbDapperContext dbContext)
             var terms = req.Terms.Where(t => t.Key.StartsWith("cc_")).Select(t => t.Key);
             var orders = req.Orders.Where(t => t.Key.StartsWith("cc_")).Select(t => t.Key);
             IEnumerable<string> list = [.. terms, .. orders];
-            foreach (var termKey in list)
+            foreach (var termKey in list.Distinct())
             {
                 var ccKey = termKey[3..];
 
                 sqlJoin += $""" 
-                JOIN books_custom_column_{ccKey}_link bccl_{ccKey} on bccl_{ccKey}.book = b.id
-                JOIN custom_column_{ccKey} cc_{ccKey} on cc_{ccKey}.Id = bccl_{ccKey}.value
+                 JOIN books_custom_column_{ccKey}_link bccl_{ccKey} on bccl_{ccKey}.book = b.id
+                 JOIN custom_column_{ccKey} cc_{ccKey} on cc_{ccKey}.Id = bccl_{ccKey}.value
                 """;
 
                 if (req.Terms.HasKey(termKey))
