@@ -7,14 +7,6 @@
 <MudIconButton Icon="@(IsDrawerOpen ? Icons.Material.Filled.MenuOpen : Icons.Material.Filled.Menu)"
     Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ToggleDrawer())" />
 
-
-@* <div class="container text-center my-3">
-    @foreach (var message in messages)
-    {
-        <div class="alert alert-sm alert-info">@message</div>
-    }
-</div> *@
-
 @code {
     private List<string> messages = new List<string>();
 
@@ -76,6 +68,7 @@ await this.InvokeAsync(() => this.StateHasChanged());
             _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import",
             "./Components/Layout/Parts/DrawerToggleButton.razor.js");
         }
+            await _jsModule!.InvokeVoidAsync("InitDrawer", [DrawerClassName]);
         if (_shouldHandleDrawerToggled && _jsModule != null)
         {
             await _jsModule!.InvokeVoidAsync("HandleDrawerToggled", [IsDrawerOpen, DrawerClassName]);

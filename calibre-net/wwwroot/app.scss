@@ -155,7 +155,7 @@ main {
 
 .mud-toolbar-appbar {
     .mud-navmenu.mud-navmenu-default .mud-nav-link.active:not(.mud-nav-link-disabled) {
-        background-color: var(--mud-palette-action-default);
+        background-color: #cdc9f5; // var(--mud-palette-action-default);
     }
 }
 
@@ -171,10 +171,10 @@ main {
     font-style: normal;
 }
 
-.mud-drawer-header.top-row {
-    overflow: hidden;
-    height: calc(var(--mud-appbar-height) - var(--mud-appbar-height)/4);
-}
+// .mud-drawer-header.top-row {
+//     overflow: hidden;
+//     height: calc(var(--mud-appbar-height) - var(--mud-appbar-height)/4);
+// }
 
 .mud-typography-h6.cookie-regular {
     font-size: 2rem;
@@ -217,5 +217,27 @@ a:hover {
         width: inherit;
         height: inherit;
         margin: 0;
+    }
+}
+
+.mud-drawer {
+    .top-right-menu {
+        flex-direction: column-reverse !important;
+    }
+}
+
+
+@media (max-width: 960px) {
+    .search-popover {
+
+        position: absolute !important;
+        // top: var(--mud-appbar-height) !important;
+        top: calc(var(--mud-appbar-height) - var(--mud-appbar-height)/4) !important;
+        left: 0 !important;
+        width: 100% !important;
+            .search-key{
+                display: none;
+            }
+
     }
 }

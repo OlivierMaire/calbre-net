@@ -6,7 +6,7 @@
     {
         <MudBadge Visible="@(o.Position > 0 || NoPosition)"
             Icon="@(o.Ascending ? Icons.Material.Filled.ArrowDownward : Icons.Material.Filled.ArrowUpward)" Overlap="true"
-            Origin="Origin.BottomRight" Class="my-4 sort-badge" Bordered="true" Color="Color.Secondary">
+            Origin="Origin.BottomRight" Class="sort-badge" Bordered="true" Color="Color.Secondary">
             <MudBadge Content="@o.Position" Overlap="true" Visible="@(o.Position > 0)" Bordered="true" Color="Color.Primary">
                 <MudIconButton Icon="@o.Icon" 
                 Title="@o.PropertyName"

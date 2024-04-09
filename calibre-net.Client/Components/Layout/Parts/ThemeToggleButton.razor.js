@@ -28,8 +28,11 @@ export const blazorDarkTheme = {
       // add also a cookie
       setCookie("calibre-net_darkmode", value, 30);
 
+      if (document.querySelector(".themeChangedEventHandler"))
+      {
       const event = new CustomEvent('themeChanged', { bubbles: true, detail: { isDarkMode : value } });
       document.querySelector(".themeChangedEventHandler").dispatchEvent(event);
+      }
     }
   }
     ;

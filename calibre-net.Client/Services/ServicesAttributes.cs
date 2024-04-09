@@ -36,7 +36,7 @@ public static class ServiceExtensions
 
         foreach (var type in types)
         {
-            Console.WriteLine($"Registering {type.Implementation.Name} ");
+            Console.WriteLine($"Registering {type.Implementation.Name} {type.Service?.Name}");
             if (type.Implementation.IsDefined(scopedRegistration, false))
                 _ = type.Service == null ? services.AddScoped(type.Implementation) : services.AddScoped(type.Service, type.Implementation);
 

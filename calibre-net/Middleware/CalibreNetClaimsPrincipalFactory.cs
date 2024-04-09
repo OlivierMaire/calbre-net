@@ -1,3 +1,4 @@
+using System.Security.Authentication;
 using System.Security.Claims;
 using calibre_net.Data;
 using Microsoft.AspNetCore.Identity;
@@ -35,12 +36,17 @@ public class CalibreNetClaimsPrincipalFactory :
                 .FromCacheAsync("permissions", user.Id))
                 .ToArray();
 
+
             foreach (var p in permissions)
             {
                 ((ClaimsIdentity)principal.Identity).AddClaims(
                     new[] { new Claim("Permissions", p) });
             }
 
+            var culture = user.PreferredLocale;
+
+            ((ClaimsIdentity)principal.Identity).AddClaims(
+                new[] { new Claim("preferedlocale", culture) });
         }
 
 

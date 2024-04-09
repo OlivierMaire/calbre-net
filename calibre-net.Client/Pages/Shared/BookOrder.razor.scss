@@ -11,3 +11,11 @@
         }
     }
 }
+
+@media (max-width: 960px) {
+    ::deep{
+        .mud-icon-button{
+            padding-left: 2px;
+        }
+    }
+}

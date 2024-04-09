@@ -7,8 +7,8 @@
 
 <div>
     <MudLayout>
-        <MainAppDrawerBar /> @* Here you can set what interactivity you want in the drawer without affecting the Body
-        interactivity. *@
+        <TopBar @rendermode="InteractiveAuto" />
+        @* <MainAppDrawerBar /> *@
         <MudMainContent>
             <MudContainer MaxWidth="MaxWidth.False" Class="pt-6">
                 @Body

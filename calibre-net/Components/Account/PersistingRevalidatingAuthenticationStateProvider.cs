@@ -88,7 +88,8 @@ internal sealed class PersistingRevalidatingAuthenticationStateProvider : Revali
         {
             var userId = principal.FindFirst(options.ClaimsIdentity.UserIdClaimType)?.Value;
             var email = principal.FindFirst(options.ClaimsIdentity.EmailClaimType)?.Value;
-            var permissions = principal.FindFirst("Permissions")?.Value ?? string.Empty;
+            var permissions = principal.FindAll("Permissions");
+            var preferedlocale = principal.FindFirst("preferedlocale")?.Value;
 
             if (userId != null && email != null)
             {
@@ -96,7 +97,9 @@ internal sealed class PersistingRevalidatingAuthenticationStateProvider : Revali
                 {
                     UserId = userId,
                     Email = email,
-                    Permissions = permissions.Split(","),
+                    Permissions = permissions.Select(c => c.Value).ToArray(),
+                    PreferredLocale = preferedlocale ?? string.Empty
+                    
                 });
             }
         }

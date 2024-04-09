@@ -7,4 +7,5 @@ public class UserInfo
     public required string UserId { get; set; }
     public required string Email { get; set; }
     public required string[] Permissions {get;set; } = [];
+    public string PreferredLocale { get; set; } = string.Empty;
 }

@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using Microsoft.AspNetCore.Localization
+@inject calibre_net.Client.Services.LayoutService LayoutService
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link href="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.css" rel="stylesheet" />
-    
+
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="calibre-net.styles.css" />
     <link rel="stylesheet" href="fontello/css/calibre-net.css" />
@@ -35,7 +36,6 @@
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
-    @* private PersistingComponentStateSubscription persistingSubscription; *@
     protected override void OnInitialized()
     {
         HttpContext?.Response.Cookies.Append(
@@ -44,9 +44,8 @@
         new RequestCulture(
         CultureInfo.CurrentCulture,
         CultureInfo.CurrentUICulture)));
+
+        LayoutService.SetDarkMode(HttpContext?.Request.Cookies["calibre-net_darkmode"] == "true");
     }
 
-    @* private IComponentRenderMode? RenderModeForPage => HttpContext.Request.Path.StartsWithSegments("/Account")
-? null
-: InteractiveAuto; *@
 }

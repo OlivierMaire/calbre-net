@@ -1,5 +1,5 @@
 .book-thumb {
-    width: 200px;
+    width: min(200px, calc(50% - 4px));
 
     &:hover {
         img {
@@ -9,6 +9,9 @@
 
     .book-cover {
         height: 300px;
+@media (max-width: 960px) {
+    height: 274px;
+}
         text-align: center;
 
         img {

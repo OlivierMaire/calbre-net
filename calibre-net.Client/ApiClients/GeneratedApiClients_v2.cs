@@ -44,6 +44,10 @@ namespace calibre_net.Client.ApiClients
 
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task PerformExternalLoginAsync(string provider, string returnUrl)
         {
@@ -78,12 +82,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("returnUrl")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(returnUrl, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -98,7 +102,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -155,12 +159,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("returnUrl")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(returnUrl, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -175,7 +179,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -232,12 +236,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("provider")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(provider, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -252,7 +256,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -303,12 +307,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "Account/Manage/DownloadPersonalData"
                     urlBuilder_.Append("Account/Manage/DownloadPersonalData");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -323,7 +327,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -479,6 +483,10 @@ namespace calibre_net.Client.ApiClients
 
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<object> SetAsync(string culture, string redirectUri)
@@ -515,12 +523,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("redirectUri")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(redirectUri, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -535,7 +543,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -546,6 +554,90 @@ namespace calibre_net.Client.ApiClients
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<GetCultureResponse> GetAsync()
+        {
+            return GetAsync(System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>Success</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<GetCultureResponse> GetAsync(System.Threading.CancellationToken cancellationToken)
+        {
+            var client_ = await CreateHttpClientAsync(cancellationToken).ConfigureAwait(false);
+            var disposeClient_ = true;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                
+                    // Operation Path: "culture/get"
+                    urlBuilder_.Append("culture/get");
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<GetCultureResponse>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -696,6 +788,10 @@ namespace calibre_net.Client.ApiClients
 
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<byte[]> PageAsync(int bookId, string bookFormat, int pageId)
@@ -736,12 +832,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append("/page/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(pageId, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -756,7 +852,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -830,12 +926,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append("api/v1/book/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -850,7 +946,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -924,12 +1020,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append("api/v1/book/cover/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -944,7 +1040,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1023,12 +1119,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append('/');
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(format, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1043,7 +1139,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1126,12 +1222,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("position")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(position, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1146,7 +1242,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1209,12 +1305,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("bookFormat")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(bookFormat, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1229,7 +1325,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1306,12 +1402,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/book/search"
                     urlBuilder_.Append("api/v1/book/search");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1326,7 +1422,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1396,12 +1492,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/book/custom_columns"
                     urlBuilder_.Append("api/v1/book/custom_columns");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1416,7 +1512,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1433,6 +1529,12 @@ namespace calibre_net.Client.ApiClients
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -1489,12 +1591,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append('/');
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(format, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1509,7 +1611,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1676,6 +1778,10 @@ namespace calibre_net.Client.ApiClients
 
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<CalibreConfiguration> ConfigurationGetAsync()
@@ -1702,12 +1808,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/configuration/"
                     urlBuilder_.Append("api/v1/configuration/");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1722,7 +1828,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1799,12 +1905,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/configuration/"
                     urlBuilder_.Append("api/v1/configuration/");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1819,7 +1925,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -1895,12 +2001,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("value")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(value, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -1915,7 +2021,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2086,6 +2192,10 @@ namespace calibre_net.Client.ApiClients
 
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<GetTagsResponse> TagsAsync()
@@ -2112,12 +2222,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/category/tags"
                     urlBuilder_.Append("api/v1/category/tags");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2132,7 +2242,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2196,12 +2306,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/category/series"
                     urlBuilder_.Append("api/v1/category/series");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2216,7 +2326,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2280,12 +2390,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/category/authors"
                     urlBuilder_.Append("api/v1/category/authors");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2300,7 +2410,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2364,12 +2474,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/category/publishers"
                     urlBuilder_.Append("api/v1/category/publishers");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2384,7 +2494,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2448,12 +2558,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/category/languages"
                     urlBuilder_.Append("api/v1/category/languages");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2468,7 +2578,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2485,6 +2595,12 @@ namespace calibre_net.Client.ApiClients
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -2538,12 +2654,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append(System.Uri.EscapeDataString("columnId")).Append('=').Append(System.Uri.EscapeDataString(ConvertToString(columnId, System.Globalization.CultureInfo.InvariantCulture))).Append('&');
                     urlBuilder_.Length--;
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2558,7 +2674,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2575,6 +2691,12 @@ namespace calibre_net.Client.ApiClients
                         {
                             string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
                             throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -2622,12 +2744,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/category/ratings"
                     urlBuilder_.Append("api/v1/category/ratings");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2642,7 +2764,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2706,12 +2828,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/category/formats"
                     urlBuilder_.Append("api/v1/category/formats");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2726,7 +2848,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2893,6 +3015,10 @@ namespace calibre_net.Client.ApiClients
 
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<GetSearchValuesResponse> SearchValueAsync(GetSearchValuesRequest getSearchValuesRequest)
@@ -2926,12 +3052,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/search/searchValue"
                     urlBuilder_.Append("api/v1/search/searchValue");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -2946,7 +3072,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -2957,6 +3083,18 @@ namespace calibre_net.Client.ApiClients
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 401)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Unauthorized", status_, responseText_, headers_, null);
+                        }
+                        else
+                        if (status_ == 403)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Forbidden", status_, responseText_, headers_, null);
                         }
                         else
                         {
@@ -3107,6 +3245,10 @@ namespace calibre_net.Client.ApiClients
 
         protected System.Text.Json.JsonSerializerOptions JsonSerializerSettings { get { return _settings.Value; } }
 
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
+        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
+        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
+
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<string> MeAsync()
@@ -3133,12 +3275,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/user/me"
                     urlBuilder_.Append("api/v1/user/me");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -3153,7 +3295,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -3211,12 +3353,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/user/all"
                     urlBuilder_.Append("api/v1/user/all");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -3231,7 +3373,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -3301,12 +3443,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/user/allPermissions"
                     urlBuilder_.Append("api/v1/user/allPermissions");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -3321,7 +3463,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -3383,12 +3525,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append("api/v1/user/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -3403,7 +3545,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -3477,12 +3619,12 @@ namespace calibre_net.Client.ApiClients
                     urlBuilder_.Append("api/v1/user/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -3497,7 +3639,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -3574,12 +3716,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/user/update"
                     urlBuilder_.Append("api/v1/user/update");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -3594,7 +3736,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -3671,12 +3813,12 @@ namespace calibre_net.Client.ApiClients
                     // Operation Path: "api/v1/user/add"
                     urlBuilder_.Append("api/v1/user/add");
 
-                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, urlBuilder_);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+                    PrepareRequest(client_, request_, url_);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -3691,7 +3833,7 @@ namespace calibre_net.Client.ApiClients
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+                        ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)

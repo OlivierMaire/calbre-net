@@ -106,8 +106,10 @@
         return await Task.FromResult(BookList.Skip(request.StartIndex).Take(30));
     }
 
+ 
     protected override async Task OnInitializedAsync()
     {
+
         if (!ApplicationState.TryTakeFromJson<List<SearchOrderModel>>(
         nameof(Orders), out var restoredOrders))
         {

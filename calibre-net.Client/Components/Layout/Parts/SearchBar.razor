@@ -7,7 +7,7 @@
 
 @rendermode InteractiveAuto
 
-<div class="search-form d-flex flex-row">
+<div class="search-form d-flex flex-row pl-2">
     @* <EditForm Model="Keyword" method="post" OnValidSubmit="SubmitForm" FormName="Keyword"> *@
     <MudTextField Label="Keyword" name="Keyword" @bind-Value="Keyword" Variant="Variant.Outlined"
         Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" Margin="Margin.Dense" Clearable="true"
@@ -18,7 +18,7 @@
         Icon="@Icons.Material.Filled.KeyboardArrowDown" Color="@Color.Default"
         ToggledIcon="@Icons.Material.Filled.KeyboardArrowUp">
     </MudToggleIconButton>
-    <MudPopover Open="@_isOpen" Class="pa-4" RelativeWidth="false" AnchorOrigin="Origin.BottomLeft"
+    <MudPopover Open="@_isOpen" Class="pa-4 search-popover" RelativeWidth="false" AnchorOrigin="Origin.BottomLeft"
         TransformOrigin="Origin.TopLeft">
         <div class="d-flex flex-column">
             <MudText>Advanced Search</MudText>

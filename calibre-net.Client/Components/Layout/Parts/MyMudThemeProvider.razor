@@ -3,18 +3,22 @@
 @* @inject IJSRuntime JS *@
 @implements IDisposable
 @inject PersistentComponentState ApplicationState
+@inject LayoutService LayoutService
 
-<div class="themeChangedEventHandler" @onthemechangedevent="HandleCustomEvent" style="display: none;"></div>
+
+@* <div class="themeChangedEventHandler" @onthemechangedevent="HandleCustomEvent" style="display: none;"></div> *@
 <CascadingValue Value=false Name="UsePopoverProvider">
-    <MudThemeProvider Theme="MyTheme" @bind-IsDarkMode="@_isDarkMode" />
+    @* <MudThemeProvider Theme="MyTheme" @bind-IsDarkMode="@_isDarkMode" /> *@
+    <MudThemeProvider @ref="@_mudThemeProvider" Theme="@LayoutService.CurrentTheme" IsDarkMode="@LayoutService.IsDarkMode"
+        IsDarkModeChanged="LayoutService.SetDarkMode" />
 </CascadingValue>
-
 
 @code {
 
-    [CascadingParameter(Name = "DarkModeCookie")]
-    private bool _isDarkMode { get; set; }
+    @* [CascadingParameter(Name = "DarkModeCookie")]
+    private bool _isDarkMode { get; set; } *@
 
+    private MudThemeProvider _mudThemeProvider = null!;
     public static MudTheme MyTheme => new()
         {
             Palette = new PaletteLight()
@@ -31,39 +35,73 @@
             }
         };
 
-    private void HandleCustomEvent(ThemeChangedEvent eventArgs)
+    @* private void HandleCustomEvent(ThemeChangedEvent eventArgs)
     {
-        @* Console.WriteLine("Event fired"); *@
         if (eventArgs != null)
         {
-            @* Console.WriteLine($"Is Dark ? {eventArgs.IsDarkMode} "); *@
             _isDarkMode = eventArgs.IsDarkMode;
         }
-    }
+    } *@
 
     private PersistingComponentStateSubscription persistingSubscription;
 
     protected override void OnInitialized()
     {
+        LayoutService.MajorUpdateOccured += LayoutServiceOnMajorUpdateOccured;
+        LayoutService.SetBaseTheme(MyTheme);
+@* 
         persistingSubscription =
         ApplicationState.RegisterOnPersisting(PersistData);
 
         if (ApplicationState.TryTakeFromJson<bool>(
         "DarkModeCookie", out var restored))
+        {
+            LayoutService.SetDarkMode(restored!);
             _isDarkMode = restored!;
+        } *@
 
     }
 
-    private Task PersistData()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await ApplyUserPreferences();
+            await _mudThemeProvider.WatchSystemPreference(OnSystemPreferenceChanged);
+            StateHasChanged();
+        }
+    }
+
+    private async Task ApplyUserPreferences()
+    {
+        var defaultDarkMode = await _mudThemeProvider.GetSystemPreference();
+        await LayoutService.ApplyUserPreferences(defaultDarkMode);
+    }
+
+    private async Task OnSystemPreferenceChanged(bool newValue)
+    {
+        await LayoutService.OnSystemPreferenceChanged(newValue);
+    }
+
+    private void LayoutServiceOnMajorUpdateOccured(object? sender, EventArgs e)
+    {
+        @* _isDarkMode = LayoutService.IsDarkMode; *@
+        StateHasChanged();
+    }
+
+    @* private Task PersistData()
     {
         ApplicationState.PersistAsJson("DarkModeCookie", _isDarkMode);
 
         return Task.CompletedTask;
-    }
+    } *@
 
     void IDisposable.Dispose()
     {
-        persistingSubscription.Dispose();
+        @* persistingSubscription.Dispose(); *@
+        LayoutService.MajorUpdateOccured -= LayoutServiceOnMajorUpdateOccured;
     }
 
 }

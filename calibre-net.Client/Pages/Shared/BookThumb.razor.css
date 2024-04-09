@@ -1,5 +1,5 @@
 .book-thumb {
-  width: 200px;
+  width: min(200px, 50% - 4px);
 }
 .book-thumb:hover img {
   opacity: 0.75;
@@ -7,6 +7,11 @@
 .book-thumb .book-cover {
   height: 300px;
   text-align: center;
+}
+@media (max-width: 960px) {
+  .book-thumb .book-cover {
+    height: 274px;
+  }
 }
 .book-thumb .book-cover img {
   transition: opacity linear 0.3s;

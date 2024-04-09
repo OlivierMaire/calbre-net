@@ -1,17 +1,26 @@
+@* @rendermode InteractiveAuto *@
+
 <MudAppBar Fixed="true" Elevation="0" Dense="true">
+        <SiteTitle/>
+
     <DrawerToggleButton DrawerClassName="my-layout-drawer" IsDrawerOpen="_initialDrawerState" />
+
     <SearchBar />
     <MudSpacer />
+ 
+
     <ThemeToggleButton />
     @* <CultureSelector /> *@
     <div> @System.Globalization.CultureInfo.CurrentCulture.Name</div>
 
     <TopMenu />
 </MudAppBar>
-<MudDrawer Class="mud-drawer-fixed my-layout-drawer" ClipMode="DrawerClipMode.Never" Open="_initialDrawerState">
-    <MudDrawerHeader Class="top-row" Dense="true">
-        <SiteTitle/>
-    </MudDrawerHeader>
+<MudDrawer Class="mud-drawer-fixed my-layout-drawer" 
+ClipMode="DrawerClipMode.Always" 
+Open="_initialDrawerState">
+    @* <MudDrawerHeader Class="top-row" Dense="true">
+
+    </MudDrawerHeader> *@
     <NavMenu />
 </MudDrawer>
 

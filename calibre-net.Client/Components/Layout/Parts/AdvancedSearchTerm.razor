@@ -4,12 +4,17 @@
 @using MudExtensions
 
 <div class="d-flex flex-row align-items-baseline gap-1 adv-form-term">
-    <MudText Class="flex-grow-1">
+    <MudText Class="flex-grow-1 text-nowrap">
         @if (!string.IsNullOrEmpty(Icon))
         {
-            <MudIcon Icon="@Icon" Class="mr-1" />
+            <MudIcon Icon="@Icon" Class="mr-1" Title="@KeyName" />
+            <span class="search-key">@KeyName</span>
         }
-        @KeyName
+        else
+        {
+            @KeyName
+        }
+
     </MudText>
 
     <div style="max-width: 100px;">

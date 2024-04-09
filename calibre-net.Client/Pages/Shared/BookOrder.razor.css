@@ -7,3 +7,9 @@
 ::deep .sort-badge .mud-badge-bottom {
   top: -10px;
 }
+
+@media (max-width: 960px) {
+  ::deep .mud-icon-button {
+    padding-left: 2px;
+  }
+}
