@@ -32,4 +32,5 @@ public partial class Book
     public bool? HasCover { get; set; }
 
     public DateTimeOffset LastModified { get; set; }
+    public bool MarkAsRead { get; set; }
 }

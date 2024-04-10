@@ -13,12 +13,19 @@
     height: 274px;
 }
         text-align: center;
+        position: relative;
 
         img {
             transition: opacity linear .3s;
 
             max-height: 100%;
             max-width: 100%;
+        }
+
+        .mark-read{
+            position: absolute;
+            bottom:-2px;
+            left: -2px;
         }
     }
 
@@ -98,3 +105,5 @@
         }
 
     }
+
+  

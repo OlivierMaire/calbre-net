@@ -7,6 +7,7 @@
 .book-thumb .book-cover {
   height: 300px;
   text-align: center;
+  position: relative;
 }
 @media (max-width: 960px) {
   .book-thumb .book-cover {
@@ -17,6 +18,11 @@
   transition: opacity linear 0.3s;
   max-height: 100%;
   max-width: 100%;
+}
+.book-thumb .book-cover .mark-read {
+  position: absolute;
+  bottom: -2px;
+  left: -2px;
 }
 .book-thumb .book-info {
   height: 100%;

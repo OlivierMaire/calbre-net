@@ -57,7 +57,7 @@
     <PackageReference Include="ComicMeta" Version="1.0.4" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
-    <ProjectReference Include="..\ComicMeta\ComicMeta.csproj" /> 
+    <ProjectReference Include="..\..\Components\ComicMeta\ComicMeta.csproj" /> 
   </ItemGroup>
   
   <ItemGroup>

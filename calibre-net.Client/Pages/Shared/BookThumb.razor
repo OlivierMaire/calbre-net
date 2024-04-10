@@ -1,13 +1,19 @@
 @inject SearchService SearchService
 <div class="book-thumb p-1 d-flex flex-column">
     @* <MudPaper Elevation="0"> *@
-        @CalibreBook.Publisher.Name
+    @CalibreBook.Publisher.Name
     <MudLink Href="@CalibreBook.BookLink">
         <div class=" book-cover">
 
             <img src="@CalibreBook.CoverUrl" Alt="@CalibreBook.Title"
                 class="mud-image object-contain object-center mud-elevation-5 rounded-lg" />
-       
+
+            @if (CalibreBook.MarkAsRead)
+            {
+                <div class="mark-read">
+                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="@Color.Tertiary" />
+                </div>
+            }
         </div>
     </MudLink>
     <div class="book-info p-1 d-flex flex-column flex-grow-1">
@@ -22,7 +28,8 @@
                 @foreach (var author in CalibreBook.Authors)
                 {
                     <li>
-                        <MudLink Typo="Typo.body2" Align="Align.Left" Href="@SearchService.GetSearchUrl(author)">@author.Name</MudLink>
+                        <MudLink Typo="Typo.body2" Align="Align.Left" Href="@SearchService.GetSearchUrl(author)">
+                            @author.Name</MudLink>
                     </li>
                 }
             </ul>

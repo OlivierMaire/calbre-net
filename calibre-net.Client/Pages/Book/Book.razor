@@ -82,7 +82,7 @@
                          @foreach (var ident in CalibreBook.Identifiers)
                         {
                             <a href="@ident.Link" target="_blank">
-                        <MudChip Color="Color.Success" Variant="Variant.Text" Size="Size.Small" 
+                        <MudChip Color="Color.Tertiary" Variant="Variant.Text" Size="Size.Small" 
                        Href="@ident.Link" Target="_blank">@ident.TypeName</MudChip>
                        </a>
  }
@@ -134,8 +134,8 @@
                 }
 
                 <!-- Auth Only -->
-<div>Mark as read</div>
-<div>Archived</div>
+                    <MarkAsRead Book="@CalibreBook" @rendermode="InteractiveAuto" />
+                    <div>Archived</div>
                 <!-- !Auth Only -->
         </div>
     </div>

@@ -4,7 +4,7 @@
 @* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
 <div>
 
-    @if (Book?.Data != null)
+    @if (Book?.Data != null && Book.Data.Count > 0)
     {
         <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
 

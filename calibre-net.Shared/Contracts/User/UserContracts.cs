@@ -1,5 +1,4 @@
 namespace calibre_net.Shared.Contracts;
 
-public record GetUserRequest (string Id);
+public record SetReadStatusRequest (int BookId, bool Status);
 
-public record DeleteUserRequest (string Id);

@@ -9,6 +9,7 @@ using static ATL.PictureInfo;
 using calibre_net.Data;
 using Microsoft.AspNetCore.Authorization;
 using FastEndpoints.Security;
+using System.Security.Claims;
 
 namespace calibre_net.Api.Endpoints;
 
@@ -19,25 +20,6 @@ public class Book : Group
         Configure("book", ep => ep.Description(x => x.WithGroupName("book")));
     }
 }
-
-// public sealed class GetBooksEndpoint(BookService service) : EndpointWithoutRequest<List<BookDto>>
-// {
-//     private readonly BookService service = service;
-
-//     public override void Configure()
-//     {
-//         Get("/all");
-//         Version(1);
-//         Group<Book>();
-//         ResponseCache(60); //cache for 60 seconds
-//         Policies(PermissionType.BOOK_VIEW);
-//     }
-
-//     public override async Task HandleAsync(CancellationToken ct)
-//     {
-//         await SendOkAsync(service.GetBooks(new GetSearchValuesRequest([], [])), ct);
-//     }
-// }
 
 public sealed class GetBookEndpoint(BookService service) : Endpoint<GetBookRequest, BookDto>
 {
@@ -56,7 +38,8 @@ public sealed class GetBookEndpoint(BookService service) : Endpoint<GetBookReque
 
     public override async Task HandleAsync(GetBookRequest req, CancellationToken ct)
     {
-        var book = service.GetBook(req.Id);
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        var book = service.GetBook(req.Id,userId);
         if (book == null)
             await SendNotFoundAsync(ct);
         else
@@ -170,11 +153,15 @@ public sealed class SetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
 
     public override async Task HandleAsync(SetBookmarkRequest req, CancellationToken ct)
     {
-        //   var userId = ((ClaimsIdentity)User.Identity).FindFirst("UserId");
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        if (string.IsNullOrEmpty(userId))
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
 
         // save bookmark
-        var bookmark = await dbContext.Bookmarks.FindAsync("720e80fb-6004-4ab8-bc5c-4675446323d9",
-        (uint)req.BookId, req.BookFormat, ct);
+        var bookmark = await dbContext.Bookmarks.FindAsync([userId, (uint)req.BookId, req.BookFormat], ct);
         if (bookmark != null)
             bookmark.Position = req.Position;
         else
@@ -184,11 +171,11 @@ public sealed class SetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
                 BookId = (uint)req.BookId,
                 Format = req.BookFormat,
                 Position = req.Position,
-                UserId = "720e80fb-6004-4ab8-bc5c-4675446323d9"
+                UserId = userId
             });
         }
-        await dbContext.SaveChangesAsync();
-        await SendOkAsync();
+        await dbContext.SaveChangesAsync(ct);
+        await SendOkAsync(ct);
     }
 }
 
@@ -206,13 +193,19 @@ public sealed class GetBookmarkEndpoint(ApplicationDbContext dbContext) : Endpoi
 
     public override async Task HandleAsync(GetBookmarkRequest req, CancellationToken ct)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        if (string.IsNullOrEmpty(userId))
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
         // get bookmark
-        var bookmark = await dbContext.Bookmarks.FindAsync("720e80fb-6004-4ab8-bc5c-4675446323d9", (uint)req.BookId, req.BookFormat, ct);
+        var bookmark = await dbContext.Bookmarks.FindAsync([userId, (uint)req.BookId, req.BookFormat], ct);
 
         if (bookmark != null)
-            await SendOkAsync(new GetBookmarkResponse((int)bookmark.BookId, bookmark.Format, bookmark.Position));
+            await SendOkAsync(new GetBookmarkResponse((int)bookmark.BookId, bookmark.Format, bookmark.Position), ct);
         else
-            await SendOkAsync(new GetBookmarkResponse((int)req.BookId, req.BookFormat, ""));
+            await SendOkAsync(new GetBookmarkResponse((int)req.BookId, req.BookFormat, string.Empty), ct);
     }
 }
 
@@ -230,13 +223,15 @@ public sealed class SearchBooksEndpoint(BookService service) : Endpoint<GetSearc
         // ResponseCache((int)TimeSpan.FromDays(1).TotalSeconds);//, varyByHeader: "x-request-hash");
         Options(x => x.CacheOutput(p => p.AddPolicy(typeof(MyCustomPolicy))
         .SetVaryByHeader("x-request-hash")
-        .Expire(TimeSpan.FromDays(1)) ));
+        .Expire(TimeSpan.FromDays(1))
+        .Tag("book_search")));
     }
 
     public override async Task HandleAsync(GetSearchValuesRequest req, CancellationToken ct)
     {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
         this.HttpContext.Response.Headers.Append("cache", "force-cache");
-        await SendOkAsync(service.GetBooks(req), ct);
+        await SendOkAsync(service.GetBooks(req, userId), ct);
     }
 }
 

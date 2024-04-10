@@ -12,6 +12,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public virtual DbSet<UserPermission> UserPermissions { get; set; }
 
     public virtual DbSet<Bookmark> Bookmarks {get;set;}
+    public virtual DbSet<Read> ReadStates {get;set;}
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +31,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         //     });
 
         modelBuilder.Entity<Bookmark>().HasKey(x => new {x.UserId, x.BookId, x.Format});
+        modelBuilder.Entity<Read>().HasKey(x => new {x.UserId, x.BookId});
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

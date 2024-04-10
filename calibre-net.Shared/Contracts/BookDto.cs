@@ -85,4 +85,7 @@ public partial class BookDto
     [JsonIgnore]
     public string CoverUrl => this.HasCover ?? false ? $"/api/v1/book/cover/{this.Id}" :
     "/image/no-cover.jpg";
+
+    [JsonPropertyName("mark_as_read")]
+    public bool MarkAsRead {get;set;} = false;
 }

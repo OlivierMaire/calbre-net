@@ -5,15 +5,17 @@ using calibre_net.Shared;
 using Calibre_net.Data.Calibre;
 using Dapper;
 using System.Globalization;
+using calibre_net.Data;
+using System.Security.Claims;
 
 namespace calibre_net.Services;
 
 [ScopedRegistration]
-public class BookService(CalibreDbDapperContext dbContext)
+public class BookService(CalibreDbDapperContext dbContext, ApplicationDbContext appDbContext)
 
 {
     private readonly CalibreDbDapperContext dbContext = dbContext;
-
+    private readonly ApplicationDbContext _appDbContext = appDbContext;
     private static readonly Dictionary<string, string> OrderTables = new(){
         {$"{SearchTermsConstants.BOOK_TAG}_LastModified", "b.timestamp"},
         {$"{SearchTermsConstants.BOOK_TAG}_Title", "b.title"},
@@ -26,7 +28,7 @@ public class BookService(CalibreDbDapperContext dbContext)
         {$"{SearchTermsConstants.FORMAT_TAG}_Format", "d.format"},
     };
 
-    public List<BookDto> GetBooks(GetSearchValuesRequest req)
+    public List<BookDto> GetBooks(GetSearchValuesRequest req, string userId)
     {
         // var books = calibreDb.Books
         // .Include(b => b.Authors)
@@ -305,11 +307,21 @@ public class BookService(CalibreDbDapperContext dbContext)
                 return groupedBook;
             }).ToList();
 
+        if (!string.IsNullOrEmpty(userId))
+        {
+            var readStates = _appDbContext.ReadStates.Where(x => x.UserId == userId && books.Select(b => b.Id).Contains((int)x.BookId)).ToArray();
+            books = books.GroupJoin(readStates, b => b.Id, r => (int)r.BookId, (b, r) =>
+            {
+                var book = b;
+                book.MarkAsRead = r.SingleOrDefault()?.MarkedAsRead ?? false;
+                return book;
+            });
+        }
         return books.ProjectToDto().ToList();
 
     }
 
-    public BookDto? GetBook(int id)
+    public BookDto? GetBook(int id, string userId = "")
     {
         using (var ctx = dbContext.ConnectionCreate())
         {
@@ -360,6 +372,9 @@ public class BookService(CalibreDbDapperContext dbContext)
                         }
                     }
                 }
+
+                if (!string.IsNullOrEmpty(userId))
+                    book.MarkAsRead = _appDbContext.ReadStates.SingleOrDefault(x => x.UserId == userId && book.Id == (int)x.BookId)?.MarkedAsRead ?? false;
 
                 return book.ToDto();
             }

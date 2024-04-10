@@ -149,7 +149,7 @@ public sealed class DeleteUserEndpoint(UserService userService) : Endpoint<Delet
 
     public override async Task HandleAsync(DeleteUserRequest req, CancellationToken ct)
     {
-        var currentUserId = User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
 
         /* TODO set current user */ 
         await service.DeleteUser(req.Id, currentUserId);
