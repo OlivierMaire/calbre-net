@@ -32,7 +32,6 @@ public class BaseApiClient
     }
     public static async Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, string url, CancellationToken ct)
     {
-        Console.WriteLine("prepare request");
         if (request.Method == HttpMethod.Post || request.Method == HttpMethod.Put)
         {
             if (request.Content is ByteArrayContent bytes)

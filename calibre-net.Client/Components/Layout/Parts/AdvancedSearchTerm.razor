@@ -100,7 +100,6 @@
     {
         Term.Value = value;
         await TermChanged.InvokeAsync(Term);
-        Console.WriteLine($"Term Changed: {Term.Value}");
     }
 
     private async Task UpdateTermRating(int? value)
@@ -110,6 +109,5 @@
         else
             Term.Value = string.Empty;
         await TermChanged.InvokeAsync(Term);
-        Console.WriteLine($"Term Changed: {Term.Value}");
     }
 }

@@ -5,12 +5,8 @@
     AdornmentIcon="@Icons.Material.Filled.FileOpen" OnAdornmentClick="OnSelectFile" />
 
 @code {
-    [Parameter]
-    public string Label { get; set; } = string.Empty;
-
-    [Parameter]
-    public string Name { get; set; } = string.Empty;
-
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string Name { get; set; } = string.Empty;
     [Parameter] public bool ChooseFolder { get; set; } = false;
 
     private string _value = ".";
@@ -38,8 +34,6 @@
 
     public async Task OnSelectFile()
     {
-        Console.WriteLine("Select a file");
-
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<FileManagerDialog>();
         parameters.Add(x => x.SelectedPath, Value);
@@ -51,6 +45,5 @@
             if (!string.IsNullOrEmpty(result.Data.ToString()))
                 Value = result.Data.ToString() ?? string.Empty;
         }
-        Console.WriteLine(Value);
     }
 }

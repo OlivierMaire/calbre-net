@@ -7,7 +7,7 @@ public class MessageService : IMessageService
     public event Action<MessageEventArgs>? OnMessage;
     public void SendMessage(MessageEventArgs message)
     {
-        Console.WriteLine($"Sending Message : {message.EventType}, GUID: {message.WindowId}");
+        // Console.WriteLine($"Sending Message : {message.EventType}, GUID: {message.WindowId}");
         OnMessage?.Invoke(message);
     }
 

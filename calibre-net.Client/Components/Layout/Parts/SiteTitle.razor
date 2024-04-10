@@ -15,15 +15,11 @@
 
 @code {
     public string? Title { get; set; }
-    public int cnt = 0;
-    @* private IDisposable? monitorDisposable; *@
 
     private PersistingComponentStateSubscription persistingSubscription;
 
     protected override async Task OnInitializedAsync()
     {
-        @* Title = await ConfigurationClient.GetConfigurationValueAsync("calibre:ui:view:site_title"); *@
-
         persistingSubscription =
         ApplicationState.RegisterOnPersisting(PersistData);
 
@@ -49,11 +45,6 @@
 
     public async Task ConfigUpdate(CalibreConfiguration config)
     {
-
-        cnt++;
-        var oper = OperatingSystem.IsBrowser() ? "Wasm" : "Server";
-        Console.WriteLine($"{oper} counter {cnt}");
-        @* Title = config.UI.View.SiteTitle; *@
         this.Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
         await InvokeAsync(StateHasChanged);
     }
@@ -61,19 +52,8 @@
 
     private async Task HandleMessageEvent(CalibreMessageEvent eventArgs)
     {
-        @* Console.WriteLine("event received");
-cnt++;
-var oper = OperatingSystem.IsBrowser() ? "Wasm" : "Server";
-Console.WriteLine($"JS Event {oper} counter {cnt}"); *@
-
-
         if (eventArgs != null && eventArgs.EventType == MessageType.ConfigChanged)
-        {
-            @* Console.WriteLine("Config Changed Event"); *@
             this.Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
-            @* Console.WriteLine($"New Title is {Title}"); *@
-            @* await InvokeAsync(StateHasChanged); *@
-        }
     }
 
 }

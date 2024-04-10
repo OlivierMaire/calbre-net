@@ -20,16 +20,11 @@
 
 @code {
     [Parameter] public List<SearchOrderModel> Orders { get; set; } = [];
-
     [Parameter] public Action<List<SearchOrder>>? OrderChanged { get; set; }
     [Parameter] public bool NoPosition  { get; set; } = false;
 
-   
-
     private async void ButtonClicked(SearchOrderModel model)
     {
-        Console.WriteLine($"{model.Key} clicked");
-
         var maxPosition = Orders.Max(o => o.Position);
         if (model.Position == 0 && !NoPosition)
             model.Position = maxPosition + 1;

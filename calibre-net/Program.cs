@@ -116,16 +116,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
-// var calibreDbLocation = builder.Configuration["calibre:database:location"] ?? throw new InvalidOperationException("Connection string 'calibre:database:location' not found.");
-// builder.Services.AddDbContext<CalibreDbContext>(options =>
-// {
-//     // Console.WriteLine("Connect to : " + $"Data Source={calibreDbLocation}\\metadata.db;");
-//     var connection = CalibreDbContext.Configure($"Data Source={calibreDbLocation}{Path.DirectorySeparatorChar}metadata.db;");
-//     options.UseSqlite(connection);
-// }, ServiceLifetime.Scoped);
-
-// builder.Services.AddLocalization();
-
 builder.Services.AddLocalization();
 SupportedCulturesOptions supportedCulturesOptions = new SupportedCulturesOptions();
 // builder.Services.Configure<SupportedCulturesOptions>(options =>
@@ -140,23 +130,18 @@ builder.Services.Configure<JsonStringLocalizerOptions>(options =>
 builder.Services.AddSingleton
      <IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
-// builder.Services.AddSingleton
-//      <IMessageService, MessageService>();
 builder.Services.AddScoped<WindowIdService>();
 
 
 builder.Services.AddScoped<CalibreNetAuthenticationService>();
 builder.Services.AddScoped<PasskeyService>();
 
-// builder.Services.AddScoped<Fido2NetLib.Fido2Configuration>();
-// builder.Services.AddScoped<Fido2NetLib.Fido2>();
 builder.Services.AddEPubBlazor(ServiceLifetime.Scoped);
 builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
 builder.Services.AddComicsBlazor(ServiceLifetime.Scoped);
 
 builder.Services.RegisterServices(builder.Configuration);
 
-// builder.Services.AddOptions<CalibreConfiguration>().BindConfiguration(CalibreConfiguration.SectionName);
 builder.Services.Configure<CalibreConfiguration>(builder.Configuration.GetSection(CalibreConfiguration.SectionName));
 
 
@@ -176,66 +161,7 @@ builder.Services.AddFido2(options =>
           //   options.BackedUpCredentialPolicy = Configuration.GetValue<Fido2Configuration.CredentialBackupPolicy>("fido2:backedUpCredentialPolicy");
       });
 
-
-// builder.Services.AddOpenApiDocument(); 
-
-
-// builder.Services.AddApiVersioning(o =>
-//         {
-//             o.AssumeDefaultVersionWhenUnspecified = true;
-//             o.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
-//             o.ReportApiVersions = true;
-//             o.ApiVersionReader = Asp.Versioning.ApiVersionReader.Combine(
-//                 new Asp.Versioning.UrlSegmentApiVersionReader(),
-//                 new Asp.Versioning.QueryStringApiVersionReader("api-version"),
-//                 new Asp.Versioning.HeaderApiVersionReader("X-Version")
-//             // new MediaTypeApiVersionReader("ver")
-//             );
-//         })
-//         //.AddMvc()
-//         .AddApiExplorer(
-//         options =>
-//         {
-//             options.GroupNameFormat = "'v'VVV";
-//             options.SubstituteApiVersionInUrl = true;
-//         });
-
-// var versionDescriptionProvider = builder.Services.BuildServiceProvider().GetService<Asp.Versioning.ApiExplorer.IApiVersionDescriptionProvider>();
-// if (versionDescriptionProvider != null)
-//     foreach (var description in versionDescriptionProvider.ApiVersionDescriptions)
-//     {
-//         builder.Services.AddOpenApiDocument(config =>
-//             {
-//                 config.DocumentName = description.GroupName;
-//                 config.PostProcess = document =>
-//                 {
-//                     document.Info.Version = description.GroupName;
-//                     document.Info.Title = "Calibre.Net Api";
-//                     document.Info.Description = "Calibre.Net Api Services.";
-//                     document.Info.TermsOfService = "None";
-//                     document.Info.Contact = new NSwag.OpenApiContact
-//                     {
-//                         Name = "Olivier Maire",
-//                         Email = string.Empty,
-//                         Url = ""
-//                     };
-//                 };
-//                 // config.OperationProcessors.Add(new OperationSecurityScopeProcessor("JWT token"));
-//                 // config.AddSecurity("JWT token", new OpenApiSecurityScheme
-//                 // {
-//                 //     Type = OpenApiSecuritySchemeType.ApiKey,
-//                 //     Name = "Authorization",
-//                 //     Description = "Copy 'Bearer ' + valid JWT token into field",
-//                 //     In = OpenApiSecurityApiKeyLocation.Header
-//                 // });
-//                 config.ApiGroupNames = new[] { description.GroupName };
-//             });
-//     }
-
-
 builder.Services.AddFastEndpoints()
-//  .AddAuthenticationCookie(validFor: TimeSpan.FromMinutes(10))
-// .AddAuthorization() //add this
 .AddResponseCaching()
 .AddAntiforgery();
 
@@ -292,22 +218,6 @@ if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
     app.UseMigrationsEndPoint();
-
-
-    // Add OpenAPI 3.0 document serving middleware
-    // Available at: http://localhost:<port>/swagger/v1/swagger.json
-    // app.UseOpenApi();
-
-    // Add web UIs to interact with the document
-    // Available at: http://localhost:<port>/swagger
-    // app.UseSwaggerUi();
-
-    // Add ReDoc UI to interact with the document
-    // Available at: http://localhost:<port>/redoc
-    // app.UseReDoc(options =>
-    // {
-    //     options.Path = "/redoc";
-    // });
 }
 else
 {
@@ -315,7 +225,6 @@ else
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCulturesOptions.SupportedCultures[0])

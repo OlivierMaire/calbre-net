@@ -84,9 +84,8 @@ public static class TermsExt
         return terms.FirstOrDefault(t => t.Key == key);
     }
 
-    public static string ToUrl(this List<SearchTerm> terms)
+    public static string ToUrl(this List<SearchTerm> terms, string url = "")
     {
-        string url = string.Empty;
         foreach (var term in terms)
         {
             var operatorValue = string.Empty;
@@ -127,9 +126,9 @@ public static class TermsExt
                 var value = SourceValue[2..];
                 term = new StringSearchTerm();
                 var possibleOperator = value.Split(":")[0];
-                if (GetValueFromEnumMember<StringOperator>(value.Split(":")[0], out var enumValue) )
+                if (GetValueFromEnumMember<StringOperator>(value.Split(":")[0], out var enumValue))
                 {
-                    if (term is StringSearchTerm t ) t.StringSearchOperator = enumValue;
+                    if (term is StringSearchTerm t) t.StringSearchOperator = enumValue;
                     value = value[(possibleOperator.Length + 1)..];
                 }
                 term.Value = value;
@@ -198,6 +197,76 @@ public static class TermsExt
         }
 
         throw new InvalidOperationException("Not Enum");
+    }
+
+
+    // public static List<SearchOrderModel> ToSearchOrderModel(this string orderString)
+    // {
+    //     var orders = orderString.Split(';');
+    //     return orders.Select(o =>
+    //     {
+    //         if (string.IsNullOrEmpty(o))
+    //             return null;
+    //         var param = o.Split(':');
+    //         var searchOrder = orders.FirstOrDefault(os => os.Type == SearchOrdersConstants.BOOK_PUBDATE_TAG);
+    //         if (searchOrder != null)
+    //         {
+    //             searchOrder.Ascending = param[1] == "a";
+    //             int.TryParse(param[0], out var position);
+    //             searchOrder.Position = position;
+
+    //             return searchOrder;
+    //         }
+    //         return null;
+    //     }).Where(so => so != null).ToList() as List<SearchOrderModel>;
+    // }
+
+    public static List<SearchOrderModel> ApplyFromQuery(this List<SearchOrderModel> orders, string orderString)
+    {
+        var ordersString = orderString.Split(';');
+        foreach (var o in ordersString)
+        {
+            if (string.IsNullOrEmpty(o))
+                continue;
+            var param = o.Split(':');
+            SearchOrderModel? searchOrder = orders.FirstOrDefault(os => os.Type == param[2]);
+            if (searchOrder != null)
+            {
+                searchOrder.Ascending = param[1] == "a";
+                int.TryParse(param[0], out var position);
+                searchOrder.Position = position;
+            }
+
+        }
+
+        return orders;
+    }
+
+    public static List<SearchOrderModel> ApplyDefaults(this List<SearchOrderModel> orders)
+    {
+        var searchOrder = orders.FirstOrDefault(os => os.Type == SearchOrdersConstants.BOOK_PUBDATE_TAG);
+        if (searchOrder != null)
+        {
+            searchOrder.Ascending = false;
+            searchOrder.Position = 1;
+        }
+
+        searchOrder = orders.FirstOrDefault(os => os.Type == SearchOrdersConstants.SERIES_SORT_TAG);
+        if (searchOrder != null)
+        {
+            searchOrder.Ascending = true;
+            searchOrder.Position = 2;
+        }
+        return orders;
+    }
+
+    public static string ToUrl(this List<SearchOrderModel> orders, string url = "")
+    {
+
+        var orderString = orders.Where(o => o.Position > 0).OrderBy(o => o.Position)
+            .Select(o => $"{o.Position}:{(o.Ascending ? 'a' : 'd')}:{o.Type}");
+
+        return url.TrimEnd('/') + "/order/" + string.Join(';', orderString);
     }
 
 }

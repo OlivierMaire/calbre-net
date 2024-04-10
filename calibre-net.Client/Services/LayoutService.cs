@@ -37,11 +37,11 @@ public class LayoutService : IAsyncDisposable
 
     public async Task ApplyUserPreferences(bool isDarkModeDefaultTheme)
     {
-        Console.WriteLine($"ApplyUserPreferences {isDarkModeDefaultTheme}");
+        // Console.WriteLine($"ApplyUserPreferences {isDarkModeDefaultTheme}");
         _systemPreferences = isDarkModeDefaultTheme;
         _userPreferences ??= await _userPreferencesService.LoadUserPreferences();
-        Console.WriteLine($"LoadUserPreferences {_userPreferences.DarkLightTheme}");
-        Console.WriteLine($"DarkModeToggle {DarkModeToggle}");
+        // Console.WriteLine($"LoadUserPreferences {_userPreferences.DarkLightTheme}");
+        // Console.WriteLine($"DarkModeToggle {DarkModeToggle}");
 
         if (_userPreferences != null)
         {
@@ -61,7 +61,7 @@ public class LayoutService : IAsyncDisposable
             _userPreferences = new UserPreferences { DarkLightTheme = DarkLightMode.System };
             await _userPreferencesService.SaveUserPreferences(_userPreferences);
         }
-        Console.WriteLine($"DarkModeToggle {DarkModeToggle}");
+        // Console.WriteLine($"DarkModeToggle {DarkModeToggle}");
         OnMajorUpdateOccured();
     }
 

@@ -7,7 +7,6 @@
 @code {
     public void SaveAudioProgress(AudioPlayerBlazor.BookmarkProgress bookmark)
     {
-        Console.WriteLine($"Received Time Update {bookmark.BookId} {bookmark.Timestamp}");
         var bId = bookmark.BookId.Split("-");
         BookClient.SetBookmarkAsync(int.Parse(bId[0]), bId[1], bookmark.Timestamp.ToString());
     }

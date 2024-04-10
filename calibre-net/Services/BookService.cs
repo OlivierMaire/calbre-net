@@ -19,11 +19,11 @@ public class BookService(CalibreDbDapperContext dbContext)
         {$"{SearchTermsConstants.BOOK_TAG}_Title", "b.title"},
         {$"{SearchTermsConstants.BOOK_TAG}_Pubdate", "b.pubdate"},
         {$"{SearchTermsConstants.AUTHOR_TAG}_AuthorSort", "a.sort"},
-        {$"{SearchTermsConstants.SERIES_TAG}_Series", "s.sort"},
+        {$"{SearchTermsConstants.SERIES_TAG}_Sort", "s.sort"},
         {$"{SearchTermsConstants.RATING_TAG}_Rating", "r.rating"},
-        {$"{SearchTermsConstants.PUBLISHER_TAG}_Publisher", "p.name"},
-        {$"{SearchTermsConstants.LANGUAGE_TAG}_Languages", "l.lang_code"},
-        {$"{SearchTermsConstants.FORMAT_TAG}_Data", "d.format"},
+        {$"{SearchTermsConstants.PUBLISHER_TAG}_Sort", "p.name"},
+        {$"{SearchTermsConstants.LANGUAGE_TAG}_LangCode", "l.lang_code"},
+        {$"{SearchTermsConstants.FORMAT_TAG}_Format", "d.format"},
     };
 
     public List<BookDto> GetBooks(GetSearchValuesRequest req)
@@ -282,11 +282,6 @@ public class BookService(CalibreDbDapperContext dbContext)
             }
             sql += sqlOrder;
         }
-
-        Console.WriteLine(sql);
-        // foreach (var p in dynamicParams.ParameterNames)
-        //     Console.WriteLine($"{p}: {dynamicParams.Get<string>(p)}");
-
 
         var books =
             ctx.Query<Book, Author, Series, Rating, Book>(sql,

@@ -63,14 +63,6 @@
                 
                 },
             };
-
-
-
-          
-          
-      
-
-
     }
 
     protected override async Task OnParametersSetAsync()
@@ -109,8 +101,6 @@
 
     private void OrderChanged(List<SearchOrder> orders)
     {
-        Console.WriteLine("Order Changed");
-  
         var order = orders.Single(o => o.Key ==  "Category");
         Orders.Single(o => o.Key ==  "Category").Ascending = order.Ascending;
         if (order.Ascending)
