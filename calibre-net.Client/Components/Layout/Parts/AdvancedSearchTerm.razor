@@ -1,0 +1,113 @@
+@typeparam T where T : ISearchTerm
+@using calibre_net.Client.Components.Shared
+@using calibre_net.Shared.Contracts
+@using MudExtensions
+
+<div class="d-flex flex-row align-items-baseline gap-1 adv-form-term">
+    <MudText Class="flex-grow-1 text-nowrap">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <MudIcon Icon="@Icon" Class="mr-1" Title="@KeyName" />
+            <span class="search-key">@KeyName</span>
+        }
+        else
+        {
+            @KeyName
+        }
+
+    </MudText>
+
+    <div style="max-width: 100px;">
+        @if (Term is StringSearchTerm stringTerm)
+        {
+            <MudSelect Class="m-0" PopoverClass="search-list-term-popover" Dense="true" DisableUnderLine="true"
+                @bind-Value="@(stringTerm.StringSearchOperator)" T="StringOperator" AnchorOrigin="Origin.TopLeft">
+                @foreach (var so in StringOperators)
+                {
+                    <MudSelectItem Value="so.Value">@so.Key</MudSelectItem>
+                }
+            </MudSelect>
+        }
+        else if (Term is NumericSearchTerm numTerm)
+        {
+            <MudSelect PopoverClass="search-list-term-popover" Dense="true" DisableUnderLine="true" FullWidth
+                @bind-Value="@(numTerm.NumericSearchOperator)" T="NumericOperator" AnchorOrigin="Origin.TopLeft">
+                @foreach (var so in NumericOperators)
+                {
+                    <MudSelectItem Value="so.Value">@so.Key</MudSelectItem>
+                }
+
+            </MudSelect>
+
+        }
+        else if (Term is ListSearchTerm)
+        {
+            <MudText Style="padding-right: 24px;">Is</MudText>
+        }
+
+    </div>
+    <div style="width: 240px;">
+        @if (Term is StringSearchTerm)
+        {
+            <MudTextField Value="@Term.Value" T="string" ValueChanged="UpdateTerm" Clearable="true" />
+        }
+        else if (Term is RatingSearchTerm ratingTerm)
+        {
+            <MudField>
+                <StarRatingDisplay EditMode="true" Value="@(ratingTerm.IntValue)" ValueChanged="UpdateTermRating" />
+            </MudField>
+        }
+        else if (Term is ListSearchTerm listTerm)
+        {
+            <MudSelect PopoverClass="search-list-term-popover" Value="@Term.Value" T="string" ValueChanged="UpdateTerm"
+                AnchorOrigin="Origin.TopRight" Clearable="true">
+                @foreach (var (key, value) in listTerm.Values)
+                {
+                    <MudSelectItem Value="@key">@value</MudSelectItem>
+                }
+            </MudSelect>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public T Term { get; set; } = default!;
+    [Parameter] public EventCallback<T> TermChanged { get; set; }
+
+    private List<KeyValuePair<string, StringOperator>> StringOperators { get; set; } = [];
+    private List<KeyValuePair<string, NumericOperator>> NumericOperators { get; set; } = [];
+
+    private string Icon { get; set; } = string.Empty;
+    private string KeyName { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+                Icon = Term.GetIcon();
+        KeyName = Term.Key;
+        if (Term is CustomColumnSearchTerm ccTerm)
+            KeyName = ccTerm.KeyName;
+
+
+        StringOperators = Enum.GetNames(typeof(StringOperator))
+        .Select(e => KeyValuePair.Create(e, (StringOperator)Enum.Parse(typeof(StringOperator), e))).ToList();
+
+        NumericOperators = Enum.GetNames(typeof(NumericOperator))
+        .Select(e => KeyValuePair.Create(e, (NumericOperator)Enum.Parse(typeof(NumericOperator), e))).ToList();
+
+    }
+
+    private async Task UpdateTerm(string value)
+    {
+        Term.Value = value;
+        await TermChanged.InvokeAsync(Term);
+    }
+
+    private async Task UpdateTermRating(int? value)
+    {
+        if (value != null && Term is RatingSearchTerm ratingTerm)
+            ratingTerm.IntValue = value.Value;
+        else
+            Term.Value = string.Empty;
+        await TermChanged.InvokeAsync(Term);
+    }
+}

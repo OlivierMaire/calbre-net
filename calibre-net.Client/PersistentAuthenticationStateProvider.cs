@@ -29,11 +29,23 @@ internal class PersistentAuthenticationStateProvider : AuthenticationStateProvid
         Claim[] claims = [
             new Claim(ClaimTypes.NameIdentifier, userInfo.UserId),
             new Claim(ClaimTypes.Name, userInfo.Email),
-            new Claim(ClaimTypes.Email, userInfo.Email) ];
+            new Claim(ClaimTypes.Email, userInfo.Email),
+            // new Claim("Permissions", string.Join(",",userInfo.Permissions)) ];
+            ..userInfo.Permissions.Select(p =>   new Claim("Permissions", p) ).ToArray(),
+            new Claim("preferedlocale", userInfo.PreferredLocale)
+            ];
+
 
         authenticationStateTask = Task.FromResult(
             new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity(claims,
                 authenticationType: nameof(PersistentAuthenticationStateProvider)))));
+
+        if (!string.IsNullOrEmpty(userInfo.PreferredLocale) &&
+         userInfo.PreferredLocale != Thread.CurrentThread.CurrentCulture.Name)
+        {
+            Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(userInfo.PreferredLocale);
+            Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo(userInfo.PreferredLocale);
+        }
     }
 
     public override Task<AuthenticationState> GetAuthenticationStateAsync() => authenticationStateTask;

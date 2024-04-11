@@ -11,11 +11,49 @@
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
   </PropertyGroup>
 
+<PropertyGroup>
+  <EmitCompilerGeneratedFiles>false</EmitCompilerGeneratedFiles>
+</PropertyGroup>
+
   <ItemGroup>
-   <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
-   <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.0" />
-	  <PackageReference Include="MudBlazor" Version="6.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.0" />
+    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.9.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="8.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.*" />
+    <PackageReference Include="MudBlazor" Version="6.19.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.*" />
+    <PackageReference Include="Riok.Mapperly" Version="3.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" /> 
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="EPubBlazor" Version="0.3.1-alpha.17" />
+    <PackageReference Include="AudioPlayerBlazor" Version="1.0.2" />
+    <PackageReference Include="ComicsBlazor" Version="1.1.5" />
+  </ItemGroup>
+
+  <!-- <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+    <ProjectReference Include="..\..\Components\EPubBlazor\EPubBlazor.csproj" />
+    <ProjectReference Include="..\..\Components\AudioPlayerBlazor\AudioPlayerBlazor.csproj" /> 
+    <ProjectReference Include="..\..\Components\ComicsBlazor\ComicsBlazor.csproj" /> 
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
+    <PackageReference Include="EPubBlazor" Version="0.3.1-alpha.17" />
+    <PackageReference Include="AudioPlayerBlazor" Version="1.0.2" />
+    <PackageReference Include="ComicsBlazor" Version="1.1.5" />
+  </ItemGroup> -->
+
+  
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

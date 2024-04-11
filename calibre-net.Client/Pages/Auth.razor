@@ -3,9 +3,16 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using calibre_net.Client.Components
+@using calibre_net.Shared.Contracts;
+@using calibre_net.Client.Services;
 
-@attribute [Authorize]
+@attribute [Authorize(Policy = "Admin")]
 @rendermode InteractiveAuto
+
+
+@inject IMessageService MessageService
+@inject WindowIdService WindowIdService
+
 
 @* <MyMudProviders /> *@
 
@@ -14,7 +21,7 @@
 <MudText Typo="Typo.h3" GutterBottom="true">You are authenticated</MudText>
 
 <AuthorizeView>
-<MudText Class="mb-4">Hello @context.User.Identity?.Name!</MudText>
+    <MudText Class="mb-4">Hello @context.User.Identity?.Name!</MudText>
 </AuthorizeView>
 
 <p>
@@ -28,8 +35,15 @@
     <li><b>Number</b>: @number.ToString("N2")</li>
 </ul>
 
+@(OperatingSystem.IsBrowser() ? "Wasm" : "Server")
+
+
+
 
 @code {
     private DateTime dt = DateTime.Now;
     private double number = 1999.69;
+
+     
+
 }

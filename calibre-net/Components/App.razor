@@ -1,5 +1,6 @@
 ﻿@using System.Globalization
 @using Microsoft.AspNetCore.Localization
+@inject calibre_net.Client.Services.LayoutService LayoutService
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,24 +13,29 @@
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link href="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="app.css" />
     <link rel="stylesheet" href="calibre-net.styles.css" />
+    <link rel="stylesheet" href="fontello/css/calibre-net.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
 </head>
 
 <body>
-    <Routes />
+    <CascadingValue Value="@(HttpContext?.Request.Cookies["calibre-net_darkmode"] == "true")" Name="DarkModeCookie">
+        <calibre_net.Client.Components.Routes />
+    </CascadingValue>
     <script src="_framework/blazor.web.js"></script>
+    <script src="/js/app.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="_content/CodeBeam.MudBlazor.Extensions/MudExtensions.min.js"></script>
 </body>
 
 </html>
 @code {
     [CascadingParameter]
     public HttpContext? HttpContext { get; set; }
-
     protected override void OnInitialized()
     {
         HttpContext?.Response.Cookies.Append(
@@ -38,5 +44,8 @@
         new RequestCulture(
         CultureInfo.CurrentCulture,
         CultureInfo.CurrentUICulture)));
+
+        LayoutService.SetDarkMode(HttpContext?.Request.Cookies["calibre-net_darkmode"] == "true");
     }
+
 }

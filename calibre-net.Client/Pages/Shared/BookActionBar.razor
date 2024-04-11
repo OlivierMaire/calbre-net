@@ -1,0 +1,100 @@
+@using calibre_net.Shared
+@inject BookClient BookClient
+@inject AudioPlayerBlazor.QueuePlayerService audioService
+@* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
+<div>
+
+    @if (Book?.Data != null && Book.Data.Count > 0)
+    {
+        <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+
+            @if (Book.Data.Count > 1)
+            {
+            <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" AnchorOrigin="Origin.BottomLeft" Label="Download">
+                <ActivatorContent>
+                    <MudButton StartIcon="@Icons.Material.Filled.Download" 
+                    EndIcon="@Icons.Material.Filled.ArrowDropDown">
+                        Download</MudButton>
+                </ActivatorContent>
+                <ChildContent>
+                    @foreach (var data in Book.Data)
+                    {
+                        <MudMenuItem Target="_blank" Href="@data.DownloadUrl">@data.Format @String.Format(new calibre_net.Shared.FileSizeFormatProvider(), "({0:fs})", data.UncompressedSize)</MudMenuItem>
+                    }
+                </ChildContent>
+            </MudMenu>
+            }
+            else
+{
+                <MudButton Target="_blank" Href="@Book.Data.First().DownloadUrl">@Book.Data.First().Format @String.Format(new calibre_net.Shared.FileSizeFormatProvider(), "({0:fs})", Book.Data.First().UncompressedSize)</MudButton>
+
+}
+@if (Readables.Count > 1)
+{
+                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" AnchorOrigin="Origin.BottomLeft" Label="Download">
+                <ActivatorContent>
+                    <MudButton StartIcon="@Icons.Material.Filled.MenuBook" 
+                    EndIcon="@Icons.Material.Filled.ArrowDropDown">
+                        Read</MudButton>
+                </ActivatorContent>
+                <ChildContent>
+                    @foreach (var data in Readables)
+                    {
+                        <MudMenuItem Target="_blank" Href="@data.ReadUrl">@data.Format</MudMenuItem>
+                    }
+                </ChildContent>
+            </MudMenu>
+}
+else if (Readables.Count == 1)
+{
+                <MudButton Target="_blank" StartIcon="@Icons.Material.Filled.MenuBook" Href="@Readables.First().ReadUrl"  >Read (@Readables.First().Format)</MudButton>
+
+}
+
+    @if (Listenables.Count > 1)
+{
+                <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" AnchorOrigin="Origin.BottomLeft" Label="Download">
+                <ActivatorContent>
+                    <MudButton StartIcon="@Icons.Material.Filled.MenuBook" 
+                    EndIcon="@Icons.Material.Filled.Audiotrack">
+                        Listen</MudButton>
+                </ActivatorContent>
+                <ChildContent>
+                    @foreach (var data in Listenables)
+                    {
+                        <MudMenuItem Target="_blank" OnClick="async () => await  Listen(data)" >@data.Format</MudMenuItem>
+                    }
+                </ChildContent>
+            </MudMenu>
+}
+else if (Listenables.Count == 1)
+{
+                <MudButton  Target="_blank" StartIcon="@Icons.Material.Filled.Audiotrack" OnClick="async () => await  Listen(Listenables.First())" >Listen (@Listenables.First().Format)</MudButton>
+
+}
+          
+        </MudButtonGroup>
+    }
+
+</div>
+@code {
+
+    [Parameter] public BookDto? Book { get; set; }
+
+    private List<DataDto> Readables => Book?.Data.Where(d => d.IsReadable).ToList() ?? [];
+    private List<DataDto> Listenables => Book?.Data.Where(d => d.IsListenable).ToList() ?? [];
+
+        public async Task Listen(DataDto data)
+        {
+            // get metadata
+            var meta = await BookClient.MetadataAsync(data.Book, data.Format);
+            if (meta.AudioMetadata != null)
+            { 
+                meta.AudioMetadata.AudioSourceUrl = data.DownloadUrl;
+                var bookmark = await BookClient.GetBookmarkAsync(data.Book, data.Format);
+                uint position = 0;
+                uint.TryParse(bookmark.Position, out position);
+                audioService.AddToQueue(meta.AudioMetadata.ToAudioPlayerBlazorMetadata(), $"{data.Book}-{data.Format}", position);
+            }
+        }
+}

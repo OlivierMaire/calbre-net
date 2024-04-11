@@ -401,3 +401,12 @@ FodyWeavers.xsd
 app.db
 app.db-shm
 app.db-wal
+
+# EPubBlazor
+EPubBlazor
+# AudioPlayerBlazor
+AudioPlayerBlazor
+# ComicsBlazor
+ComicsBlazor
+# ComicMeta
+ComicMeta

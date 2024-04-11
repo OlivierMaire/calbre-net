@@ -12,24 +12,61 @@
   <ItemGroup>
     <None Update="Data\app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Blazored.FluentValidation" Version="2.1.0" />
-    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.6.3" />
-    <PackageReference Include="Fido2" Version="4.0.0-beta4" />
-    <PackageReference Include="Fido2.AspNet" Version="4.0.0-beta4" />
-    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.0" />
-    <ProjectReference Include="..\calibre-net.Client\calibre-net.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
+    <PackageReference Include="CodeBeam.MudBlazor.Extensions" Version="6.9.2" />
+    <PackageReference Include="dapper" Version="2.1.35" />
+    <PackageReference Include="FastEndpoints" Version="5.24.0" />
+    <PackageReference Include="FastEndpoints.Security" Version="5.24.0" />
+    <PackageReference Include="FastEndpoints.Swagger" Version="5.24.0" />
+    <PackageReference Include="Fido2" Version="4.0.0-beta.12" />
+    <PackageReference Include="Fido2.AspNet" Version="4.0.0-beta.12" />
+    <PackageReference Include="HeimGuard" Version="1.0.0" />
+    <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.*" />
+    <PackageReference Include="Riok.Mapperly" Version="3.5.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.7" />
+    <PackageReference Include="VersOne.Epub" Version="3.3.1" />
+    <PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="8.102.2.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="8.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.*">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="z440.atl.core" Version="5.21.0" />
   </ItemGroup>
 
-    <ItemGroup>
-    <EmbeddedResource Include="Resources\*.json" />
+  <ItemGroup>
     <EmbeddedResource Include="Data\aaguid.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\calibre-net.Client\calibre-net.Client.csproj" />
+    <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ComicMeta" Version="1.0.5" />
+  </ItemGroup>
+
+  <!-- <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
+    <PackageReference Include="ComicMeta" Version="1.0.5" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+    <ProjectReference Include="..\..\Components\ComicMeta\ComicMeta.csproj" /> 
+  </ItemGroup> -->
+  
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
+      <PrivateAssets>All</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
 </Project>

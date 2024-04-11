@@ -1,5 +1,5 @@
 ﻿@inherits LayoutComponentBase
-@layout calibre_net.Components.Layout.MainLayout
+@layout calibre_net.Components.Account.Shared.LoginLayout
 @inject NavigationManager NavigationManager
 
 @if (HttpContext is null)
@@ -8,7 +8,9 @@
 }
 else
 {
+    <div class="p-4 ">
     @Body
+    </div>
 }
 
 @code {

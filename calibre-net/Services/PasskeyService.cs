@@ -2,12 +2,12 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
+using calibre_net.Client.Services;
 using calibre_net.Data;
 using calibre_net.Models;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.FileProviders;
@@ -15,6 +15,7 @@ using MudBlazor.Extensions;
 
 namespace calibre_net.Services;
 
+[ScopedRegistration]
 public class PasskeyService
 {
     private readonly IFido2 fidoLib;
@@ -140,7 +141,6 @@ public class PasskeyService
 
     private async Task<AaGuidModel?> GetPasskeyProviderAsync(Guid aaGuid)
     {
-
         if (AaGuids == null || AaGuids.Count == 0)
         {
             var assembly = System.Reflection.Assembly.GetExecutingAssembly();
@@ -261,9 +261,6 @@ public class PasskeyService
         uint storedSignatureCounter,
         CancellationToken cancellationToken = default)
     {
-
-        if (assertionResponse.Response.AttestationObject?.Length == 0)
-            assertionResponse.Response.AttestationObject = null;
 
         var res = await fidoLib.MakeAssertionAsync(
                       assertionResponse,

@@ -1,0 +1,13 @@
+@using AudioPlayerBlazor
+@inject ApiClients.BookClient BookClient
+@rendermode InteractiveAuto
+
+<AudioPlayer @rendermode="InteractiveAuto" OnProgress="SaveAudioProgress"></AudioPlayer>
+
+@code {
+    public void SaveAudioProgress(AudioPlayerBlazor.BookmarkProgress bookmark)
+    {
+        var bId = bookmark.BookId.Split("-");
+        BookClient.SetBookmarkAsync(int.Parse(bId[0]), bId[1], bookmark.Timestamp.ToString());
+    }
+}

@@ -1,0 +1,59 @@
+@rendermode InteractiveAuto
+
+@using calibre_net.Client.ApiClients
+@using calibre_net.Client.CustomEvents
+
+@inject ConfigurationClient ConfigurationClient
+
+@implements IDisposable
+@inject PersistentComponentState ApplicationState
+
+<div class="calibreMessageHandler" @oncalibremessageevent="HandleMessageEvent" style="display: none;"></div>
+
+<MudText Class="cookie-regular text-nowrap" Style="@($"color:{Colors.Shades.White};")" Typo="Typo.h6">@(Title)
+</MudText>
+
+@code {
+    public string? Title { get; set; }
+
+    private PersistingComponentStateSubscription persistingSubscription;
+
+    protected override async Task OnInitializedAsync()
+    {
+        persistingSubscription =
+        ApplicationState.RegisterOnPersisting(PersistData);
+
+        if (ApplicationState.TryTakeFromJson<string>(
+        "SiteTitle", out var restored))
+            Title = restored!;
+            else
+            Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
+
+        await base.OnInitializedAsync();
+
+    }
+    private Task PersistData()
+    {
+        ApplicationState.PersistAsJson("SiteTitle", Title);
+
+        return Task.CompletedTask;
+    }
+    void IDisposable.Dispose()
+    {
+        persistingSubscription.Dispose();
+    }
+
+    public async Task ConfigUpdate(CalibreConfiguration config)
+    {
+        this.Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+    private async Task HandleMessageEvent(CalibreMessageEvent eventArgs)
+    {
+        if (eventArgs != null && eventArgs.EventType == MessageType.ConfigChanged)
+            this.Title = (await ConfigurationClient.GetvalueAsync("calibre:ui:view:site_title")).Value;
+    }
+
+}

@@ -1,0 +1,21 @@
+.category-results ::deep .category-list {
+  columns: 2;
+  -webkit-columns: 2;
+  -moz-columns: 2;
+  width: -moz-fit-content;
+  width: fit-content;
+  margin: 0 auto;
+}
+.category-results ::deep .category-list a {
+  display: block;
+}
+.category-results ::deep .category-list a .mud-badge-root {
+  width: 100%;
+}
+.category-results ::deep .category-list a .mud-badge-root .mud-badge.mud-badge-center.right.mud-badge-overlap {
+  right: 4px;
+  left: unset;
+}
+.category-results ::deep .category-list a .star-rating + p {
+  margin: 0;
+}
