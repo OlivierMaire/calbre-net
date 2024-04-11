@@ -48,7 +48,7 @@ public class CalibreDbDapperContext : IDapperContext
     private string GetConnectionString()
     {
         var calibreDbLocation = _configuration["calibre:database:location"] ?? throw new InvalidOperationException("Connection string 'calibre:database:location' not found.");
-        var connectionString = $"Data Source={calibreDbLocation}{Path.DirectorySeparatorChar}metadata.db;";
+        var connectionString = $"Data Source={calibreDbLocation}{Path.DirectorySeparatorChar}metadata.db;mode=ReadOnly;";
         return connectionString;
     }
     private SqliteConnection OpenConnection(string connectionString = "")
