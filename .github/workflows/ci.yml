@@ -5,6 +5,7 @@ on:
   # Triggers the workflow on push request event for the dev or master branch
   push:    
     branches: [dev, main]
+    tags: ['v*']
 
 jobs:
   deploy:
