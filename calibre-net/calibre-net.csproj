@@ -52,13 +52,16 @@
     <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" />
   </ItemGroup>
 
-  
-  <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
+  <ItemGroup>
+    <PackageReference Include="ComicMeta" Version="1.0.5" />
+  </ItemGroup>
+
+  <!-- <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
     <PackageReference Include="ComicMeta" Version="1.0.5" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
     <ProjectReference Include="..\..\Components\ComicMeta\ComicMeta.csproj" /> 
-  </ItemGroup>
+  </ItemGroup> -->
   
   <ItemGroup>
     <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">

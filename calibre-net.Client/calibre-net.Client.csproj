@@ -32,7 +32,14 @@
     <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" /> 
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+
+  <ItemGroup>
+    <PackageReference Include="EPubBlazor" Version="0.3.1-alpha.17" />
+    <PackageReference Include="AudioPlayerBlazor" Version="1.0.2" />
+    <PackageReference Include="ComicsBlazor" Version="1.1.5" />
+  </ItemGroup>
+
+  <!-- <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
     <ProjectReference Include="..\..\Components\EPubBlazor\EPubBlazor.csproj" />
     <ProjectReference Include="..\..\Components\AudioPlayerBlazor\AudioPlayerBlazor.csproj" /> 
     <ProjectReference Include="..\..\Components\ComicsBlazor\ComicsBlazor.csproj" /> 
@@ -41,7 +48,7 @@
     <PackageReference Include="EPubBlazor" Version="0.3.1-alpha.17" />
     <PackageReference Include="AudioPlayerBlazor" Version="1.0.2" />
     <PackageReference Include="ComicsBlazor" Version="1.1.5" />
-  </ItemGroup>
+  </ItemGroup> -->
 
   
   <ItemGroup>
