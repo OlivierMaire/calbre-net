@@ -1,6 +1,0 @@
-.admin-permissions-list {
-  display: flex;
-  flex-direction: column;
-  max-height: 600px;
-  flex-wrap: wrap;
-}

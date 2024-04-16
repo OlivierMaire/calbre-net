@@ -1,9 +1,0 @@
-::deep .title-icon {
-  display: inline-block;
-  height: 3rem;
-  margin-right: 12px;
-}
-::deep .title-icon img {
-  height: 100%;
-  margin-bottom: 0.5rem;
-}

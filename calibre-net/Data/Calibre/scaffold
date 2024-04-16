@@ -1,5 +1,0 @@
-dotnet ef dbcontext scaffold 
-
-dotnet ef dbcontext scaffold "Name=ConnectionStrings:DevCalibreDb" Microsoft.EntityFrameworkCore.Sqlite -c CalibreDbContext -n Calibre_net.Data.Calibre -o ./Data/Calibre --no-onconfiguring -f -t annotations -t annotations_dirtied -t annotations_fts -t annotations_fts_config -t annotations_fts_data -t annotations_fts_docsize -t annotations_fts_idx -t annotations_fts_stemmed -t annotations_fts_stemmed_config -t annotations_fts_stemmed_data -t annotations_fts_stemmed_docsize -t annotations_fts_stemmed_idx -t authors -t books -t books_authors_link  -t books_languages_link -t books_plugin_data -t books_publishers_link -t books_ratings_link -t books_series_link -t books_tags_link -t comments -t conversion_options -t custom_columns -t data -t feeds -t identifiers -t languages -t last_read_positions -t library_id -t metadata_dirtied -t preferences -t publishers -t ratings -t series -t sqlite_sequence -t tags -t tag_browser_authors  -t tag_browser_publishers -t tag_browser_ratings -t tag_browser_tags -t custom_column_1 -t books_custom_column_1_link -t tag_browser_custom_column_1
-
--t meta

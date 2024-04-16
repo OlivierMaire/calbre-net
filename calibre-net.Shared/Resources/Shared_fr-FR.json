@@ -1,8 +1,0 @@
-{
-  
-  "Site Title": "Calibre.fr",
-    "Body": "Ce composant Blazor est défini dans le package <strong>{0}</strong> et il est utilisé par <strong id=\"{1}\">{2}</strong>.",
-    "ClickMe": "Cliquez ici !",
-    "EnterSomeText": "Saisissez un texte :",
-    "lang_eng": "Anglais"
-  }
