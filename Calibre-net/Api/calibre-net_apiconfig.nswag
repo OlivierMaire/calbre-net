@@ -97,7 +97,7 @@
       "templateDirectory": null,
       "serviceHost": null,
       "serviceSchemes": null,
-      "output": "../../calibre-net.Client/ApiClients/GeneratedApiClients_v2.cs",
+      "output": "../../Calibre-net.Client/ApiClients/GeneratedApiClients_v2.cs",
       "newLineBehavior": "Auto"
     }
   }
