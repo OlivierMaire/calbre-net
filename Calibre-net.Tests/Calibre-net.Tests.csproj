@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\calibre-net\calibre-net.csproj" />
+    <ProjectReference Include="..\Calibre-net\Calibre-net.csproj" />
   </ItemGroup>
 
 </Project>
