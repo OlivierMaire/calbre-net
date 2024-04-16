@@ -1,6 +1,6 @@
-@using calibre_net.Shared.Contracts
-@using calibre_net.Shared
-@using calibre_net.Client.Components.Shared
+@using Calibre_net.Shared.Contracts
+@using Calibre_net.Shared
+@using Calibre_net.Client.Components.Shared
 @using Blazored.LocalStorage
 
 
@@ -22,7 +22,7 @@
 
 <div class="search-page">
     <div class="search-top">
-        <MudText Typo="Typo.h3" GutterBottom="true">Books</MudText>
+        @* <MudText Typo="Typo.h3" GutterBottom="true">Books</MudText> *@
 
         <div class="search-tags">
             @foreach (var term in SearchTerms)
@@ -38,7 +38,7 @@
 
                     @if (term is RatingSearchTerm ratingTerm)
                     {
-                        <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(ratingTerm.IntValue)" />
+                        <Calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(ratingTerm.IntValue)" />
                     }
                     else if (term is IdSearchTerm idTerm)
                     {
@@ -81,8 +81,7 @@
 </div>
 
 @code {
-    [Parameter]
-    public string? PageRoute { get; set; }
+    [Parameter]    public string? PageRoute { get; set; }
 
     public List<SearchTerm> SearchTerms { get; set; } = [];
 
@@ -178,7 +177,7 @@ NumericSearchOperator = NumericOperator.GreaterThan
                     Orders.Add(order);
                 }
 
-            if (string.IsNullOrEmpty(OrderString))
+            if (string.IsNullOrEmpty(OrderString) && !string.IsNullOrEmpty(SearchTerms.ToUrl()))
                 OrderString = await LocalStorage.GetItemAsync<string>(SearchTerms.ToUrl()) ?? string.Empty;
 
             if (!string.IsNullOrEmpty(OrderString))

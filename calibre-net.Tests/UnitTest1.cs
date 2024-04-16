@@ -1,4 +1,4 @@
-namespace calibre_net.Tests;
+namespace Calibre_net.Tests;
 
 public class UnitTest1
 {

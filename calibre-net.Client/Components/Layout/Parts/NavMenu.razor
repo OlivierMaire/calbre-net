@@ -1,5 +1,5 @@
 ﻿@inject NavigationManager NavigationManager
-@inject calibre_net.Client.ApiClients.BookClient BookClient
+@inject Calibre_net.Client.ApiClients.BookClient BookClient
 
 <MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
@@ -23,27 +23,7 @@
     <MudNavLink Href="@cc.CategoryUrl" Match="NavLinkMatch.All" >@cc.Name</MudNavLink>
     }
 
-    <AuthorizeView>
-        <Authorized>
-            @* <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix"
-            Icon="@Icons.Material.Filled.List">@context.User.Identity?.Name</MudNavLink> *@
-            @* <div class="nav-item px-3">
-            <form action="Account/Logout" method="post">
-            <AntiforgeryToken />
-            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-            <button type="submit" class="nav-link">
-            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-            </button>
-            </form>
-            </div> *@
-        </Authorized>
-        <NotAuthorized>
-            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Register
-            </MudNavLink>
-            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Login
-            </MudNavLink>
-        </NotAuthorized>
-    </AuthorizeView>
+    <CustomPageLinks />
 
 </MudNavMenu>
 

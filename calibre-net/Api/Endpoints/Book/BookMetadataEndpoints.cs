@@ -1,12 +1,12 @@
 using ATL;
 using ATL.AudioData;
-using calibre_net.Services;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Services;
+using Calibre_net.Shared.Contracts;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using VersOne.Epub.Schema;
 using static ATL.PictureInfo;
-namespace calibre_net.Api.Endpoints;
+namespace Calibre_net.Api.Endpoints;
 
 public sealed class MetadataBookEndpoint(BookService bookService, ConfigurationService configService
 , ComicService comicService) : Endpoint<DownloadBookRequest,

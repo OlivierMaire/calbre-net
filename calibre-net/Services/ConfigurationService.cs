@@ -2,14 +2,14 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization.Metadata;
-using calibre_net.Client.Services;
-using calibre_net.Data;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Client.Services;
+using Calibre_net.Data;
+using Calibre_net.Shared.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Namotion.Reflection;
 
-namespace calibre_net.Services;
+namespace Calibre_net.Services;
 
 [ScopedRegistration]
 public class ConfigurationService(ApplicationDbContext dbContext,

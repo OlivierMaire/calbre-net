@@ -1,7 +1,7 @@
 using System.Runtime.Serialization;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Shared.Contracts;
 
-namespace calibre_net.Shared;
+namespace Calibre_net.Shared;
 
 public static class EnumExtensions
 {

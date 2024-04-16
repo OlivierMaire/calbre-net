@@ -1,5 +1,5 @@
 
-namespace calibre_net.Shared.Contracts;
+namespace Calibre_net.Shared.Contracts;
 
 public record GetConfigurationValueRequest(string Value);
 

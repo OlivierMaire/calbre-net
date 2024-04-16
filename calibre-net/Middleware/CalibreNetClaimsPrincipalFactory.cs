@@ -1,11 +1,11 @@
 using System.Security.Authentication;
 using System.Security.Claims;
-using calibre_net.Data;
+using Calibre_net.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Z.EntityFramework.Plus;
 
-namespace calibre_net.Middleware;
+namespace Calibre_net.Middleware;
 
 public class CalibreNetClaimsPrincipalFactory :
        UserClaimsPrincipalFactory<ApplicationUser>

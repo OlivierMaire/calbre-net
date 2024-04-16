@@ -1,8 +1,8 @@
-using calibre_net.Shared.Contracts;
+using Calibre_net.Shared.Contracts;
 using FastEndpoints;
 using FluentValidation;
 
-namespace calibre_net.Api.Validators;
+namespace Calibre_net.Api.Validators;
 
 public class GetConfigurationValueValidator : Validator<GetConfigurationValueRequest>
 {

@@ -1,4 +1,4 @@
-namespace calibre_net.Client.Components.Shared;
+namespace Calibre_net.Client.Components.Shared;
 
     public sealed class InfiniteScrollingItemsProviderRequest
     {

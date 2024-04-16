@@ -1,10 +1,10 @@
-using calibre_net.Data.Calibre;
-using calibre_net.Services;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Data.Calibre;
+using Calibre_net.Services;
+using Calibre_net.Shared.Contracts;
 using Dapper;
 using FastEndpoints;
 
-namespace calibre_net.Api.Endpoints;
+namespace Calibre_net.Api.Endpoints;
 public class Search : Group
 {
     public Search()

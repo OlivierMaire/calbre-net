@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Reflection;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Shared.Contracts;
 
-namespace calibre_net.Shared;
+namespace Calibre_net.Shared;
 public static class ObjectExtensions
 {
     public static T ToObject<T>(this IDictionary<string, string> source)

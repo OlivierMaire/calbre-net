@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using calibre_net.Client;
-using calibre_net.Data;
+using Calibre_net.Client;
+using Calibre_net.Data;
 
-namespace calibre_net.Components.Account;
+namespace Calibre_net.Components.Account;
 
 // This is a server-side AuthenticationStateProvider that revalidates the security stamp for the connected user
 // every 30 minutes an interactive circuit is connected. It also uses PersistentComponentState to flow the

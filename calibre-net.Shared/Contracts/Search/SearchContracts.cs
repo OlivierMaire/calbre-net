@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Shared.Contracts;
+namespace Calibre_net.Shared.Contracts;
 
 public class AdvancedSearchForm
 {
@@ -200,26 +200,34 @@ public static class TermsExt
     }
 
 
-    // public static List<SearchOrderModel> ToSearchOrderModel(this string orderString)
-    // {
-    //     var orders = orderString.Split(';');
-    //     return orders.Select(o =>
-    //     {
-    //         if (string.IsNullOrEmpty(o))
-    //             return null;
-    //         var param = o.Split(':');
-    //         var searchOrder = orders.FirstOrDefault(os => os.Type == SearchOrdersConstants.BOOK_PUBDATE_TAG);
-    //         if (searchOrder != null)
-    //         {
-    //             searchOrder.Ascending = param[1] == "a";
-    //             int.TryParse(param[0], out var position);
-    //             searchOrder.Position = position;
-
-    //             return searchOrder;
-    //         }
-    //         return null;
-    //     }).Where(so => so != null).ToList() as List<SearchOrderModel>;
-    // }
+    public static List<SearchOrderModel> ToSearchOrderModel(this string orderString)
+    {
+        var orders = orderString.Split(';');
+        return orders.Select(o =>
+        {
+            if (string.IsNullOrEmpty(o))
+                return null;
+            var param = o.Split(':');
+            SearchOrdersConstants.DefaultSearchOrders.TryGetValue(param[2], out var searchOrder);
+            if (searchOrder == null && param[2].StartsWith(SearchOrdersConstants.CUSTOM_COLUMN_TAG))
+            {
+                searchOrder = SearchOrdersConstants.DefaultSearchOrders[SearchOrdersConstants.CUSTOM_COLUMN_TAG];
+            }
+            if (searchOrder == null)
+                return null;
+            searchOrder = (SearchOrderModel)searchOrder.Clone();
+            searchOrder.Ascending = param[1] == "a";
+            int.TryParse(param[0], out var position);
+            searchOrder.Position = position;
+            if (searchOrder.Key == SearchOrdersConstants.CUSTOM_COLUMN_TAG)
+            {
+                searchOrder.Key = param[2];
+                searchOrder.Type = SearchOrdersConstants.CUSTOM_COLUMN_TAG + param[2].ToString();
+                searchOrder.PropertyName = "Name";
+            }
+            return searchOrder;
+        }).Where(so => so != null).ToList() as List<SearchOrderModel>;
+    }
 
     public static List<SearchOrderModel> ApplyFromQuery(this List<SearchOrderModel> orders, string orderString)
     {

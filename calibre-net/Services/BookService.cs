@@ -1,14 +1,14 @@
-using calibre_net.Client.Services;
-using calibre_net.Data.Calibre;
-using calibre_net.Shared.Contracts;
-using calibre_net.Shared;
+using Calibre_net.Client.Services;
+using Calibre_net.Data.Calibre;
+using Calibre_net.Shared.Contracts;
+using Calibre_net.Shared;
 using Calibre_net.Data.Calibre;
 using Dapper;
 using System.Globalization;
-using calibre_net.Data;
+using Calibre_net.Data;
 using System.Security.Claims;
 
-namespace calibre_net.Services;
+namespace Calibre_net.Services;
 
 [ScopedRegistration]
 public class BookService(CalibreDbDapperContext dbContext, ApplicationDbContext appDbContext)
@@ -284,6 +284,8 @@ public class BookService(CalibreDbDapperContext dbContext, ApplicationDbContext 
             }
             sql += sqlOrder;
         }
+
+        Console.WriteLine(sql);
 
         var books =
             ctx.Query<Book, Author, Series, Rating, Book>(sql,

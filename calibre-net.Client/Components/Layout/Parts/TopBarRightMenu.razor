@@ -1,5 +1,5 @@
 @inject LayoutService LayoutService
-@using calibre_net.Client.Enums
+@using Calibre_net.Client.Enums
 @implements IDisposable
 @inject AuthenticationStateProvider auth
 
@@ -12,51 +12,48 @@
             Color="Color.Inherit" OnClick="@LayoutService.ToggleDarkMode" />
     </MudTooltip>
 
-    <div  class="px-4"> @System.Globalization.CultureInfo.CurrentCulture.Name</div>
+    <div class="px-4"> @System.Globalization.CultureInfo.CurrentCulture.Name</div>
 
+    <AuthorizeView>
+        <Authorized>
 
+            <AuthorizeView Policy="Admin" Context="AuthContext">
+                <MudNavLink Class="w-auto" Href="Admin" Match="NavLinkMatch.Prefix"
+                    Icon="@Icons.Material.Filled.SettingsApplications" IconColor="Color.Inherit">Admin</MudNavLink>
+            </AuthorizeView>
+            <MudNavLink Class="w-auto" Href="Account/Manage" Match="NavLinkMatch.Prefix"
+                Icon="@Icons.Material.Filled.AccountBox" IconColor="Color.Inherit">@context.User.Identity?.Name
+            </MudNavLink>
+            <MudNavLink Class="w-auto" Href="Account/Logout" Match="NavLinkMatch.Prefix"
+                Icon="@Icons.Material.Filled.Logout" IconColor="Color.Inherit">Logout</MudNavLink>
 
-        <AuthorizeView>
-            <Authorized>
-                
-                <AuthorizeView Policy="Admin" Context="AuthContext">
-                    <MudNavLink Class="w-auto" Href="Admin" Match="NavLinkMatch.Prefix"
-                        Icon="@Icons.Material.Filled.SettingsApplications" IconColor="Color.Inherit">Admin</MudNavLink>
-                </AuthorizeView>
-                <MudNavLink Class="w-auto" Href="Account/Manage" Match="NavLinkMatch.Prefix"
-                    Icon="@Icons.Material.Filled.AccountBox" IconColor="Color.Inherit">@context.User.Identity?.Name
-                </MudNavLink>
-                <MudNavLink Class="w-auto" Href="Account/Logout" Match="NavLinkMatch.Prefix"
-                    Icon="@Icons.Material.Filled.Logout" IconColor="Color.Inherit">Logout</MudNavLink>
+        </Authorized>
+        <NotAuthorized>
+            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login"
+                IconColor="Color.Inherit">Login</MudNavLink>
+            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonAdd"
+                IconColor="Color.Inherit">Register</MudNavLink>
+        </NotAuthorized>
+    </AuthorizeView>
 
-            </Authorized>
-            <NotAuthorized>
-                <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Login"
-                    IconColor="Color.Inherit">Login</MudNavLink>
-                <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PersonAdd"
-                    IconColor="Color.Inherit">Register</MudNavLink>
-            </NotAuthorized>
-        </AuthorizeView>
+</MudNavMenu>
 
-    </MudNavMenu>
-    @* <TopMenu /> *@
+@code
+{
 
-    @code
+    [Parameter] public string Class { get; set; } = string.Empty;
+    protected override async Task OnInitializedAsync()
     {
-
-        [Parameter] public string Class { get; set; } = string.Empty;
-        protected override async Task OnInitializedAsync()
-        {
         LayoutService.MajorUpdateOccured += LayoutServiceOnMajorUpdateOccured;
-        }
-
-        private void LayoutServiceOnMajorUpdateOccured(object? sender, EventArgs e) => StateHasChanged();
-
-        void IDisposable.Dispose()
-        {
-        LayoutService.MajorUpdateOccured -= LayoutServiceOnMajorUpdateOccured;
-        }
-
-
-
     }
+
+    private void LayoutServiceOnMajorUpdateOccured(object? sender, EventArgs e) => StateHasChanged();
+
+    void IDisposable.Dispose()
+    {
+        LayoutService.MajorUpdateOccured -= LayoutServiceOnMajorUpdateOccured;
+    }
+
+
+
+}

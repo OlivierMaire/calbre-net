@@ -1,13 +1,13 @@
 using System.IO.Compression;
-using calibre_net.Client.Services;
-using calibre_net.Data.Calibre;
+using Calibre_net.Client.Services;
+using Calibre_net.Data.Calibre;
 using ComicMeta;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
 using Dapper;
 using Microsoft.AspNetCore.StaticFiles;
 
-namespace calibre_net.Services;
+namespace Calibre_net.Services;
 
 [ScopedRegistration]
 public class ComicService(CalibreDbDapperContext dbContext, ILogger<ComicService> logger)

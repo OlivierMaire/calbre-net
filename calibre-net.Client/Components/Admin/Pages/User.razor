@@ -6,7 +6,7 @@
 @inject UserClient UserClient
 @inject Microsoft.Extensions.Options.IOptions<SupportedCulturesOptions> SupportedCultures
 @inject ILogger<User> Logger
-@inject IStringLocalizer<calibre_net.Shared.Resources.Admin> L
+@inject IStringLocalizer<Calibre_net.Shared.Resources.Admin> L
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider _authenticationStateProvider
 
@@ -58,10 +58,10 @@ else
         <MudTextField Label="Password" name="SelectedUser.Password" @bind-Value="@SelectedUser.Password"
             Variant="Variant.Text" InputType="InputType.Password" />
 
-        <calibre_net.Client.Components.Shared.SsrSelect Name="SelectedUser.PreferredLocale"
+        <Calibre_net.Client.Components.Shared.SsrSelect Name="SelectedUser.PreferredLocale"
             @bind-Value="SelectedUser.PreferredLocale"
             Options="@supportedCultures.Select(s => new KeyValuePair<string,string> (s.DisplayName, s.Value)).ToList()">
-        </calibre_net.Client.Components.Shared.SsrSelect>
+        </Calibre_net.Client.Components.Shared.SsrSelect>
 
 
         <MudButton StartIcon="@Icons.Material.Filled.PersonAdd" Variant="Variant.Filled" Color="Color.Secondary"

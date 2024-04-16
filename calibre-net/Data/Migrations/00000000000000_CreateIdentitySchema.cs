@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace calibre_net.Migrations
+namespace Calibre_net.Migrations
 {
     /// <inheritdoc />
     public partial class CreateIdentitySchema : Migration

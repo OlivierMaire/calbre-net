@@ -4,7 +4,7 @@
 @using System.Globalization
 @inject ApiClients.BookClient BookClient
 @inject SearchService SearchService
-@inject IStringLocalizer<calibre_net.Shared.Resources.Shared> L
+@inject IStringLocalizer<Calibre_net.Shared.Resources.Shared> L
 
 <PageTitle>@CalibreBook?.Title</PageTitle>
 
@@ -52,7 +52,7 @@
                 {
                     <div class="book-rating">
                         <a href="@SearchService.GetSearchUrl(CalibreBook.Rating)">
-                            <calibre_net.Client.Components.Shared.StarRatingDisplay
+                            <Calibre_net.Client.Components.Shared.StarRatingDisplay
                                 Value="@(CalibreBook.Rating.Rating ?? 0)" />
                         </a>
                     </div>
@@ -120,7 +120,7 @@
                 {
                     <div class="book-pubdate">
                          <MudText Typo="Typo.body2">Published: 
-                            @CalibreBook.Pubdate.Value.Date.ToString(calibre_net.Shared.DateExtensions.GetDatePatternWithoutWeekday(CultureInfo.CurrentCulture))
+                            @CalibreBook.Pubdate.Value.Date.ToString(Calibre_net.Shared.DateExtensions.GetDatePatternWithoutWeekday(CultureInfo.CurrentCulture))
                         </MudText>
                     </div>
                 }

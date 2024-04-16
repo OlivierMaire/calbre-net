@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Shared;
+namespace Calibre_net.Shared;
 
 public class MudCheckboxConverter : JsonConverter<bool>
 {

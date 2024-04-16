@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Primitives;
 
-namespace calibre_net;
+namespace Calibre_net;
 
 public sealed class MyCustomPolicy : IOutputCachePolicy
 {

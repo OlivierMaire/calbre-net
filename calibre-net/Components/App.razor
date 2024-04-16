@@ -1,6 +1,6 @@
 ﻿@using System.Globalization
 @using Microsoft.AspNetCore.Localization
-@inject calibre_net.Client.Services.LayoutService LayoutService
+@inject Calibre_net.Client.Services.LayoutService LayoutService
 
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +24,7 @@
 
 <body>
     <CascadingValue Value="@(HttpContext?.Request.Cookies["calibre-net_darkmode"] == "true")" Name="DarkModeCookie">
-        <calibre_net.Client.Components.Routes />
+        <Calibre_net.Client.Components.Routes />
     </CascadingValue>
     <script src="_framework/blazor.web.js"></script>
     <script src="/js/app.js"></script>

@@ -1,8 +1,8 @@
 using System.Drawing;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Shared.Contracts;
 using MudBlazor;
 
-namespace calibre_net.Client.ApiClients;
+namespace Calibre_net.Client.ApiClients;
 public partial class BookClient : BaseApiClient
 {
     public System.Threading.Tasks.Task<GetPageResponse?> PageDataAsync(int bookId, string bookFormat, int pageId)

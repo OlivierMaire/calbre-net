@@ -1,5 +1,5 @@
-@using calibre_net.Shared.Contracts
-@using calibre_net.Shared
+@using Calibre_net.Shared.Contracts
+@using Calibre_net.Shared
 
 @inject CategoryClient CategoryClient
 @inject SearchService SearchService
@@ -27,7 +27,7 @@
                 <MudListItem Class="pr-10">
                         @if (CategoryType == "ratings")
                         {
- <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@int.Parse(category.Name)" />
+ <Calibre_net.Client.Components.Shared.StarRatingDisplay Value="@int.Parse(category.Name)" />
                         }
                         else
                         {

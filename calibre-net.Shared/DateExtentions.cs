@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace calibre_net.Shared;
+namespace Calibre_net.Shared;
 
 public static class DateExtensions
 {

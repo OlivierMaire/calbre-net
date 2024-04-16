@@ -2,7 +2,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 
-namespace calibre_net.Shared.Resources;
+namespace Calibre_net.Shared.Resources;
 
 public class JsonStringLocalizerFactory : IStringLocalizerFactory
 {

@@ -1,6 +1,7 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Shared.Contracts;
+namespace Calibre_net.Shared.Contracts;
 public partial class AuthorDto : Searchable
 {
     [JsonPropertyName("id")]

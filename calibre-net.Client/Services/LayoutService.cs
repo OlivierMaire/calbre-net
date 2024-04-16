@@ -1,10 +1,10 @@
 using System.Globalization;
-using calibre_net.Client.ApiClients;
-using calibre_net.Client.Enums;
+using Calibre_net.Client.ApiClients;
+using Calibre_net.Client.Enums;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace calibre_net.Client.Services;
+namespace Calibre_net.Client.Services;
 
 [ScopedRegistration]
 public class LayoutService : IAsyncDisposable

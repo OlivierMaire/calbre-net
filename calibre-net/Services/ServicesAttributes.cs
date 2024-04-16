@@ -1,6 +1,6 @@
 // using System.Security.Cryptography.X509Certificates;
 
-// namespace calibre_net.Services;
+// namespace Calibre_net.Services;
 
 // public class ScopedRegistrationAttribute : Attribute { }
 

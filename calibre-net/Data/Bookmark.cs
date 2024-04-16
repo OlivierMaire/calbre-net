@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace calibre_net.Data;
+namespace Calibre_net.Data;
 
 [Table("Bookmarks")]
 public class Bookmark

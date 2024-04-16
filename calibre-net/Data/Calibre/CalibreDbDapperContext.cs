@@ -1,9 +1,9 @@
 using System.Data;
-using calibre_net.Client.Services;
+using Calibre_net.Client.Services;
 using Dapper;
 using Microsoft.Data.Sqlite;
 
-namespace calibre_net.Data.Calibre;
+namespace Calibre_net.Data.Calibre;
 
 
 public interface IDapperContext

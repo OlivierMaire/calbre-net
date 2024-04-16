@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Shared.Contracts;
+namespace Calibre_net.Shared.Contracts;
 public partial class KeywordDto : Searchable
 {
     public string Keyword { get; set; } = string.Empty;

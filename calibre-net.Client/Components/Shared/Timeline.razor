@@ -1,0 +1,31 @@
+@inject ApiClients.BookClient BookClient
+
+@* @BookList.Count Books
+
+@SearchQuery @OrderQuery *@
+
+<MudTimeline>
+    @foreach (var book in BookList)
+    {
+        <TimelineElement BookId="@book.Id" OpositePath="CustomColumns[2].Value.Data[0].Value" />
+    }
+</MudTimeline>
+
+
+@code {
+    [Parameter] public string SearchQuery { get; set; } = string.Empty;
+    [Parameter] public string OrderQuery { get; set; } = string.Empty;
+
+    ICollection<BookDto> BookList { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        var searchTerms = SearchQuery.ParseStringToDictionary().ToSearchTerms();
+        var orderTerms = OrderQuery.ToSearchOrderModel().OrderBy(o => o.Position)
+            .Select(o => o as SearchOrder).ToList();
+
+         BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(searchTerms, orderTerms));
+
+    }
+}

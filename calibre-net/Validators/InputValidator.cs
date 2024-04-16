@@ -1,9 +1,9 @@
-using calibre_net.Client.Models;
-using calibre_net.Components.Account.Pages;
+using Calibre_net.Client.Models;
+using Calibre_net.Components.Account.Pages;
 using FluentValidation;
 using Microsoft.Extensions.Localization;
 
-namespace calibre_net.Validators;
+namespace Calibre_net.Validators;
     public class TokenRequestValidator : AbstractValidator<SignInModel>
     {
         public TokenRequestValidator(IStringLocalizer<Login> localizer)

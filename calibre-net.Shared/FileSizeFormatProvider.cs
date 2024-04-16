@@ -1,4 +1,4 @@
-namespace calibre_net.Shared;
+namespace Calibre_net.Shared;
 
 // Define a custom format provider class
 public class FileSizeFormatProvider : IFormatProvider, ICustomFormatter

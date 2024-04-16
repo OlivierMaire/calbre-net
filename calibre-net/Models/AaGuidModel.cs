@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace calibre_net.Models;
+namespace Calibre_net.Models;
 
 public class AaGuidModel{
     [JsonPropertyName("name")]

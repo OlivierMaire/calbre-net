@@ -1,4 +1,4 @@
-namespace calibre_net.Shared.Contracts;
+namespace Calibre_net.Shared.Contracts;
 
 public record GetUserRequest (string Id);
 

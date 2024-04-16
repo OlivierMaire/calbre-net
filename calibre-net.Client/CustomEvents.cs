@@ -1,9 +1,9 @@
 
 using System.Text.Json.Serialization;
-using calibre_net.Client.Services;
+using Calibre_net.Client.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace calibre_net.Client.CustomEvents;
+namespace Calibre_net.Client.CustomEvents;
 
 [EventHandler("onthemechangedevent", typeof(ThemeChangedEvent), enableStopPropagation: true, enablePreventDefault: true)]
 [EventHandler("oncalibremessageevent", typeof(CalibreMessageEvent), enableStopPropagation: true, enablePreventDefault: true)]

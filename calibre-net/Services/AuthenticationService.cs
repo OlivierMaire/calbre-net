@@ -1,12 +1,12 @@
-using calibre_net.Client.Models;
-using calibre_net.Client.Services;
-using calibre_net.Components.Account;
-using calibre_net.Data;
-using calibre_net.Middleware;
+using Calibre_net.Client.Models;
+using Calibre_net.Client.Services;
+using Calibre_net.Components.Account;
+using Calibre_net.Data;
+using Calibre_net.Middleware;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 
-namespace calibre_net.Services;
+namespace Calibre_net.Services;
 
 [ScopedRegistration]
 public class CalibreNetAuthenticationService : IAuthenticationService

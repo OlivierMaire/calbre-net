@@ -1,7 +1,5 @@
 @inject SearchService SearchService
-<div class="book-thumb p-1 d-flex flex-column">
-    @* <MudPaper Elevation="0"> *@
-    @CalibreBook.Publisher.Name
+<div class="book-thumb p-1 d-flex flex-column @Class">
     <MudLink Href="@CalibreBook.BookLink">
         <div class=" book-cover">
 
@@ -50,7 +48,7 @@
         {
             <div class="book-rating">
                 <a href="@SearchService.GetSearchUrl(CalibreBook.Rating)">
-                    <calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(CalibreBook.Rating.Rating ?? 0)" />
+                    <Calibre_net.Client.Components.Shared.StarRatingDisplay Value="@(CalibreBook.Rating.Rating ?? 0)" />
                 </a>
             </div>
         }
@@ -61,5 +59,6 @@
 @code {
 
     [Parameter] public BookDto CalibreBook { get; set; } = null!;
+    [Parameter] public string Class { get; set; } = string.Empty;
 
 }

@@ -1,8 +1,8 @@
-using calibre_net.Client.Enums;
+using Calibre_net.Client.Enums;
 using Blazored.LocalStorage;
 using System.Globalization;
 
-namespace calibre_net.Client.Services;
+namespace Calibre_net.Client.Services;
 
 public interface IUserPreferencesService
 {

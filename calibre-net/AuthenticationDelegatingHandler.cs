@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.Circuits;
 
-namespace calibre_net;
+namespace Calibre_net;
 
 public class ServerAuthenticationDelegatingHandler(IHttpContextAccessor accessor) : DelegatingHandler
 {
