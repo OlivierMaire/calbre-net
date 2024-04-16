@@ -1,5 +1,5 @@
-using calibre_net.Services;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Services;
+using Calibre_net.Shared.Contracts;
 using FastEndpoints;
 using FluentValidation.Results;
 

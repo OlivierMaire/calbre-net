@@ -3,13 +3,13 @@ using System.Globalization;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
-using calibre_net.Client.Models;
-using calibre_net.Data;
-using calibre_net.Services;
+using Calibre_net.Client.Models;
+using Calibre_net.Data;
+using Calibre_net.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 
-namespace calibre_net.Middleware;
+namespace Calibre_net.Middleware;
 
 public class BlazorCookieAuthenticationMiddleware<TUser> where TUser : class
 {

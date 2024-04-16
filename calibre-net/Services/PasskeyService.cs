@@ -2,9 +2,9 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
-using calibre_net.Client.Services;
-using calibre_net.Data;
-using calibre_net.Models;
+using Calibre_net.Client.Services;
+using Calibre_net.Data;
+using Calibre_net.Models;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.FileProviders;
 using MudBlazor.Extensions;
 
-namespace calibre_net.Services;
+namespace Calibre_net.Services;
 
 [ScopedRegistration]
 public class PasskeyService

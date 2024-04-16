@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
-using calibre_net.Data;
+using Calibre_net.Data;
 
-namespace calibre_net.Components.Account;
+namespace Calibre_net.Components.Account;
 
 internal sealed class IdentityUserAccessor(UserManager<ApplicationUser> userManager, IdentityRedirectManager redirectManager)
 {

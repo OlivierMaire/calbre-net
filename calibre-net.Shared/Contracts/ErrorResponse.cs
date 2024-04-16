@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace calibre_net.Shared.Contracts;
+namespace Calibre_net.Shared.Contracts;
 public class ErrorResponse  
 {
     private static readonly string[] _item = new string[1] { "application/problem+json" };

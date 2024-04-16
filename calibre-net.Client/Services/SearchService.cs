@@ -1,8 +1,8 @@
-using calibre_net.Client.ApiClients;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Client.ApiClients;
+using Calibre_net.Shared.Contracts;
 using Microsoft.AspNetCore.Components;
 
-namespace calibre_net.Client.Services;
+namespace Calibre_net.Client.Services;
 
 [ScopedRegistration]
 public class SearchService(NavigationManager navigationManager, CategoryClient categoryClient)

@@ -1,7 +1,7 @@
 using System.Drawing;
-using calibre_net.Api.Endpoints;
-using calibre_net.Services;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Api.Endpoints;
+using Calibre_net.Services;
+using Calibre_net.Shared.Contracts;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using SkiaSharp;

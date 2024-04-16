@@ -1,5 +1,5 @@
 using Riok.Mapperly.Abstractions;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
 
 // Mapper declaration
@@ -9,6 +9,7 @@ public static partial class BookMapper
 {
     public static partial IQueryable<BookDto> ProjectToDto(this IQueryable<Book> query);
     public static partial IEnumerable<BookDto> ProjectToDto(this IEnumerable<Book> query);
+    [UserMapping(Default = true)]
     public static partial BookDto ToDto(this Book book);
     [MapperIgnoreTarget(nameof(BookDto.Authors))]
     public static partial BookDto ToDtoWithoutAuthors(this Book book);
@@ -46,8 +47,8 @@ public static class BookDtoMapper
         => customColumn.ToDtoWithoutBooks();
 
     public static IDictionary<int, CustomColumnDto> MapCustomColumnDictionary(IDictionary<int, CustomColumn> dict)
-      =>  dict.ToDictionaryMap();
-    
+      => dict.ToDictionaryMap();
+
 }
 
 [Mapper]
@@ -56,8 +57,14 @@ public static partial class AuthorMapper
 {
     public static partial IQueryable<AuthorDto> ProjectToDto(this IQueryable<Author> query);
     public static partial IEnumerable<AuthorDto> ProjectToDto(this IEnumerable<Author> query);
+    [UserMapping(Default = true)]
+    [MapperIgnoreTarget(nameof(AuthorDto.BookCount))]
+    [MapperIgnoreTarget(nameof(AuthorDto.SearchUrl))]
+    [MapperIgnoreTarget(nameof(AuthorDto.SearchBase))]
     public static partial AuthorDto ToDto(this Author book);
     [MapperIgnoreTarget(nameof(AuthorDto.Books))]
+    [MapperIgnoreSource(nameof(Author.Books))]
+    [MapperIgnoreTarget(nameof(AuthorDto.BookCount))]
     public static partial AuthorDto ToDtoWithoutBooks(this Author book);
 }
 
@@ -90,6 +97,7 @@ public static partial class RatingMapper
 {
     public static partial IQueryable<RatingDto> ProjectToDto(this IQueryable<Rating> query);
     public static partial IEnumerable<RatingDto> ProjectToDto(this IEnumerable<Rating> query);
+    [UserMapping(Default = true)]
     public static partial RatingDto ToDto(this Rating book);
     [MapProperty(nameof(Rating.RatingValue), nameof(RatingDto.Rating))]
     [MapperIgnoreTarget(nameof(RatingDto.Books))]
@@ -108,6 +116,7 @@ public static partial class LanguageMapper
 {
     public static partial IQueryable<LanguageDto> ProjectToDto(this IQueryable<Language> query);
     public static partial IEnumerable<LanguageDto> ProjectToDto(this IEnumerable<Language> query);
+    [UserMapping(Default = true)]
     public static partial LanguageDto ToDto(this Language book);
     [MapperIgnoreTarget(nameof(LanguageDto.Books))]
     public static partial LanguageDto ToDtoWithoutBooks(this Language book);
@@ -125,6 +134,7 @@ public static partial class IdentifierMapper
 {
     public static partial IQueryable<IdentifierDto> ProjectToDto(this IQueryable<Identifier> query);
     public static partial IEnumerable<IdentifierDto> ProjectToDto(this IEnumerable<Identifier> query);
+    [UserMapping(Default = true)]
     public static partial IdentifierDto ToDto(this Identifier book);
     [MapperIgnoreTarget(nameof(IdentifierDto.BookObject))]
     public static partial IdentifierDto ToDtoWithoutBooks(this Identifier book);
@@ -160,6 +170,7 @@ public static partial class PublisherMapper
 {
     public static partial IQueryable<PublisherDto> ProjectToDto(this IQueryable<Publisher> query);
     public static partial IEnumerable<PublisherDto> ProjectToDto(this IEnumerable<Publisher> query);
+    [UserMapping(Default = true)]
     public static partial PublisherDto ToDto(this Publisher book);
     [MapperIgnoreTarget(nameof(PublisherDto.Books))]
     public static partial PublisherDto ToDtoWithoutBooks(this Publisher book);
@@ -177,10 +188,11 @@ public static partial class CustomColumnMapper
 {
     public static partial IQueryable<CustomColumnDto> ProjectToDto(this IQueryable<CustomColumn> query);
     public static partial IEnumerable<CustomColumnDto> ProjectToDto(this IEnumerable<CustomColumn> query);
+    [UserMapping(Default = true)]
     public static partial CustomColumnDto ToDto(this CustomColumn book);
     // [MapperIgnoreTarget(nameof(CustomColumnDto.Books))]
     public static partial CustomColumnDto ToDtoWithoutBooks(this CustomColumn book);
-public static partial IDictionary<int, CustomColumnDto> ToDictionaryMap(this IDictionary<int, CustomColumn> dict);
+    public static partial IDictionary<int, CustomColumnDto> ToDictionaryMap(this IDictionary<int, CustomColumn> dict);
     public static partial GenericCustomColumnDto ToDto(this GenericCustomColumn book);
 }
 

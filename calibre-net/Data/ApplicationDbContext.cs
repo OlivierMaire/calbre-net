@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 
-namespace calibre_net.Data;
+namespace Calibre_net.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
@@ -13,6 +13,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public virtual DbSet<Bookmark> Bookmarks {get;set;}
     public virtual DbSet<Read> ReadStates {get;set;}
+    public virtual DbSet<CustomPage> CustomPages {get;set;}
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

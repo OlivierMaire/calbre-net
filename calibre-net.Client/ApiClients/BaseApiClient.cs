@@ -1,8 +1,8 @@
-namespace calibre_net.Client.ApiClients;
+namespace Calibre_net.Client.ApiClients;
 
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
-using calibre_net.Client.Services;
+using Calibre_net.Client.Services;
 
 // [SingletonRegistration]
 public class BaseApiClient

@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace calibre_net.Migrations
+namespace Calibre_net.Migrations
 {
     /// <inheritdoc />
     public partial class IdentityFix : Migration

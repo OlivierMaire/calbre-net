@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Security.Claims;
-using calibre_net.Data;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Data;
+using Calibre_net.Shared.Contracts;
 using FastEndpoints;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 
-namespace calibre_net.Api.Endpoints;
+namespace Calibre_net.Api.Endpoints;
 
 public sealed class SetCultureEndpoint : Endpoint<SetCultureRequest>
 {

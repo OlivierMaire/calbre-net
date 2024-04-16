@@ -1,17 +1,18 @@
-using calibre_net.Client;
+using Calibre_net.Client;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MudBlazor.Services;
 using System.Globalization;
 using Microsoft.JSInterop;
-using calibre_net.Shared.Resources;
+using Calibre_net.Shared.Resources;
 using Microsoft.Extensions.Localization;
-using calibre_net.Client.Services;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Client.Services;
+using Calibre_net.Shared.Contracts;
 using EPubBlazor;
 using AudioPlayerBlazor;
 using ComicsBlazor;
 using MudExtensions.Services;
+using MudBlazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 // builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -20,7 +21,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddMudServices();
 
- builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthorizationCore();
 builder.Services.AddAuthorizationCore(options =>
 {
     options.AddPolicy("Admin",

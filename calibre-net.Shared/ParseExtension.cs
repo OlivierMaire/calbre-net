@@ -1,4 +1,4 @@
-namespace calibre_net.Shared;
+namespace Calibre_net.Shared;
 
 public static class ParseExtension{
 

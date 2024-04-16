@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Localization;
 
-namespace calibre_net.Shared.Resources;
+namespace Calibre_net.Shared.Resources;
 
 public class JsonStringLocalizerOptions : LocalizationOptions{
 

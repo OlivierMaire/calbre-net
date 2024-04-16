@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
-using calibre_net.Components.Account.Pages;
-using calibre_net.Components.Account.Pages.Manage;
-using calibre_net.Data;
+using Calibre_net.Components.Account.Pages;
+using Calibre_net.Components.Account.Pages.Manage;
+using Calibre_net.Data;
 
 namespace Microsoft.AspNetCore.Routing;
 

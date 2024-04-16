@@ -1,7 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
-using calibre_net.Client.ApiClients;
+using Calibre_net.Client.ApiClients;
 
-namespace calibre_net.Client.Services;
+namespace Calibre_net.Client.Services;
 
 public class ScopedRegistrationAttribute : Attribute { }
 

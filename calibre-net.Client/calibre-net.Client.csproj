@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
-    <RootNamespace>calibre-net.Client</RootNamespace>
+    <RootNamespace>Calibre-net.Client</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
     <BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>
   </PropertyGroup>
@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" /> 
+    <ProjectReference Include="..\Calibre-net.Shared\Calibre-net.Shared.csproj" /> 
   </ItemGroup>
 
 

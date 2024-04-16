@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace calibre_net.Data;
+namespace Calibre_net.Data;
 
 [Table("UserPermissions")]
 public class UserPermission

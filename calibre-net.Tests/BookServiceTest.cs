@@ -1,6 +1,6 @@
-using calibre_net.Services;
+using Calibre_net.Services;
 
-namespace calibre_net.Tests;
+namespace Calibre_net.Tests;
 
 public class BookServiceTest{
 

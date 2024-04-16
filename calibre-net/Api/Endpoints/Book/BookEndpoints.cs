@@ -1,17 +1,17 @@
-using calibre_net.Services;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Services;
+using Calibre_net.Shared.Contracts;
 using FastEndpoints;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.StaticFiles;
 using ATL.AudioData;
 using ATL;
 using static ATL.PictureInfo;
-using calibre_net.Data;
+using Calibre_net.Data;
 using Microsoft.AspNetCore.Authorization;
 using FastEndpoints.Security;
 using System.Security.Claims;
 
-namespace calibre_net.Api.Endpoints;
+namespace Calibre_net.Api.Endpoints;
 
 public class Book : Group
 {

@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using calibre_net.Data;
+using Calibre_net.Data;
 
 #nullable disable
 
-namespace calibre_net.Migrations
+namespace Calibre_net.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20231209124730_PasskeyProviders")]
@@ -132,7 +132,7 @@ namespace calibre_net.Migrations
                     b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.ApplicationUser", b =>
+            modelBuilder.Entity("Calibre_net.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -184,7 +184,7 @@ namespace calibre_net.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.UserCredential", b =>
+            modelBuilder.Entity("Calibre_net.Data.UserCredential", b =>
                 {
                     b.Property<byte[]>("Id")
                         .HasColumnType("BLOB");
@@ -267,15 +267,15 @@ namespace calibre_net.Migrations
                     b.ToTable("UserCredentials");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.UserCredential", b =>
+            modelBuilder.Entity("Calibre_net.Data.UserCredential", b =>
                 {
-                    b.HasOne("calibre_net.Data.ApplicationUser", "User")
+                    b.HasOne("Calibre_net.Data.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("calibre_net.Models.PublicKeyCredentialDescriptorModel", "Descriptor", b1 =>
+                    b.OwnsOne("Calibre_net.Models.PublicKeyCredentialDescriptorModel", "Descriptor", b1 =>
                         {
                             b1.Property<byte[]>("UserCredentialId")
                                 .HasColumnType("BLOB");

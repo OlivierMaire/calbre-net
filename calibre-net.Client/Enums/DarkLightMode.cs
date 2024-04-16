@@ -1,4 +1,4 @@
-namespace calibre_net.Client.Enums;
+namespace Calibre_net.Client.Enums;
 
 public enum DarkLightMode
 {

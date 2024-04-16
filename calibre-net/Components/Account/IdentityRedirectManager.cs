@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 
-namespace calibre_net.Components.Account;
+namespace Calibre_net.Components.Account;
 
 internal sealed class IdentityRedirectManager(NavigationManager navigationManager)
 {

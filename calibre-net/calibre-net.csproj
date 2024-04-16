@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-calibre-net-460c1009-5615-4b82-a0fa-faab7c79bf67</UserSecretsId>
-    <RootNamespace>calibre-net</RootNamespace>
+    <RootNamespace>Calibre-net</RootNamespace>
     <AssemblyName>$(AssemblyName.Replace(' ', '_'))</AssemblyName>
   </PropertyGroup>
 
@@ -24,6 +24,7 @@
     <PackageReference Include="Fido2.AspNet" Version="4.0.0-beta.12" />
     <PackageReference Include="HeimGuard" Version="1.0.0" />
     <PackageReference Include="InterpolatedSql.Dapper" Version="2.3.0" />
+    <PackageReference Include="Markdig" Version="0.37.0" />
     <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.*" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
@@ -48,8 +49,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\calibre-net.Client\calibre-net.Client.csproj" />
-    <ProjectReference Include="..\calibre-net.Shared\calibre-net.Shared.csproj" />
+    <ProjectReference Include="..\Calibre-net.Client\Calibre-net.Client.csproj" />
+    <ProjectReference Include="..\Calibre-net.Shared\Calibre-net.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,7 +58,7 @@
   </ItemGroup>
 
   <!-- <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
-    <PackageReference Include="ComicMeta" Version="1.0.5" />
+    <PackageReference Include="ComicMeta" Version="1.0.6" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
     <ProjectReference Include="..\..\Components\ComicMeta\ComicMeta.csproj" /> 
@@ -68,5 +69,9 @@
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+<!-- <PropertyGroup>
+  <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+</PropertyGroup> -->
 
 </Project>

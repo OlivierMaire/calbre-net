@@ -1,4 +1,4 @@
-namespace calibre_net.Client.Services;
+namespace Calibre_net.Client.Services;
 
 public interface IMessageService
 {

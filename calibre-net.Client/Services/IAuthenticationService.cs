@@ -1,6 +1,6 @@
-using calibre_net.Client.Models;
+using Calibre_net.Client.Models;
 
-namespace calibre_net.Client.Services;
+namespace Calibre_net.Client.Services;
 
 public interface IAuthenticationService
 {

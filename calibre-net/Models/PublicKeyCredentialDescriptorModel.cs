@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 using Fido2NetLib;
 using Fido2NetLib.Objects;
 
-namespace calibre_net.Models;
+namespace Calibre_net.Models;
 
 public class PublicKeyCredentialDescriptorModel
 {

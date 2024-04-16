@@ -1,20 +1,20 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using calibre_net.Components.Account;
-using calibre_net.Data;
+using Calibre_net.Components.Account;
+using Calibre_net.Data;
 using MudBlazor.Services;
 using Microsoft.Extensions.Localization;
-using calibre_net.Middleware;
+using Calibre_net.Middleware;
 using MudExtensions.Services;
-using calibre_net.Services;
-using calibre_net.Components;
+using Calibre_net.Services;
+using Calibre_net.Components;
 using HeimGuard;
-using calibre_net.Shared.Resources;
-using calibre_net.Client.Services;
+using Calibre_net.Shared.Resources;
+using Calibre_net.Client.Services;
 using Namotion.Reflection;
-using calibre_net.Migrations;
-using calibre_net.Shared.Contracts;
+using Calibre_net.Migrations;
+using Calibre_net.Shared.Contracts;
 using Calibre_net.Data.Calibre;
 using EPubBlazor;
 using AudioPlayerBlazor;
@@ -22,8 +22,9 @@ using ComicsBlazor;
 using FastEndpoints;
 using FastEndpoints.Swagger;
 using FastEndpoints.Security;
-using calibre_net;
+using Calibre_net;
 using System.Security.Claims;
+using MudBlazor;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
@@ -198,11 +199,12 @@ builder.Services.AddScoped<ServerAuthenticationDelegatingHandler>();
 builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress = new Uri(baseAddress))
     .AddHttpMessageHandler<ServerAuthenticationDelegatingHandler>();
 
-builder.Services.AddOutputCache(options => {
-    options.AddPolicy ("custompolicy", MyCustomPolicy.Instance);
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("custompolicy", MyCustomPolicy.Instance);
     // options.AddPolicy ("custompolicy", p => p.AddPolicy<MyCustomPolicy>().Exp);
 });
- 
+
 builder.WebHost.ConfigureKestrel(o =>
 {
     // o.Limits.
@@ -268,7 +270,7 @@ if (app.Environment.IsDevelopment())
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
-    .AddAdditionalAssemblies(typeof(calibre_net.Client.Pages.Book.Books).Assembly);
+    .AddAdditionalAssemblies(typeof(Calibre_net.Client.Pages.Book.Books).Assembly);
 
 
 

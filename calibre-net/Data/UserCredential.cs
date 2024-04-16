@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using Fido2NetLib;
 
-namespace calibre_net.Data;
+namespace Calibre_net.Data;
 
 [Table("UserCredentials")]
 public class UserCredential

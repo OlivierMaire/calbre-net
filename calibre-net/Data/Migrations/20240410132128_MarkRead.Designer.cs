@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using calibre_net.Data;
+using Calibre_net.Data;
 
 #nullable disable
 
-namespace calibre_net.Migrations
+namespace Calibre_net.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     [Migration("20240410132128_MarkRead")]
@@ -131,7 +131,7 @@ namespace calibre_net.Migrations
                     b.ToTable("UserTokens");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.ApplicationUser", b =>
+            modelBuilder.Entity("Calibre_net.Data.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -187,7 +187,7 @@ namespace calibre_net.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.Bookmark", b =>
+            modelBuilder.Entity("Calibre_net.Data.Bookmark", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
@@ -209,7 +209,7 @@ namespace calibre_net.Migrations
                     b.ToTable("Bookmarks");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.Read", b =>
+            modelBuilder.Entity("Calibre_net.Data.Read", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
@@ -225,7 +225,7 @@ namespace calibre_net.Migrations
                     b.ToTable("ReadStates");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.UserCredential", b =>
+            modelBuilder.Entity("Calibre_net.Data.UserCredential", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -278,7 +278,7 @@ namespace calibre_net.Migrations
                     b.ToTable("UserCredentials");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.UserPermission", b =>
+            modelBuilder.Entity("Calibre_net.Data.UserPermission", b =>
                 {
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
@@ -291,9 +291,9 @@ namespace calibre_net.Migrations
                     b.ToTable("UserPermissions");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.Bookmark", b =>
+            modelBuilder.Entity("Calibre_net.Data.Bookmark", b =>
                 {
-                    b.HasOne("calibre_net.Data.ApplicationUser", "User")
+                    b.HasOne("Calibre_net.Data.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -302,9 +302,9 @@ namespace calibre_net.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.Read", b =>
+            modelBuilder.Entity("Calibre_net.Data.Read", b =>
                 {
-                    b.HasOne("calibre_net.Data.ApplicationUser", "User")
+                    b.HasOne("Calibre_net.Data.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -313,9 +313,9 @@ namespace calibre_net.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.UserCredential", b =>
+            modelBuilder.Entity("Calibre_net.Data.UserCredential", b =>
                 {
-                    b.HasOne("calibre_net.Data.ApplicationUser", "User")
+                    b.HasOne("Calibre_net.Data.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -324,9 +324,9 @@ namespace calibre_net.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.UserPermission", b =>
+            modelBuilder.Entity("Calibre_net.Data.UserPermission", b =>
                 {
-                    b.HasOne("calibre_net.Data.ApplicationUser", "User")
+                    b.HasOne("Calibre_net.Data.ApplicationUser", "User")
                         .WithMany("Permissions")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -335,7 +335,7 @@ namespace calibre_net.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("calibre_net.Data.ApplicationUser", b =>
+            modelBuilder.Entity("Calibre_net.Data.ApplicationUser", b =>
                 {
                     b.Navigation("Permissions");
                 });

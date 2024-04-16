@@ -1,6 +1,6 @@
 
 
-using calibre_net.Shared.Contracts;
+using Calibre_net.Shared.Contracts;
 using Riok.Mapperly.Abstractions;
 
 [Mapper]
