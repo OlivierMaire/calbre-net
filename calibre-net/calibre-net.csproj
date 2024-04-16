@@ -54,7 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ComicMeta" Version="1.0.5" />
+    <PackageReference Include="ComicMeta" Version="1.0.6" />
   </ItemGroup>
 
   <!-- <ItemGroup Condition=" '$(Configuration)'!='Debug' ">
