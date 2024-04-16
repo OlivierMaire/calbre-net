@@ -1,0 +1,41 @@
+@inject IJSRuntime JSRuntime
+@if (rendered)
+{
+    <MudIconButton OnClick="ToggleTheme" Color="Color.Inherit"
+        Icon="@(_isDarkMode ? Icons.Material.Filled.LightMode : Icons.Material.Outlined.DarkMode)" />
+}
+else{
+    <MudSkeleton SkeletonType="SkeletonType.Circle" Width="48px" Height="48px" />
+}
+
+@code {
+
+    private IJSObjectReference? _jsModule;
+
+    [CascadingParameter] public bool _isDarkMode { get; set; }
+    private bool rendered { get; set; } = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import",
+            "./Components/Layout/Parts/ThemeToggleButton.razor.js");
+
+            var darkMode = await _jsModule!.InvokeAsync<string>("blazorDarkTheme.get") == "true";
+            if (_isDarkMode != darkMode)
+                await ToggleTheme();
+            rendered = true;
+            StateHasChanged();
+        }
+    }
+
+    public async Task ToggleTheme()
+    {
+        _isDarkMode = !_isDarkMode;
+        await _jsModule!.InvokeVoidAsync("blazorDarkTheme.set", _isDarkMode);
+
+        StateHasChanged();
+    }
+
+}

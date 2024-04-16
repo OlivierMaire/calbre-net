@@ -1,0 +1,26 @@
+﻿@inherits LayoutComponentBase
+@layout MudMainLayout
+@using Microsoft.AspNetCore.Authorization
+
+@* // force authorization on all pages *@
+@attribute [Authorize]
+
+<div>
+    <MudLayout>
+        <TopBar @rendermode="InteractiveAuto" />
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.False" Class="pt-6">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+        <AudioPlayerWrapper />
+    </MudLayout>
+
+    <PageScript Src="/Components/Layout/MainLayout.razor.js" />
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+</div>

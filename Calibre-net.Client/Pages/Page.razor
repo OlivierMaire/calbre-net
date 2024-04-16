@@ -1,0 +1,197 @@
+@page "/page/{*slug}"
+@using AngleSharp.Dom
+@using AngleSharp.Html.Dom
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.Rendering
+@using System.Text.Json
+@attribute [Authorize]
+@attribute [StreamRendering]
+
+@inject PageClient PageClient
+
+<div>
+    @PageRenderer
+</div>
+
+@code {
+    [Parameter] public string? Slug { get; set; }
+
+    MarkupString Markup { get; set; } = (MarkupString)string.Empty;
+
+    static Dictionary<string, Type> dict = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        dict = GetPages(typeof(Program));
+
+        var response = await PageClient.MarkupAsync(Slug);
+        Markup = (MarkupString)response.MarkupString;
+
+
+    }
+
+
+
+
+    private void PageRenderer(RenderTreeBuilder builder)
+    {
+
+        var htmlParser = new AngleSharp.Html.Parser.HtmlParser();
+        var doc = htmlParser.ParseDocument(Markup.ToString());
+        var elem = doc.Body;
+
+        RenderList(builder, elem.Children);
+
+    }
+
+
+    static void RenderList(RenderTreeBuilder builder, IHtmlCollection<IElement> ChildNodes)
+    {
+        int index = 0;
+
+        foreach (var d in ChildNodes)
+        {
+            if (d.NodeType == NodeType.Text)
+            {
+                builder.AddContent(index, d.TextContent);
+                index++;
+            }
+            else if (d.NodeName.Length > 4 && dict.ContainsKey(d.NodeName))
+            {
+                Type com = dict[d.NodeName];
+
+                builder.OpenComponent(index, com);
+
+                var props = com.GetProperties().ToDictionary(s => s.Name.ToLowerInvariant());
+
+                foreach (var a in d.Attributes)
+                {
+                    bool isComHasProp = props.ContainsKey(a.Name);
+
+
+                    if (isComHasProp)
+                    {
+                        PropertyInfo prop = props[a.Name];
+                        bool isStringProp = prop.PropertyType == typeof(string);
+
+                        if (isStringProp)
+                        {
+                            builder.AddAttribute(index, a.Name, a.Value);
+                        }
+                        else
+                        {
+                            if (prop.PropertyType == typeof(Guid))
+                            {
+                                builder.AddAttribute(index, a.Name, Guid.Parse(a.Value));
+                            }
+                            else
+                            {
+                                var value = JsonSerializer.Deserialize(a.Value, prop.PropertyType);
+                                //will cast
+                                object castedValue = SetValue(prop, value);
+                                builder.AddAttribute(index, a.Name, castedValue);
+                            }
+                        }
+
+                    }
+                    else
+                    {
+                        builder.AddAttribute(index, a.Name, a.Value);
+
+                    }
+                    index++;
+                }
+
+                if (d.Children.Length > 0)
+                {
+                    RenderFragment ff = new RenderFragment(builder =>
+                    {
+                        //builder.AddContent(0, "xqxw");
+                        RenderList(builder, d.Children);
+                    });
+
+                    builder.AddAttribute(index++, "ChildContent", ff);
+                }
+
+                builder.CloseComponent();
+            }
+            else
+            {
+                builder.OpenElement(index, d.NodeName);
+
+                foreach (var a in d.Attributes)
+                {
+                    builder.AddAttribute(index, a.Name, a.Value);
+                }
+
+                if (d.Children.Length > 0)
+                {
+                    RenderList(builder, d.Children);
+                }
+                else
+                {
+                    builder.AddMarkupContent(index, d.InnerHtml);
+                }
+                builder.CloseElement();
+                index++;
+            }
+            index++;
+        }
+    }
+
+    public static bool IsNullableType(Type type)
+    {
+        return type.IsGenericType
+        && type.GetGenericTypeDefinition().Equals(typeof(Nullable<>));
+    }
+    static object SetValue(PropertyInfo info, object value)
+    {
+        var targetType = IsNullableType(info.PropertyType)
+        ? Nullable.GetUnderlyingType(info.PropertyType)
+        : info.PropertyType;
+        var convertedValue = Convert.ChangeType(value, targetType);
+
+        //info.SetValue(instance, convertedValue, null);
+
+        return convertedValue;
+    }
+    public Dictionary<string, Type> GetPages(Type program)
+    {
+        var type = typeof(ComponentBase);
+
+        var types =
+        //AppDomain.CurrentDomain.GetAssemblies()
+        //.SelectMany(s => s.GetTypes())
+        //Assembly.GetAssembly(typeof(Program)).GetTypes()
+        Assembly.GetAssembly(program).GetTypes()
+        .Where(p =>
+        type.IsAssignableFrom(p)
+        && p.IsPublic
+        && p.IsClass
+        && !p.IsAbstract
+        );
+
+        Dictionary<string, Type> dict = new();
+
+        string[] ignores = { "App", "_Imports" };
+
+        foreach (var d in types)
+        {
+            if (ignores.Contains(d.Name)) continue;
+
+            var attributes = d.GetCustomAttributes() ?? new List<Attribute>();
+
+            bool isLayout = d.IsSubclassOf(typeof(LayoutComponentBase));
+            bool isPage = attributes.Any(s => s is RouteAttribute);
+
+            if (!isLayout && !isPage)
+            {
+                dict.Add(d.Name.ToUpperInvariant(), d);
+            }
+
+        }
+
+        return dict;
+    }
+}

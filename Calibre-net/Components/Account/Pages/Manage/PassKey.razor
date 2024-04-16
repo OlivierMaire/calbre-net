@@ -1,0 +1,129 @@
+@page "/Account/Manage/PassKey"
+@rendermode InteractiveServer
+
+@inject PasskeyService PasskeyService
+@inject IDialogService DialogService
+@inject IJSRuntime JsRuntime
+
+<PageTitle>PassKey</PageTitle>
+
+<StatusMessage />
+<h3>PassKey</h3>
+
+<MudText Class="mb-4">
+    Passkeys enable you to securely sign in to your Account using your fingerprint, face, screen lock, or hardware
+    security key. <br /> Only set up passkeys on devices you own.
+</MudText>
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h5">Passkeys you created</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudList>
+            @foreach (var passkey in Passkeys)
+            {
+                <MudItem Class="d-flex gap-3 py-3">
+                    <MudImage Src="@passkey.ProviderIconLight" Alt="@passkey.ProviderName" ObjectFit="ObjectFit.Contain"
+                        Height="36" Width="36" Class="rounded-lg" />
+                    <div>
+                        <div>
+                            <MudText Typo="Typo.h6" Class="d-inline">
+                                @passkey.Title
+                            </MudText>
+                            <MudText Typo="Typo.subtitle1" Class="d-inline">
+                                @passkey.SubTitle
+                            </MudText>
+                        </div>
+                        <MudText Typo="Typo.body1">
+                            Created: @passkey.CreatedDate.ToString("f")
+                        </MudText>
+                    </div>
+                    <div>
+                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" aria-label="edit"
+                            OnClick=" async () => await EditDialog(passkey)"></MudIconButton>
+                        <MudIconButton Icon="@Icons.Material.Outlined.DeleteForever" aria-label="delete"
+                            OnClick="async () => await DeletePasskeyAsync(passkey.Id)"></MudIconButton>
+                    </div>
+
+                </MudItem>
+                <MudDivider />
+            }
+        </MudList>
+
+
+    </MudCardContent>
+    <MudCardActions>
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Variant="Variant.Outlined" Color="Color.Primary"
+            OnClick="GeneratePassKey" Disabled="!CanPassKey">Create a PassKey</MudButton>
+    </MudCardActions>
+</MudCard>
+
+@code {
+    private List<Models.PasskeyModel> Passkeys { get; set; } = new List<Models.PasskeyModel>();
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private bool CanPassKey = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JsRuntime.InvokeVoidAsync(identifier: "import", "/js/passkey.js");
+            CanPassKey = await JsRuntime.InvokeAsync<bool>("blazorPasskey.canPassKey");
+            StateHasChanged();
+
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Passkeys = await PasskeyService.GetMyPasskeysAsync();
+    }
+
+    public async Task DeletePasskeyAsync(int id)
+    {
+        await PasskeyService.DeletePasskey(id);
+        Passkeys = await PasskeyService.GetMyPasskeysAsync();
+
+    }
+
+    public async Task EditDialog(Models.PasskeyModel passkey)
+    {
+        System.Diagnostics.Debug.WriteLine("Hello there !!");
+
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var dialog = DialogService.Show<EditPassKeyName>("Passkey name", new DialogParameters
+            {
+                ["passkey"] = passkey
+            }, options);
+
+        var result = await dialog.Result;
+
+        // Check if the dialog was closed with a positive result
+        if (!result.Canceled)
+        {
+        // reload passkeys
+            @* Passkeys = await PasskeyService.GetMyPasskeysAsync(); *@
+            StateHasChanged();
+        }
+    }
+
+    public async Task GeneratePassKey()
+    {
+        var credentials = await PasskeyService.RequestPasskeyAsync();
+        var response = await JsRuntime
+        .InvokeAsync<Fido2NetLib.AuthenticatorAttestationRawResponse?>("blazorPasskey.generatePassKey",
+        credentials);
+
+        if (response != null)
+        {
+            await PasskeyService.StoreCredentialsAsync(credentials, response);
+            Passkeys = await PasskeyService.GetMyPasskeysAsync();
+        }
+    }
+}

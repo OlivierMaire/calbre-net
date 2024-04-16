@@ -1,0 +1,68 @@
+@rendermode InteractiveAuto
+@using System.Globalization
+@using Microsoft.Extensions.Options
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+@inject IOptions<SupportedCulturesOptions> SupportedCultures
+
+<div> | Current Culture: @CultureInfo.CurrentCulture.Name;</div>
+
+<div class="culture-selector">
+    <MudSelect @bind-Value="Culture" ToStringFunc="@convertFunc" Dense="true"
+        AdornmentIcon="@Icons.Material.Filled.Language" AdornmentColor="Color.Inherit" Adornment="Adornment.Start">
+        @foreach (var culture in supportedCultures)
+        {
+            <MudSelectItem Class="culture-selector" Value="@(culture)" />
+        }
+    </MudSelect>
+</div>
+
+@code
+{
+    private CultureOption[] supportedCultures { get; set; } = [];
+
+    private Func<CultureOption, string> convertFunc = ci =>
+    ci == null ? string.Empty : ci.DisplayName;
+    protected override void OnInitialized()
+    {
+        supportedCultures = SupportedCultures.Value.SupportedCultureOptions;
+        @* StateHasChanged(); *@
+    }
+
+    private CultureOption Culture
+    {
+        get
+        {
+            try
+            {
+                return SupportedCultures.Value.SupportedCultureOptions.First(c => c.Value ==
+                CultureInfo.CurrentCulture.Name);
+            }
+            catch
+            {
+                return SupportedCultures.Value.SupportedCultureOptions.First();
+            }
+
+        }
+
+        set
+        {
+            if (CultureInfo.CurrentCulture.Name != value.Value)
+            {
+                // handle Client side
+                @* var js = (IJSInProcessRuntime)JS; *@
+                @* JS.InvokeVoidAsync("blazorCulture.set", value.Value); *@
+
+                // handle Server side
+                var uri = new Uri(Navigation.Uri)
+                .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value.Value);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                Navigation.NavigateTo(
+                $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                forceLoad: true);
+            }
+        }
+    }
+}

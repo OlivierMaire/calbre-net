@@ -1,0 +1,28 @@
+@using Calibre_net.Client.ApiClients
+@inject PageClient PageClient
+<AuthorizeView>
+    <Authorized>
+        <MudDivider Class="my-2" DividerType="DividerType.Middle" />
+        <MudStack Row Justify="Justify.SpaceBetween">
+            <MudText Typo="Typo.body1" Class="px-4">Custom Pages</MudText>
+            <MudIconButton Icon="@Icons.Material.Outlined.PostAdd" 
+            Href="/custom-pages"
+                    DisableRipple Class="p-0 mx-4" />
+        </MudStack>
+        @foreach (var customPage in CustomPageUrls)
+        {
+            <MudNavLink Href="@customPage.Url" Match="NavLinkMatch.All">@customPage.Title</MudNavLink>
+
+        }
+    </Authorized>
+</AuthorizeView>
+
+@code
+{
+    GetCustomPagesLinksResponse[] CustomPageUrls { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        CustomPageUrls = [.. await PageClient.LinksAsync()];
+    }
+}

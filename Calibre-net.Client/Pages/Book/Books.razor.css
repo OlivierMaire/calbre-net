@@ -1,0 +1,23 @@
+.infinite-scroll-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+.infinite-scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.search-results {
+  -webkit-mask-image: linear-gradient(to top, transparent, white 10px calc(100% - 10px), transparent);
+  mask-image: linear-gradient(to top, transparent, white 10px calc(100% - 10px), transparent);
+}
+.search-results .infinite-wrap {
+  overflow-y: scroll;
+  width: 100%;
+  padding-top: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+}

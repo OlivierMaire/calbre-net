@@ -1,0 +1,335 @@
+@page "/admin/configuration"
+@using Calibre_net.Client.Components.Shared
+@using Microsoft.Extensions.Options
+@* @attribute [StreamRendering] *@
+@rendermode InteractiveServer
+
+@inject ConfigurationClient ConfigurationClient
+@inject ILogger<Configuration> Logger
+@* @inject Microsoft.Extensions.Hosting.IHostApplicationLifetime AppLifetime; *@
+@inject NavigationManager NavigationManager
+
+@inject IJSRuntime JSRuntime
+
+
+
+<PageTitle>Admin - Configuration</PageTitle>
+
+<MudText Typo="Typo.h4">Configuration</MudText>
+@{ #pragma warning disable CS8602 }
+@if (CalibreSettings != null)
+{
+    <EditForm Model="CalibreSettings" method="post" OnValidSubmit="SubmitSettingsForm" FormName="CalibreSettings">
+        <MudExpansionPanels DisableBorders="true" MultiExpansion="true" Elevation="0">
+            <MudExpansionPanel IsInitiallyExpanded>
+                <TitleContent>
+                    <MudText Typo="Typo.h5">Database</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <FileManager @bind-Value="CalibreSettings.Database.Location" Name="CalibreSettings.Database.Location"
+                        Label="Location of Calibre Database" ChooseFolder="true" />
+                </ChildContent>
+            </MudExpansionPanel>
+            <MudExpansionPanel IsInitiallyExpanded>
+                <TitleContent>
+                    <MudText Typo="Typo.h5">Basic Configuration</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <MudExpansionPanels DisableBorders="true" MultiExpansion="true" Elevation="0">
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">Server Configuration</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudTextField @bind-Value="@CalibreSettings.Basic.Server.Port"
+                                    Name="CalibreSettings.Basic.Server.Port" Label="Server Port" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Server.SslCertfilePath"
+                                    Name="CalibreSettings.Basic.Server.SslCertfilePath"
+                                    Label="SSL certfile location (leave it empty for non-SSL Servers)" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Server.SslKeyfilePath"
+                                    Name="CalibreSettings.Basic.Server.SslKeyfilePath"
+                                    Label="SSL Keyfile location (leave it empty for non-SSL Servers)" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Server.UpdateChannel"
+                                    Name="CalibreSettings.Basic.Server.UpdateChannel" Label="Update Channel" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Server.TrustedHosts"
+                                    Name="CalibreSettings.Basic.Server.TrustedHosts"
+                                    Label="Trusted Hosts (Comma Separated)" />
+                            </ChildContent>
+                        </MudExpansionPanel>
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">Logfile Configuration</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Logfile.LogLevel"
+                                    Name="CalibreSettings.Basic.Logfile.LogLevel" Label="Log Level" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Logfile.LogfilePath"
+                                    Name="CalibreSettings.Basic.Logfile.LogfilePath"
+                                    Label="Location and name of logfile (calibre-web.log for no entry)" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Logfile.AccessLogEnabled"
+                                    Name="CalibreSettings.Basic.Logfile.AccessLogEnabled" Label="Enable Access Log" />
+                                @if (CalibreSettings.Basic.Logfile.AccessLogEnabled == true)
+                                {
+                                    <MudTextField @bind-Value="CalibreSettings.Basic.Logfile.AccessLogPath"
+                                        Name="CalibreSettings.Basic.Logfile.AccessLogPath"
+                                        Label="Location and name of access logfile (access.log for no entry)" />
+                                }
+                            </ChildContent>
+                        </MudExpansionPanel>
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">Feature Configuration</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Feature.ConvertNonEnglish"
+                                    Name="CalibreSettings.Basic.Feature.ConvertNonEnglish"
+                                    Label="Convert non-English characters in title and author while saving to disk" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Feature.UploadEnabled"
+                                    Name="CalibreSettings.Basic.Feature.UploadEnabled"
+                                    Label="Enable Uploads (Please ensure users having also upload rights)" />
+                                @if (CalibreSettings.Basic.Feature.UploadEnabled == true)
+                                {
+                                    <MudTextField @bind-Value="CalibreSettings.Basic.Feature.UploadFormatsAllowed"
+                                        Name="CalibreSettings.Basic.Feature.UploadFormatsAllowed"
+                                        Label="Allowed Upload Fileformats" />
+                                }
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Feature.AnonymousEnabled"
+                                    Name="CalibreSettings.Basic.Feature.AnonymousEnabled"
+                                    Label="Enable Anonymous Browsing" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Feature.RegistrationEnabled"
+                                    Name="CalibreSettings.Basic.Feature.RegistrationEnabled"
+                                    Label="Enable Public Registration" />
+                                @if (CalibreSettings.Basic.Feature.RegistrationEnabled == true)
+                                {
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Feature.UseEmailAsUsername"
+                                        Name="CalibreSettings.Basic.Feature.UseEmailAsUsername" Label="Use Email as Username" />
+                                }
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Feature.MagicLinkEnabled"
+                                    Name="CalibreSettings.Basic.Feature.MagicLinkEnabled"
+                                    Label="Enable Magic Link Remote Login" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Feature.ReverseProxyAuthEnabled"
+                                    Name="CalibreSettings.Basic.Feature.ReverseProxyAuthEnabled"
+                                    Label="Allow Reverse Proxy Authentication" />
+                                @if (CalibreSettings.Basic.Feature.ReverseProxyAuthEnabled == true)
+                                {
+                                    <MudTextField @bind-Value="CalibreSettings.Basic.Feature.ReverseProxyHeaderName"
+                                        Name="CalibreSettings.Basic.Feature.ReverseProxyHeaderName"
+                                        Label="Reverse Proxy Header Name" />
+                                }
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Feature.OAuthGoogleClientId"
+                                    Name="CalibreSettings.Basic.Feature.OAuthGoogleClientId"
+                                    Label="Google OAuth Client Id" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Feature.OAuthGoogleClientSecret"
+                                    Name="CalibreSettings.Basic.Feature.OAuthGoogleClientSecret"
+                                    Label="Google OAuth Client Secret" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Feature.OAuthGitHubClientId"
+                                    Name="CalibreSettings.Basic.Feature.OAuthGitHubClientId"
+                                    Label="GitHub OAuth Client Id" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Feature.OAuthGitHubClientSecret"
+                                    Name="CalibreSettings.Basic.Feature.OAuthGitHubClientSecret"
+                                    Label="GitHub OAuth Client Secret" />
+                            </ChildContent>
+                        </MudExpansionPanel>
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">External binaries</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudTextField @bind-Value="CalibreSettings.Basic.External.CalibreEbookConverterPath"
+                                    Name="CalibreSettings.Basic.External.CalibreEbookConverterPath"
+                                    Label="Path to Calibre E-Book Converter" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.External.CalibreEbookConverterSettings"
+                                    Name="CalibreSettings.Basic.External.CalibreEbookConverterSettings"
+                                    Label="Calibre E-Book Converter Settings" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.External.KepubifyEbookConverterPath"
+                                    Name="CalibreSettings.Basic.External.KepubifyEbookConverterPath"
+                                    Label="Path to Kepubify E-Book Converter" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.External.UnrarPath"
+                                    Name="CalibreSettings.Basic.External.UnrarPath" Label="Location of Unrar binary" />
+                            </ChildContent>
+                        </MudExpansionPanel>
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">Security Settings</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Security.FailedLoginAttemptLimit"
+                                    Name="CalibreSettings.Basic.Security.FailedLoginAttemptLimit"
+                                    Label="Limit failed login attempts" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordPolicy"
+                                    Name="CalibreSettings.Basic.Security.EnforcePasswordPolicy"
+                                    Label="User Password policy" />
+                                @if (CalibreSettings.Basic.Security.EnforcePasswordPolicy == true)
+                                {
+                                    <MudTextField @bind-Value="CalibreSettings.Basic.Security.MinPasswordLength"
+                                        Name="CalibreSettings.Basic.Security.MinPasswordLength"
+                                        Label="Minimum password length" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordNumber"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordNumber" Label="Enforce number" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordLowercase"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordLowercase"
+                                        Label="Enforce lowercase characters" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordUppercase"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordUppercase"
+                                        Label="Enforce uppercase characters" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordSpecial"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordSpecial"
+                                        Label="Enforce special characters" />
+                                }
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.PasskeyAllowed"
+                                    Name="CalibreSettings.Basic.Security.PasskeyAllowed" Label="Allow Passkeys" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.MfaAllowed"
+                                    Name="CalibreSettings.Basic.Security.MfaAllowed" Label="Allow MFA" />
+
+
+
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    </MudExpansionPanels>
+                </ChildContent>
+
+            </MudExpansionPanel>
+            <MudExpansionPanel IsInitiallyExpanded>
+                <TitleContent>
+                    <MudText Typo="Typo.h5">UI Configuration</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <MudExpansionPanels DisableBorders="true" MultiExpansion="true" Elevation="0">
+
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">View Configuration</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.SiteTitle"
+                                    Name="CalibreSettings.UI.View.SiteTitle" Label="Title" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.BooksPerPage"
+                                    Name="CalibreSettings.UI.View.BooksPerPage" Label="Books per Page" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.RandomBooksDisplayNb"
+                                    Name="CalibreSettings.UI.View.RandomBooksDisplayNb"
+                                    Label="No. of Random Books to Display" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.NbAuthorDisplayedBeforeHiding"
+                                    Name="CalibreSettings.UI.View.NbAuthorDisplayedBeforeHiding"
+                                    Label="No. of Authors to Display Before Hiding (0=Disable Hiding)" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.ThemeName"
+                                    Name="CalibreSettings.UI.View.ThemeName" Label="Theme" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.IgnoreColumnRegex"
+                                    Name="CalibreSettings.UI.View.IgnoreColumnRegex"
+                                    Label="Regular Expression for Ignoring Columns" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.ReadStatusColumn"
+                                    Name="CalibreSettings.UI.View.ReadStatusColumn"
+                                    Label="Link Read/Unread Status to Calibre Column" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.ViewRestrictionColumn"
+                                    Name="CalibreSettings.UI.View.ViewRestrictionColumn"
+                                    Label="View Restrictions based on Calibre column" />
+                                <MudTextField @bind-Value="CalibreSettings.UI.View.TitleSortRegex"
+                                    Name="CalibreSettings.UI.View.TitleSortRegex"
+                                    Label="Regular Expression for Title Sorting" />
+                            </ChildContent>
+                        </MudExpansionPanel>
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">Default Settings for New Users</MudText>
+                            </TitleContent>
+                            <ChildContent>
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Security.FailedLoginAttemptLimit"
+                                    Name="CalibreSettings.Basic.Security.FailedLoginAttemptLimit"
+                                    Label="Limit failed login attempts" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordPolicy"
+                                    Name="CalibreSettings.Basic.Security.EnforcePasswordPolicy"
+                                    Label="User Password policy" />
+                                @if (CalibreSettings.Basic.Security.EnforcePasswordPolicy == true)
+                                {
+                                    <MudTextField @bind-Value="CalibreSettings.Basic.Security.MinPasswordLength"
+                                        Name="CalibreSettings.Basic.Security.MinPasswordLength"
+                                        Label="Minimum password length" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordNumber"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordNumber" Label="Enforce number" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordLowercase"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordLowercase"
+                                        Label="Enforce lowercase characters" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordUppercase"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordUppercase"
+                                        Label="Enforce uppercase characters" />
+                                    <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.EnforcePasswordSpecial"
+                                        Name="CalibreSettings.Basic.Security.EnforcePasswordSpecial"
+                                        Label="Enforce special characters" />
+                                }
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.PasskeyAllowed"
+                                    Name="CalibreSettings.Basic.Security.PasskeyAllowed" Label="Allow Passkeys" />
+                                <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.MfaAllowed"
+                                    Name="CalibreSettings.Basic.Security.MfaAllowed" Label="Allow MFA" />
+
+
+
+                            </ChildContent>
+                        </MudExpansionPanel>
+                        <MudExpansionPanel IsInitiallyExpanded>
+                            <TitleContent>
+                                <MudText Typo="Typo.h6">Default Visibilities for New Users</MudText>
+                            </TitleContent>
+                            <ChildContent>
+
+
+                            </ChildContent>
+                        </MudExpansionPanel>
+                    </MudExpansionPanels>
+                </ChildContent>
+            </MudExpansionPanel>
+
+        </MudExpansionPanels>
+
+        <MudButton Variant="Variant.Outlined" ButtonType="ButtonType.Submit" Class="ml-auto" Color="Color.Primary">
+            Save</MudButton>
+
+
+    </EditForm>
+
+}
+@{ #pragma warning restore CS8602 }
+
+@code {
+
+    [SupplyParameterFromForm(FormName = "CalibreSettings")]
+    private CalibreConfiguration? CalibreSettings { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CalibreSettings ??= (CalibreConfiguration)await ConfigurationClient.ConfigurationGetAsync();
+    }
+
+    private IJSObjectReference? _jsModule;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import",
+            "./Components/Layout/Parts/SiteTitle.razor.js");
+        }
+    }
+
+    public async Task SubmitSettingsForm()
+    {
+        await ConfigurationClient.ConfigurationPostAsync(CalibreSettings);
+        @* CalibreSettings = await ConfigurationClient.GetCalibreConfigurationAsync(); *@
+
+        await SendMessageWithDelay(350);
+
+    }
+
+    async Task SendMessageWithDelay(int time)
+    {
+        await Task.Delay(time);
+        await _jsModule!.InvokeVoidAsync("calibreMessage.send", new MessageEventArgs()
+            {
+                EventType = MessageType.ConfigChanged
+            });
+
+    }
+
+    @* public void RestartServer()
+{
+
+AppLifetime.StopApplication();
+} *@
+}

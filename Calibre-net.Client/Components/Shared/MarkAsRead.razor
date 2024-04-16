@@ -1,0 +1,21 @@
+@using Calibre_net.Client.ApiClients
+@inject ReadClient ReadClient
+
+<AuthorizeView>
+    <div>
+        <MudToggleIconButton Toggled="@Book.MarkAsRead" Icon="@Icons.Material.Outlined.Circle"
+            Color="@Color.Default" Title="Unread" ToggledIcon="@Icons.Material.Outlined.CheckCircle"
+            ToggledColor="@Color.Success" ToggledTitle="Read" ToggledChanged="OnToggle" />
+        <span>@(Book.MarkAsRead ? "Mark unread" : "Mark as Read")</span>
+    </div>
+</AuthorizeView>
+
+@code{
+
+    [Parameter] public BookDto Book {get;set;} = null!;
+
+    private async Task OnToggle()
+    {
+        Book.MarkAsRead = await ReadClient.ReadAsync(Book.Id, new SetReadStatusRequest(Book.Id, !Book.MarkAsRead));
+    }
+}   

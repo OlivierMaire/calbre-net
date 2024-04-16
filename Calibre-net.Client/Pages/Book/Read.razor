@@ -1,0 +1,84 @@
+@page "/book/read/{id:int}/{format}"
+@layout Components.Layout.EmptyLayout
+@inject NavigationManager NavManager
+@inject BookClient BookClient
+
+@attribute [Authorize(PermissionType.BOOK_VIEW)]
+@rendermode InteractiveAuto
+
+@* // Ebook : EPUB, AZW3,CUE *@
+@if (Format.ToLower() == "epub")
+{
+  <EPubBlazor.EPubReader GetBookData="GetBookData" SaveBookmark="SaveBookmark" AppName="EPUB Reader"
+    @rendermode="new InteractiveAutoRenderMode(prerender: false)" />
+}
+  // Comics : CBZ, CBR, PDF 
+else if (Format.ToLower() == "cbz" ||
+Format.ToLower() == "cbr" ||
+Format.ToLower() == "pdf")
+{
+  @if (Metadata != null)
+  {
+    <ComicsBlazor.ComicsBlazorView Url="@Url" Name="Comics Reader" Metadata="@Metadata" GetPage="GetComicPage"
+      SaveBookmark="SaveBookmark" @rendermode="new InteractiveAutoRenderMode(prerender: false)" />
+  }
+  else
+  {
+    <div>Loading...</div>
+  }
+}
+
+@code {
+  [Parameter] public int Id { get; set; }
+  [Parameter] public string Format { get; set; } = string.Empty;
+
+  private ComicsBlazor.ComicMetadata? Metadata { get; set; }
+
+
+  private string Url => NavManager.BaseUri + $"api/v1/book/download/{Id}/{Format}";
+
+  private async Task<VersOne.Epub.EpubBook?> GetBookData()
+  {
+    var bookData = await BookClient.DownloadDataAsync(Id, Format);
+    if (bookData == null) return null;
+    using MemoryStream ms = new(bookData.Data);
+    var book = await VersOne.Epub.EpubReader.ReadBookAsync(ms);
+    return book;
+  }
+
+  override protected async Task OnInitializedAsync()
+  {
+    var meta = await BookClient.MetadataAsync(Id, Format);
+    var bookmark = await BookClient.GetBookmarkAsync(Id, Format);
+    if (meta.ComicMetadata != null)
+    {
+      Metadata = meta.ComicMetadata.ToComicsBlazorMetadata();
+      if (bookmark != null)
+      {
+        int.TryParse(bookmark.Position, out var position);
+        Metadata.LastReadPosition = position;
+      }
+    }
+  }
+
+  private async Task<ComicsBlazor.PageData?> GetComicPage(int pageNmber)
+  {
+    var page = await BookClient.PageDataAsync(Id, Format, pageNmber);
+
+
+    if (page != null)
+    { 
+      return new ComicsBlazor.PageData(page.PageContent, page.ContentType, page.Size, page.LeftColor, page.RightColor );
+      }
+
+    return null;
+  }
+
+
+  private async void SaveBookmark(string position)
+  {
+    await BookClient.SetBookmarkAsync(Id, Format, position);
+  }
+
+
+}

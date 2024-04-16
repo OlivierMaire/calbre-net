@@ -1,0 +1,21 @@
+::deep {
+    .sort-badge {
+        .right {
+            left: -10px;
+        }
+        .mud-badge-top{
+            top: 10px;
+        }
+        .mud-badge-bottom{
+            top: -10px;
+        }
+    }
+}
+
+@media (max-width: 960px) {
+    ::deep{
+        .mud-icon-button{
+            padding-left: 2px;
+        }
+    }
+}

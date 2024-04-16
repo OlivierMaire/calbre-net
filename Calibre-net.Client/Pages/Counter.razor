@@ -1,0 +1,20 @@
+﻿@page "/counter"
+@rendermode InteractiveAuto
+@using Calibre_net.Client.Components
+
+@* <MyMudProviders /> *@
+
+<PageTitle>Counter @(OperatingSystem.IsBrowser() ? "Wasm" : "Server")</PageTitle>
+
+<MudText Typo="Typo.h3" GutterBottom="true">Counter @(OperatingSystem.IsBrowser() ? "Wasm" : "Server")</MudText>
+<MudText Class="mb-4">Current count: @currentCount</MudText>
+<MudButton Color="Color.Primary" Variant="Variant.Filled" @onclick="IncrementCount">Click me</MudButton>
+
+@code {
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}

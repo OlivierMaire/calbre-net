@@ -1,0 +1,42 @@
+@using Calibre_net.Shared;
+<div>
+    <MudText Typo="Typo.body2" Class="d-inline-block">
+    @CustomColumn.Name:&nbsp;
+    </MudText>
+
+        @{
+            bool first = true;
+            foreach (var data in CustomColumn.Data)
+        {
+            if (CustomColumn.Datatype == "rating")
+            {
+                <StarRatingDisplay Value="data.Value.Parse<int>()" />
+            }
+            else if (CustomColumn.Datatype == "bool")
+            {
+                <MudIcon Icon="@(data.Value.Parse<bool>() ? Icons.Material.Filled.Check : Icons.Material.Filled.Close)" />
+            }
+            else
+            {
+                <MudText Typo="Typo.body2" Class="d-inline-block">
+                @if (!first)
+{
+    <span>, </span>
+}
+                     @data.Value 
+                @if (first)
+    {
+        first = false;
+    }
+                </MudText>
+            }
+        }
+        }
+</div>
+
+@code {
+
+    [Parameter] public CustomColumnDto CustomColumn { get; set; } = null!;
+
+
+}

@@ -1,0 +1,5 @@
+::deep .mud-main-content {
+  max-height: calc(100svh - var(--bottom-player-height));
+  overflow: auto;
+  padding-bottom: 1rem;
+}

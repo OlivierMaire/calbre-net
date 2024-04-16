@@ -1,0 +1,126 @@
+@using Calibre_net.Shared.Contracts
+@using Calibre_net.Shared
+
+@inject CategoryClient CategoryClient
+@inject SearchService SearchService
+
+@page "/books/{categoryType}"
+@* @attribute [StreamRendering] *@
+@attribute [Authorize]
+@rendermode InteractiveAuto
+
+
+<PageTitle>@CategoryType</PageTitle>
+        <MudText Typo="Typo.h3" GutterBottom="true">@CategoryType</MudText>
+
+        <div class="d-flex flex-row gap-2 align-items-center">
+            <BookOrder OrderChanged="OrderChanged" Orders="@Orders" NoPosition="true"/>
+            <CategoryFilter AvailableLetters="CategoryLetters" SelectionChanged="SelectionChanged"/>
+        </div>
+<div class="category-results">
+    <MudList Clickable="true" class="category-list">
+        @foreach (var category in Categories)
+        {
+            <a href="@SearchService.GetSearchUrl(category)">
+                    <MudBadge Content="@category.BookCount" Overlap="true" Origin="Origin.CenterRight" Color="Color.Primary"
+                       >
+                <MudListItem Class="pr-10">
+                        @if (CategoryType == "ratings")
+                        {
+ <Calibre_net.Client.Components.Shared.StarRatingDisplay Value="@int.Parse(category.Name)" />
+                        }
+                        else
+                        {
+                            @category.Name
+                        }
+                </MudListItem>
+                    </MudBadge>
+            </a>
+        }
+    </MudList>
+</div>
+
+
+@code
+{
+    [Parameter] public string CategoryType { get; set; } = string.Empty;
+
+    private List<GenericCategoryCount> AllCategories { get; set; } = [];
+    private List<GenericCategoryCount> Categories { get; set; } = [];
+    private List<SearchOrderModel> Orders { get; set; } = [];
+
+    private IEnumerable<char> CategoryLetters => AllCategories.Select(c => (string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).FirstOrDefault()).Distinct().OrderBy(x => x);
+        private char? SelectedLetter {get;set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+            Orders = new() {
+                new() {
+                Key = "Category",
+                PropertyName = "Name",
+                Icon = Icons.Material.Outlined.Reorder,
+                Ascending = true
+                
+                },
+            };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Categories = CategoryType switch
+        {
+            "tags" => (await CategoryClient.TagsAsync()).Tags.ProjectToCategoryCount().ToList(),
+            "series" => (await CategoryClient.SeriesAsync()).Series.ProjectToCategoryCount().ToList(),
+            "authors" => (await CategoryClient.AuthorsAsync()).Authors.ProjectToCategoryCount().ToList(),
+            "publishers" => (await CategoryClient.PublishersAsync()).Publishers.ProjectToCategoryCount().ToList(),
+            "languages" => (await CategoryClient.LanguagesAsync()).Languages.ProjectToCategoryCount().ToList(),
+            "ratings" => (await CategoryClient.RatingsAsync()).Rating.ProjectToCategoryCount().ToList(),
+            "formats" => (await CategoryClient.FormatsAsync()).Formats.ProjectToCategoryCount().ToList(),
+            _ => CategoryType.StartsWith("cc_") ? await HandleCustomColumns() : [],
+        };
+
+        AllCategories = Categories;
+        Categories = Categories.OrderBy(c => string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).ToList();
+    }
+    
+    private async Task<List<GenericCategoryCount>> HandleCustomColumns()
+        {
+            var colIdAsString = CategoryType.Replace("cc_", "");
+           if ( !int.TryParse(colIdAsString, out var colId) )
+           return [];
+
+           var response = (await CategoryClient.Custom_columnAsync(colId));
+           if (response != null)
+           {
+                return response.CustomColumns.ProjectToCategoryCount().ToList();
+           }
+
+           return [];
+           
+        }
+
+    private void OrderChanged(List<SearchOrder> orders)
+    {
+        var order = orders.Single(o => o.Key ==  "Category");
+        Orders.Single(o => o.Key ==  "Category").Ascending = order.Ascending;
+        if (order.Ascending)
+            Categories = Categories.OrderBy(c => string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).ToList();
+        else
+            Categories = Categories.OrderByDescending(c => string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).ToList();
+       StateHasChanged();
+    }
+
+    private void SelectionChanged(char? letter)
+    {
+SelectedLetter = letter;
+if (letter == null)
+    Categories = AllCategories;
+    else
+        Categories = AllCategories.Where(c => c.Sort?.StartsWith(letter.Value) ?? false).ToList();
+
+    OrderChanged(Orders.Select(o => o as SearchOrder).ToList());
+    }
+
+
+
+}

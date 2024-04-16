@@ -1,0 +1,84 @@
+@using System.Linq;
+@using System.Linq.Expressions;
+
+<div class="mud-select">
+    <div class="mud-input-control mud-select">
+        <div class="mud-input-control-input-container">
+            <div
+                class="mud-input mud-input-text mud-input-adorned-start mud-input-underline mud-shrink mud-select-input">
+                <InputSelect Name="@Name" @bind-Value="@InnerValue" 
+                    Class="input-select mud-input-slot mud-input-root mud-input-root-text mud-input-root-adorned-start mud-select-input">
+                    @foreach (var opt in Options)
+                    {
+                        <option value="@opt.Value">
+                            @opt.Key
+                        </option>
+                    }
+                </InputSelect>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="p-2">
+    Value: @this.Value
+</div>
+
+@code {
+    private string _value = string.Empty;
+
+    [Parameter]
+    public string Value {get;set;} = string.Empty;
+
+    public string InnerValue   {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+
+
+    [Parameter] public Expression<Func<string>> ValueExpression { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Name { get; set; } = string.Empty;
+
+
+    [Parameter]
+    public List<KeyValuePair<string, string>> Options { get; set; } = new List<KeyValuePair<string, string>>();
+
+protected override void OnInitialized()
+    {
+        InnerValue = Value;
+        if (String.IsNullOrEmpty(this.Name))
+            this.Name = ParseFieldName();
+    }
+
+    private string ParseFieldName()
+    {
+        if (this.ValueExpression is null)
+            throw new ArgumentException($"You must provide a ValueExpression for this component.");
+
+        var accessorBody = this.ValueExpression.Body;
+
+        if (accessorBody is UnaryExpression unaryExpression
+            && unaryExpression.NodeType == ExpressionType.Convert
+            && unaryExpression.Type == typeof(object))
+        {
+            accessorBody = unaryExpression.Operand;
+        }
+
+        if (!(accessorBody is MemberExpression memberExpression))
+            throw new ArgumentException($"The provided expression is not supported.");
+
+        return memberExpression.Member.Name;
+    }
+
+}
