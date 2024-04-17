@@ -42,7 +42,7 @@
 {
 
     [Parameter] public string Class { get; set; } = string.Empty;
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         LayoutService.MajorUpdateOccured += LayoutServiceOnMajorUpdateOccured;
     }

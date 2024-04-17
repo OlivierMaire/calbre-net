@@ -2,7 +2,6 @@ using Calibre_net.Client.Services;
 using Calibre_net.Data.Calibre;
 using Calibre_net.Shared.Contracts;
 using Calibre_net.Shared;
-using Calibre_net.Data.Calibre;
 using Dapper;
 using System.Globalization;
 using Calibre_net.Data;
@@ -285,7 +284,7 @@ public class BookService(CalibreDbDapperContext dbContext, ApplicationDbContext 
             sql += sqlOrder;
         }
 
-        Console.WriteLine(sql);
+        // Console.WriteLine(sql);
 
         var books =
             ctx.Query<Book, Author, Series, Rating, Book>(sql,

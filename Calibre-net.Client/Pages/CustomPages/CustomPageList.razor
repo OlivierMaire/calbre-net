@@ -6,8 +6,7 @@
 
 <MudText Typo="Typo.h3" GutterBottom="true">Custom Pages</MudText>
 
-<MudDataGrid T="CustomPageDto" Items="@Pages" EditMode="DataGridEditMode.Form" StartedEditingItem="@StartedEditingItem"
-    CanceledEditingItem="@CanceledEditingItem" CommittedItemChanges="@CommittedItemChanges" Bordered="true" Dense="true"
+<MudDataGrid T="CustomPageDto" Items="@Pages" EditMode="DataGridEditMode.Form" Bordered="true" Dense="true"
     EditTrigger="DataGridEditTrigger.Manual">
     <Columns>
         @* <PropertyColumn Property="x => x.Id" Title="#" IsEditable="false" /> *@
@@ -37,22 +36,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Pages = (await PageClient.AllAsync())?.Pages;
+        var response = await PageClient.AllAsync();
+        if (response != null)
+            Pages = response.Pages;
     }
 
-    // events
-    void StartedEditingItem(CustomPageDto item)
-    {
-        @* _events.Insert(0, $"Event = StartedEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}"); *@
-    }
 
-    void CanceledEditingItem(CustomPageDto item)
-    {
-        @* _events.Insert(0, $"Event = CanceledEditingItem, Data = {System.Text.Json.JsonSerializer.Serialize(item)}"); *@
-    }
-
-    void CommittedItemChanges(CustomPageDto item)
-    {
-        @* _events.Insert(0, $"Event = CommittedItemChanges, Data = {System.Text.Json.JsonSerializer.Serialize(item)}"); *@
-    }
 }

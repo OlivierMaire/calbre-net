@@ -1,7 +1,6 @@
 @using Calibre_net.Shared
 @inject BookClient BookClient
 @inject AudioPlayerBlazor.QueuePlayerService audioService
-@* @rendermode @(new InteractiveAutoRenderMode(prerender: false)) *@
 <div>
 
     @if (Book?.Data != null && Book.Data.Count > 0)

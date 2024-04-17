@@ -1,13 +1,10 @@
 using System.Security.Claims;
 using Calibre_net.Data;
-using Calibre_net.Markdown.Extensions;
-using Calibre_net.Services;
 using Calibre_net.Shared.Contracts;
 using FastEndpoints;
 using Markdig;
 using Calibre_net.Shared;
 using Microsoft.EntityFrameworkCore;
-using ZXing;
 
 namespace Calibre_net.Api.Endpoints;
 public class CustomPageGroup : Group
@@ -167,8 +164,7 @@ public sealed class GetCustomPageMarkupEndpoint(ApplicationDbContext dbContext) 
             await SendNotFoundAsync(ct);
         // Configure the pipeline with all advanced extensions active
         var pipeline = new MarkdownPipelineBuilder()
-        // .Use<BookExtension>(new BookExtension(_bookService))
-        .UseAdvancedExtensions().UseBookBlocks().Build();
+        .UseAdvancedExtensions().Build();
         var markup = Markdig.Markdown.ToHtml(pageDb?.Content ?? string.Empty, pipeline: pipeline);
 
     Console.WriteLine(markup);

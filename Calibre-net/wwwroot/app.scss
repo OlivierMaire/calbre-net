@@ -235,9 +235,18 @@ a:hover {
         top: calc(var(--mud-appbar-height) - var(--mud-appbar-height)/4) !important;
         left: 0 !important;
         width: 100% !important;
-            .search-key{
-                display: none;
-            }
 
+        .search-key {
+            display: none;
+        }
+
+    }
+}
+
+
+html,
+body {
+    &:has(.comics-blazor-view) {
+        overscroll-behavior: none;
     }
 }

@@ -7,3 +7,8 @@
   height: 100%;
   margin-bottom: 0.5rem;
 }
+@media (max-width: 960px) {
+  ::deep .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:not(:last-child) {
+    margin-bottom: -30%;
+  }
+}

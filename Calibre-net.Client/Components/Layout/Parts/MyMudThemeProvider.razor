@@ -49,7 +49,7 @@
     {
         LayoutService.MajorUpdateOccured += LayoutServiceOnMajorUpdateOccured;
         LayoutService.SetBaseTheme(MyTheme);
-@* 
+
         persistingSubscription =
         ApplicationState.RegisterOnPersisting(PersistData);
 
@@ -57,8 +57,8 @@
         "DarkModeCookie", out var restored))
         {
             LayoutService.SetDarkMode(restored!);
-            _isDarkMode = restored!;
-        } *@
+            @* LayoutService.IsDarkMode = restored!; *@
+        }
 
     }
 
@@ -91,12 +91,12 @@
         StateHasChanged();
     }
 
-    @* private Task PersistData()
+    private Task PersistData()
     {
-        ApplicationState.PersistAsJson("DarkModeCookie", _isDarkMode);
+        ApplicationState.PersistAsJson("DarkModeCookie", LayoutService.IsDarkMode);
 
         return Task.CompletedTask;
-    } *@
+    }
 
     void IDisposable.Dispose()
     {

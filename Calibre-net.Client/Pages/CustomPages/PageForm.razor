@@ -111,17 +111,16 @@ else
     }
 
 
-    bool success;
     string[] errors = { };
 
-    MudForm form;
+    MudForm form { get; set; } = null!;
     [Parameter] public CustomPageDto PageModel { get; set; } = new();
 
 
     CustomPageValidator pageValidator = new();
 
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         pageValidator.ValidateValue = async (model, propertyName) =>
         {

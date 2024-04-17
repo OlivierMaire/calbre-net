@@ -3,7 +3,6 @@ using Calibre_net.Client.Services;
 using Calibre_net.Data.Calibre;
 using ComicMeta;
 using Calibre_net.Shared.Contracts;
-using Calibre_net.Data.Calibre;
 using Dapper;
 using Microsoft.AspNetCore.StaticFiles;
 

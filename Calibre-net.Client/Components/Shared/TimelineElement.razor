@@ -41,7 +41,9 @@
         if (Book == null)
             return string.Empty;
 
-        object currentObject = Book;
+        object? currentObject = Book;
+        if (currentObject == null)
+            return string.Empty;
 
         foreach (var propertyName in propertyNames)
         {
@@ -53,14 +55,15 @@
                 name = propertyName.Split("[")[0];
             }
 
-            var propertyInfo = currentObject.GetType().GetProperty(name);
+            var propertyInfo = currentObject?.GetType().GetProperty(name);
             if (propertyInfo == null)
             {
                 Console.WriteLine($"Property '{name}' not found.");
                 return string.Empty;
             }
 
-            if (propertyInfo.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && propertyInfo.PropertyType != typeof(String))
+            if (propertyInfo.PropertyType.GetInterfaces().Contains(typeof(IEnumerable)) && propertyInfo.PropertyType !=
+            typeof(String))
             {
                 IEnumerable? collection = (IEnumerable?)propertyInfo.GetValue(currentObject);
                 if (collection == null)
@@ -72,9 +75,9 @@
                 currentObject = enumerator.Current;
             }
             else
-                currentObject = propertyInfo.GetValue(currentObject);
+                currentObject = propertyInfo?.GetValue(currentObject);
         }
 
-        return currentObject.ToString();
+        return currentObject?.ToString() ?? string.Empty;
     }
 }

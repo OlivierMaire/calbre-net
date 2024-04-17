@@ -69,7 +69,8 @@
   display: inline-flex;
   overflow: visible;
 }
-.book-thumb .book-info .book-series:hover ::deep p, .book-thumb .book-info .book-series:hover ::deep span,
+.book-thumb .book-info .book-series:hover ::deep p,
+.book-thumb .book-info .book-series:hover ::deep span,
 .book-thumb .book-info .book-series :focus-within ::deep p,
 .book-thumb .book-info .book-series :focus-within ::deep span {
   background-color: var(--mud-palette-background);
@@ -80,21 +81,38 @@
   font-size: 0.8rem;
 }
 
-.book-thumb.timeline {
-  width: 100%;
-  flex-direction: row-reverse !important;
-  gap: 8px;
-  width: min(450px, 80%);
-  margin: 0 0 0 auto;
-}
-.book-thumb.timeline .book-cover {
-  max-height: 200px;
-  width: -moz-max-content;
-  width: max-content;
-}
-
-.mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:nth-child(odd):not(.mud-timeline-item-start) .book-thumb.timeline ::deep,
+@media (min-width: 960px) {
+  .book-thumb.timeline {
+    width: 100%;
+    flex-direction: row-reverse !important;
+    gap: 8px;
+    width: min(450px, 80%);
+    margin: 0 0 0 auto;
+  }
+  .book-thumb.timeline .book-cover {
+    max-height: 200px;
+    width: -moz-max-content;
+    width: max-content;
+  }
+  .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:nth-child(odd):not(.mud-timeline-item-start) .book-thumb.timeline ::deep,
 .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item.mud-timeline-item-end .book-thumb.timeline ::deep {
-  flex-direction: row !important;
-  margin: 0 auto 0 0;
+    flex-direction: row !important;
+    margin: 0 auto 0 0;
+  }
+}
+@media (max-width: 960px) {
+  .book-thumb.timeline {
+    width: 100%;
+    gap: 8px;
+    margin: 0 0 0 auto;
+  }
+  .book-thumb.timeline .book-cover {
+    max-height: 200px;
+    width: -moz-max-content;
+    width: max-content;
+  }
+  .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:nth-child(odd):not(.mud-timeline-item-start) .book-thumb.timeline ::deep,
+.mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item.mud-timeline-item-end .book-thumb.timeline ::deep {
+    margin: 0 auto 0 0;
+  }
 }

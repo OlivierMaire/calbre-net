@@ -52,7 +52,7 @@
     private IEnumerable<char> CategoryLetters => AllCategories.Select(c => (string.IsNullOrEmpty(c.Sort) ? c.Name : c.Sort).FirstOrDefault()).Distinct().OrderBy(x => x);
         private char? SelectedLetter {get;set;}
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
             Orders = new() {
                 new() {

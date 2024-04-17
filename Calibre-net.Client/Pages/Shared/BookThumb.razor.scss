@@ -9,9 +9,11 @@
 
     .book-cover {
         height: 300px;
-@media (max-width: 960px) {
-    height: 274px;
-}
+
+        @media (max-width: 960px) {
+            height: 274px;
+        }
+
         text-align: center;
         position: relative;
 
@@ -22,9 +24,9 @@
             max-width: 100%;
         }
 
-        .mark-read{
+        .mark-read {
             position: absolute;
-            bottom:-2px;
+            bottom: -2px;
             left: -2px;
         }
     }
@@ -62,6 +64,7 @@
 
         .book-series {
             text-wrap: nowrap;
+
             ::deep {
                 a {
                     overflow: hidden;
@@ -84,7 +87,9 @@
                         // min-width: 100%;
                         overflow: visible;
                     }
-                    p,span {
+
+                    p,
+                    span {
                         background-color: var(--mud-palette-background);
                         border-radius: 0 8px 8px 0;
                         padding-right: .3rem;
@@ -93,43 +98,70 @@
                 }
 
             }
-            }
+        }
 
-            ::deep {
-                .star-rating {
-                    .mud-icon-root {
-                        font-size: .8rem;
-                    }
+        ::deep {
+            .star-rating {
+                .mud-icon-root {
+                    font-size: .8rem;
                 }
             }
         }
-
     }
 
-  
+}
+
+
+@media (min-width: 960px) {
+    .book-thumb.timeline {
+        width: 100%;
+        flex-direction: row-reverse !important;
+        gap: 8px;
+        width: min(450px, 80%);
+        margin: 0 0 0 auto;
+
+        .book-cover {
+            max-height: 200px;
+            // height: 200px;
+            width: max-content;
+        }
+    }
+
+    .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:nth-child(odd):not(.mud-timeline-item-start),
+    .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item.mud-timeline-item-end {
         .book-thumb.timeline {
-            width: 100%;
-            flex-direction: row-reverse !important;
-            gap: 8px;
-            width: min(450px, 80%);
-            margin: 0 0 0 auto;
-            .book-cover{
-                max-height: 200px;
-                // height: 200px;
-                width: max-content;
+            ::deep {
+
+                flex-direction: row !important;
+                margin: 0 auto 0 0;
+
             }
         }
+    }
+}
 
-        .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:nth-child(odd):not(.mud-timeline-item-start),
-         .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item.mud-timeline-item-end 
-         {
-                .book-thumb.timeline
-                {
-            ::deep{
 
-            flex-direction: row !important;
-            margin: 0 auto 0 0;
+@media (max-width: 960px) {
+    .book-thumb.timeline {
+        width: 100%;
+        gap: 8px;
+        margin: 0 0 0 auto;
 
-                }
+        .book-cover {
+            max-height: 200px;
+            // height: 200px;
+            width: max-content;
+        }
+    }
+
+    .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:nth-child(odd):not(.mud-timeline-item-start),
+    .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item.mud-timeline-item-end {
+        .book-thumb.timeline {
+            ::deep {
+
+                margin: 0 auto 0 0;
+
             }
-         }
+        }
+    }
+}
