@@ -145,13 +145,14 @@ builder.Services.RegisterServices(builder.Configuration);
 
 builder.Services.Configure<CalibreConfiguration>(builder.Configuration.GetSection(CalibreConfiguration.SectionName));
 
+var fidoRpId = builder.Configuration["calibre:basic:security:passkey_rpid"];
 
 builder.Services.AddFido2(options =>
       {
-          options.ServerDomain = "localhost";
+          options.ServerDomain = fidoRpId ?? "localhost"; // <- Set front side domain
           options.ServerName = "Calibre.Net";
           options.ServerIcon = "https://static-00.iconduck.com/assets.00/apps-calibre-icon-512x512-qox1oz2k.png";
-          options.Origins = new HashSet<string> { "https://localhost:7046/" };
+          options.Origins = new HashSet<string> { $"https://{fidoRpId ?? "localhost:7046"}/"  };
 
           //   options.ServerDomain = Configuration["fido2:serverDomain"];
           //   options.ServerName = "FIDO2 Test";

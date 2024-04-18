@@ -1,0 +1,4 @@
+::deep .mud-main-content {
+  padding-top: 0;
+  padding-bottom: calc(var(--mud-appbar-height) - var(--mud-appbar-height) / 8);
+}

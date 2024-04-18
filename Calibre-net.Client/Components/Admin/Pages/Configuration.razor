@@ -16,7 +16,9 @@
 <PageTitle>Admin - Configuration</PageTitle>
 
 <MudText Typo="Typo.h4">Configuration</MudText>
-@{ #pragma warning disable CS8602 }
+@{
+#pragma warning disable CS8602
+}
 @if (CalibreSettings != null)
 {
     <EditForm Model="CalibreSettings" method="post" OnValidSubmit="SubmitSettingsForm" FormName="CalibreSettings">
@@ -257,6 +259,9 @@
                                 }
                                 <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.PasskeyAllowed"
                                     Name="CalibreSettings.Basic.Security.PasskeyAllowed" Label="Allow Passkeys" />
+                                <MudTextField @bind-Value="CalibreSettings.Basic.Security.PasskeyRpId"
+                                    Name="CalibreSettings.Basic.Security.PasskeyRpId" Label="Passkey RelyingPartyId" />
+
                                 <MudCheckBox @bind-Value="CalibreSettings.Basic.Security.MfaAllowed"
                                     Name="CalibreSettings.Basic.Security.MfaAllowed" Label="Allow MFA" />
 
@@ -286,7 +291,9 @@
     </EditForm>
 
 }
-@{ #pragma warning restore CS8602 }
+@{
+#pragma warning restore CS8602
+}
 
 @code {
 

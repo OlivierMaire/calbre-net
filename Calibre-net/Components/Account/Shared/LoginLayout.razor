@@ -3,17 +3,18 @@
 @layout Calibre_net.Client.Components.Layout.MudMainLayout
 
 
+<div>
+    <MudLayout>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
 
-<MudLayout>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
 
-
-<MudAppBar Bottom="true" Fixed="true" Elevation="1" Dense=true>
+        <MudAppBar Bottom="true" Fixed="true" Elevation="1" Dense=true>
             <CultureSelector />
-</MudAppBar>
-</MudLayout>
+        </MudAppBar>
+    </MudLayout>
+</div>
 
 <div id="blazor-error-ui">
     An unhandled error has occurred.

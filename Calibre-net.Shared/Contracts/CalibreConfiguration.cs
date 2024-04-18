@@ -168,6 +168,9 @@ public class BasicConfiguration
         [JsonPropertyName("passkey_allowed")]
         [ConfigurationKeyName("passkey_allowed")]
         public bool? PasskeyAllowed { get; set; } = true;
+        [JsonPropertyName("passkey_rpid")]
+        [ConfigurationKeyName("passkey_rpid")]
+        public string PasskeyRpId { get; set; } = string.Empty;
         [JsonPropertyName("mfa_allowed")]
         [ConfigurationKeyName("mfa_allowed")]
         public bool? MfaAllowed { get; set; } = true;
