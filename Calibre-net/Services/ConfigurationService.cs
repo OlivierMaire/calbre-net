@@ -35,23 +35,23 @@ IConfiguration configuration)
     {
         try
         {
-            logger.LogInformation("Saving Calibre Configuration");
+            // logger.LogInformation("Saving Calibre Configuration");
 
             var filePath = Path.Combine(AppContext.BaseDirectory, "customsettings.json");
 
-            logger.LogInformation($"Looking for file: {filePath}");
+            // logger.LogInformation($"Looking for file: {filePath}");
 
 
             if (!File.Exists(filePath))
             {
-                logger.LogInformation($"No file found, writing defaults");
+                // logger.LogInformation($"No file found, writing defaults");
 
                 File.WriteAllText(filePath, "{ \"calibre\": {} }");
             }
             string json = File.ReadAllText(filePath);
 
-            logger.LogInformation($"Reading File");
-            logger.LogInformation(json);
+            // logger.LogInformation($"Reading File");
+            // logger.LogInformation(json);
 
             // dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
             // dynamic? jsonObj = System.Text.Json.JsonSerializer.Deserialize<dynamic>(json);
@@ -77,10 +77,10 @@ IConfiguration configuration)
 
             string output = jsonObj.ToJsonString(jsonOptions);
 
-            logger.LogInformation($"Updated config");
-            logger.LogInformation(output);
+            // logger.LogInformation($"Updated config");
+            // logger.LogInformation(output);
 
-            logger.LogInformation($"Writing to {filePath}");
+            // logger.LogInformation($"Writing to {filePath}");
 
             File.WriteAllText(filePath, output);
         }
