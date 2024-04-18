@@ -28,7 +28,7 @@ public sealed class GetCalibreConfigurationEndpoint(ConfigurationService configu
     }
 }
 
-public sealed class SetCalibreConfigurationEndpoint(ConfigurationService configurationService) : Endpoint<CalibreConfiguration>
+public sealed class SetCalibreConfigurationEndpoint(ConfigurationService configurationService) : Endpoint<CalibreConfiguration, bool>
 {
     private readonly ConfigurationService configurationService = configurationService;
     public override void Configure()
@@ -42,7 +42,7 @@ public sealed class SetCalibreConfigurationEndpoint(ConfigurationService configu
     public override async Task HandleAsync(CalibreConfiguration req, CancellationToken ct)
     {
         configurationService.SetCalibreConfiguration(req);
-        await SendOkAsync(ct);
+        await SendOkAsync(true,ct);
 
     }
 }
