@@ -31,14 +31,28 @@ IConfiguration configuration)
         return configSnap.Value;
     }
 
-    public  CalibreConfiguration SetCalibreConfiguration(CalibreConfiguration model)
+    public CalibreConfiguration SetCalibreConfiguration(CalibreConfiguration model)
     {
         try
         {
+            logger.LogInformation("Saving Calibre Configuration");
+
             var filePath = Path.Combine(AppContext.BaseDirectory, "customsettings.json");
+
+            logger.LogInformation($"Looking for file: {filePath}");
+
+
             if (!File.Exists(filePath))
+            {
+                logger.LogInformation($"No file found, writing defaults");
+
                 File.WriteAllText(filePath, "{ \"calibre\": {} }");
+            }
             string json = File.ReadAllText(filePath);
+
+            logger.LogInformation($"Reading File");
+            logger.LogInformation(json);
+
             // dynamic jsonObj = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
             // dynamic? jsonObj = System.Text.Json.JsonSerializer.Deserialize<dynamic>(json);
             // JsonElement? jsonObj = System.Text.Json.JsonSerializer.Deserialize<JsonElement>(json);
@@ -55,24 +69,6 @@ IConfiguration configuration)
 
             jsonObj["calibre"] = JsonNode.Parse(modelJson);
 
-            // configuration.GetSection("calibre").Value = jsonObj["calibre"].ToJsonString();
-            // var sectionPath = key.Split(":")[0];
-
-            // if (!string.IsNullOrEmpty(sectionPath))
-            // {
-            //     var keyPath = key.Split(":")[1];
-            //     if (jsonObj[sectionPath] == null)
-            //         jsonObj[sectionPath] = JsonNode.Parse("{}");
-            //     // if(!jsonObj.HasProperty(sectionPath))
-            //     // jsonObj.
-            //     jsonObj[sectionPath][keyPath] = JsonValue.Create(value);
-            // }
-            // else
-            // {
-            //     jsonObj[sectionPath] = JsonValue.Create(value); // if no sectionpath just set the value
-            // }
-
-
             var jsonOptions = new System.Text.Json.JsonSerializerOptions()
             {
                 WriteIndented = true,
@@ -80,19 +76,25 @@ IConfiguration configuration)
             };
 
             string output = jsonObj.ToJsonString(jsonOptions);
+
+            logger.LogInformation($"Updated config");
+            logger.LogInformation(output);
+
+            logger.LogInformation($"Writing to {filePath}");
+
             File.WriteAllText(filePath, output);
         }
-        catch (System.Configuration.ConfigurationErrorsException)
+        catch (System.Configuration.ConfigurationErrorsException e)
         {
-            Console.WriteLine("Error writing app settings");
+            logger.LogError(e, "Error writing app settings");
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            logger.LogError(ex, "Exception");
 
         }
 
-        return  GetCalibreConfiguration();
+        return GetCalibreConfiguration();
     }
 
 
