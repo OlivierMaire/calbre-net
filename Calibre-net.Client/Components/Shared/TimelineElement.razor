@@ -78,6 +78,17 @@
                 currentObject = propertyInfo?.GetValue(currentObject);
         }
 
-        return currentObject?.ToString() ?? string.Empty;
+        if (currentObject != null)
+        {
+            if (string.IsNullOrEmpty(Comment) && currentObject?.ToString().IndexOf('|') > 0)
+            {
+                var split = currentObject.ToString()?.Split("|");
+                Comment = split[1] ?? string.Empty;
+                return split[0];
+            }
+            return currentObject?.ToString() ?? string.Empty;
+        }
+
+        return string.Empty;
     }
 }
