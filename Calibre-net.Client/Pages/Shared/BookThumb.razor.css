@@ -93,6 +93,7 @@
     max-height: 200px;
     width: -moz-max-content;
     width: max-content;
+    max-width: 100%;
   }
   .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item:nth-child(odd):not(.mud-timeline-item-start) .book-thumb.timeline ::deep,
 .mud-timeline-vertical.mud-timeline-position-alternate .mud-timeline-item.mud-timeline-item-end .book-thumb.timeline ::deep {
