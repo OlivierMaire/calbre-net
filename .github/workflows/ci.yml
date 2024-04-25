@@ -36,7 +36,10 @@ jobs:
 
       - name: Build
         # run: dotnet build --configuration Release --no-restore
-        run: dotnet build --configuration Release #--no-restore
+        run: |
+          git config --unset-all extensions.worktreeconfig
+          dotnet build --configuration Release 
+        #--no-restore
 
       - name: Install EF Core CLI
         run: dotnet tool update dotnet-ef --global 
