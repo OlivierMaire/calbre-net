@@ -1,9 +1,13 @@
 @inject ApiClients.BookClient BookClient
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveAuto
 
 @* @BookList.Count Books
 
 @SearchQuery @OrderQuery *@
 
+<MudButton OnClick="GoToUnread"> Go To Last Unread</MudButton>
 <MudTimeline>
     @foreach (var book in BookList)
     {
@@ -15,6 +19,7 @@
 @code {
     [Parameter] public string SearchQuery { get; set; } = string.Empty;
     [Parameter] public string OrderQuery { get; set; } = string.Empty;
+    private IJSObjectReference? _module;
 
     ICollection<BookDto> BookList { get; set; } = [];
 
@@ -23,9 +28,30 @@
 
         var searchTerms = SearchQuery.ParseStringToDictionary().ToSearchTerms();
         var orderTerms = OrderQuery.ToSearchOrderModel().OrderBy(o => o.Position)
-            .Select(o => o as SearchOrder).ToList();
+        .Select(o => o as SearchOrder).ToList();
 
-         BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(searchTerms, orderTerms));
+        BookList = await BookClient.SearchAsync(new GetSearchValuesRequest(searchTerms, orderTerms));
 
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Console.WriteLine("First Render");
+            _module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./Components/Shared/Timeline.razor.js");
+        }
+    }
+
+
+    private void GoToUnread()
+    {
+        Console.WriteLine("Got to unread");
+
+        if (_module != null)
+        {
+        Console.WriteLine("Invoke JS");
+            _module.InvokeAsync<IJSObjectReference>("scrollToUnread");
+        }
     }
 }
