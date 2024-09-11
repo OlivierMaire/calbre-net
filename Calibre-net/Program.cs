@@ -138,7 +138,8 @@ builder.Services.AddScoped<CalibreNetAuthenticationService>();
 builder.Services.AddScoped<PasskeyService>();
 
 builder.Services.AddEPubBlazor(ServiceLifetime.Scoped);
-builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
+// builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
+builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Scoped);
 builder.Services.AddComicsBlazor(ServiceLifetime.Scoped);
 
 builder.Services.RegisterServices(builder.Configuration);

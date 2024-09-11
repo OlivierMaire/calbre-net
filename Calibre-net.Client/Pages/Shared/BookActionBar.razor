@@ -93,6 +93,7 @@
                 var bookmark = await BookClient.GetBookmarkAsync(data.Book, data.Format);
                 uint position = 0;
                 uint.TryParse(bookmark.Position, out position);
+                @* Console.WriteLine($"get position: {bookmark.Position} -> {position}"); *@
                 audioService.AddToQueue(meta.AudioMetadata.ToAudioPlayerBlazorMetadata(), $"{data.Book}-{data.Format}", position);
             }
         }

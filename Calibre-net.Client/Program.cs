@@ -74,6 +74,7 @@ builder.Services.AddHttpClient("calibre-net.Api", client => client.BaseAddress =
 builder.Services.AddComicsBlazor(ServiceLifetime.Singleton);
 builder.Services.AddEPubBlazor(ServiceLifetime.Singleton);
 builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Singleton);
+// builder.Services.AddAudioPlayerBlazor(ServiceLifetime.Scoped);
 
 
 builder.Services.RegisterServices(builder.Configuration);
